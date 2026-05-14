@@ -10,7 +10,7 @@ Multi-lingual client intake web forms and secure multi-lingual upload portals fo
 
 ## 🚀 What is this project?
 
-**Multi Lingual Universal Access** is the open-source technology backbone for the [Universal Removal Defense Project](https://universalremovaldefenseproject.org), a new national nonprofit providing remote, culturally responsive removal (deportation) defense across the United States.
+**Multi Lingual Universal Access** is the open-source technology backbone for the [Universal Removal Defense Project](https://universalremovaldefenseproject.org), a new national nonprofit providing remote, culturally responsive removal (deportation) defense across the United States.Pending DOJ Approval. 
 
 This repository contains the code for building **multi-lingual client intake forms** and **secure document upload portals** that work seamlessly in **any language**. Our goal is to remove language and technology barriers so immigrants from all backgrounds can easily access critical legal representation in EOIR proceedings.
 
