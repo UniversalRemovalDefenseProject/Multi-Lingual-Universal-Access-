@@ -1,0 +1,12 @@
+<h1>URDP Asylum Intake Form</h1>
+
+<p>
+Submitting this form does not create an attorney-client relationship.
+URDP must review your intake, complete conflict screening, and provide written acceptance before representation begins.
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Intake</button>
+</form>
