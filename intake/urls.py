@@ -6,4 +6,3 @@ urlpatterns = [
     path('intake-success/', views.intake_success, name='intake_success'),
 ]
 
-

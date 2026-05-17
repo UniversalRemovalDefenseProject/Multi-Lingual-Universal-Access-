@@ -15,7 +15,7 @@ class IntakeSubmission(models.Model):
     ]
 
     full_name = models.CharField(max_length=255)
-    date_of_birth = models.DateField(null=True, blank=True)
+    date_of_birth = models.CharField(max_length=100,blank=True)
     country_of_origin = models.CharField(max_length=255)
     preferred_language = models.CharField(max_length=100)
     phone = models.CharField(max_length=100, blank=True)
@@ -24,7 +24,7 @@ class IntakeSubmission(models.Model):
     detained = models.BooleanField(default=False)
     immigration_court = models.CharField(max_length=255, blank=True)
     a_number = models.CharField(max_length=50, blank=True)
-    next_hearing_date = models.DateField(null=True, blank=True)
+    next_hearing_date = models.CharField(max_length=100, blank=True)
     fear_of_return_summary = models.TextField()
     past_harm_summary = models.TextField(blank=True)
     family_members_included = models.BooleanField(default=False)
