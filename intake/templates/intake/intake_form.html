@@ -1,12 +1,236 @@
-<h1>URDP Asylum Intake Form</h1>
+{% load static %}
 
-<p>
-Submitting this form does not create an attorney-client relationship.
-URDP must review your intake, complete conflict screening, and provide written acceptance before representation begins.
-</p>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<form method="post">
+  <title>Asylum Intake | Universal Removal Defense Project</title>
+
+  <meta
+    name="description"
+    content="Secure multilingual asylum intake form for Universal Removal Defense Project."
+  />
+
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}" />
+  <link rel="shortcut icon" href="{% static 'favicons/favicon.ico' %}" />
+</head>
+
+<body class="intake-page">
+
+<header class="topbar">
+  <div class="topbar-left">▣ Secure • Confidential • Multilingual • For All Cultures</div>
+  <div class="topbar-right">Every person deserves access to justice.</div>
+</header>
+
+<main class="intake-main">
+
+  <section class="brand-hero">
+    <img class="hero-logo" src="{% static 'images/urdp-logo.png' %}" alt="Universal Removal Defense Project Logo">
+
+    <h1>Universal Removal Defense Project</h1>
+    <p>All Cultures, All Languages.</p>
+  </section>
+
+  <section class="important-notice">
+    <div class="notice-shield">🔒</div>
+    <div>
+      <h2>Important Notice</h2>
+      <p>
+        Submitting this form <strong>does not</strong> create an attorney-client relationship.
+        URDP must review your intake, complete conflict screening, and provide written
+        acceptance before representation begins.
+      </p>
+    </div>
+  </section>
+
+  <form method="post" class="intake-form">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit Intake</button>
-</form>
+
+    {% if form.non_field_errors %}
+      <div class="form-errors">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <section class="form-section">
+      <div class="section-title">
+        <span>1</span>
+        <h2>Personal Information</h2>
+      </div>
+
+      <div class="form-grid four">
+        <div class="field">
+          {{ form.full_name.label_tag }}
+          {{ form.full_name }}
+          {{ form.full_name.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.date_of_birth.label_tag }}
+          {{ form.date_of_birth }}
+          {{ form.date_of_birth.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.country_of_origin.label_tag }}
+          {{ form.country_of_origin }}
+          {{ form.country_of_origin.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.preferred_language.label_tag }}
+          {{ form.preferred_language }}
+          {{ form.preferred_language.errors }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span>2</span>
+        <h2>Contact Information</h2>
+      </div>
+
+      <div class="form-grid three">
+        <div class="field">
+          {{ form.phone.label_tag }}
+          {{ form.phone }}
+          {{ form.phone.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.email.label_tag }}
+          {{ form.email }}
+          {{ form.email.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.current_location.label_tag }}
+          {{ form.current_location }}
+          {{ form.current_location.errors }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span>3</span>
+        <h2>Immigration Case Information</h2>
+      </div>
+
+      <div class="form-grid four">
+        <div class="field checkbox-field">
+          <label>Are you currently detained?</label>
+          <div class="checkbox-line">
+            {{ form.detained }}
+            <span>Yes, I am detained</span>
+          </div>
+          {{ form.detained.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.immigration_court.label_tag }}
+          {{ form.immigration_court }}
+          {{ form.immigration_court.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.a_number.label_tag }}
+          {{ form.a_number }}
+          {{ form.a_number.errors }}
+        </div>
+
+        <div class="field">
+          {{ form.next_hearing_date.label_tag }}
+          {{ form.next_hearing_date }}
+          {{ form.next_hearing_date.errors }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span>4</span>
+        <h2>Asylum Screening</h2>
+      </div>
+
+      <div class="form-grid three">
+        <div class="field textarea-field">
+          <label for="{{ form.fear_of_return_summary.id_for_label }}">
+            Why do you fear returning to your home country?
+          </label>
+          <p class="field-help">Please provide as much detail as you can.</p>
+          {{ form.fear_of_return_summary }}
+          {{ form.fear_of_return_summary.errors }}
+        </div>
+
+        <div class="field textarea-field">
+          <label for="{{ form.past_harm_summary.id_for_label }}">
+            Have you experienced past harm or persecution?
+          </label>
+          <p class="field-help">Please describe what happened.</p>
+          {{ form.past_harm_summary }}
+          {{ form.past_harm_summary.errors }}
+        </div>
+
+        <div class="field checkbox-field">
+          <label>Are family members included in your case?</label>
+          <div class="checkbox-line">
+            {{ form.family_members_included }}
+            <span>Yes, family members are included</span>
+          </div>
+          {{ form.family_members_included.errors }}
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="section-title">
+        <span>5</span>
+        <h2>Consent & Acknowledgment</h2>
+      </div>
+
+      <div class="consent-list">
+        <label class="checkbox-line">
+          {{ form.consent_acknowledged }}
+          <span>
+            I understand that submitting this form does not create an attorney-client relationship.
+          </span>
+        </label>
+        {{ form.consent_acknowledged.errors }}
+      </div>
+    </section>
+
+    <div class="submit-wrap">
+      <button class="submit-button" type="submit">
+        🔒 Submit Intake
+      </button>
+
+      <p class="security-note">
+        🔒 Your information is submitted for confidential intake review.
+      </p>
+    </div>
+
+  </form>
+
+</main>
+
+<footer class="intake-footer">
+  <div>
+    <img src="{% static 'images/urdp-logo.png' %}" alt="URDP Logo">
+    <strong>Universal Removal Defense Project</strong>
+  </div>
+
+  <p>All Cultures, All Languages.</p>
+
+  <p>❤️ Justice. Dignity. Humanity.</p>
+</footer>
+
+</body>
+</html>

@@ -1,2 +1,110 @@
-<h1>Thank you</h1>
-<p>Your intake has been submitted for review.</p>
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Intake Submitted | Universal Removal Defense Project</title>
+
+  <meta
+    name="description"
+    content="Your intake has been securely submitted to Universal Removal Defense Project."
+  />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{% static 'styles.css' %}" />
+
+  <!-- Favicons -->
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="{% static 'favicons/apple-touch-icon.png' %}"
+  />
+
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="32x32"
+    href="{% static 'favicons/favicon-32x32.png' %}"
+  />
+
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="16x16"
+    href="{% static 'favicons/favicon-16x16.png' %}"
+  />
+
+</head>
+
+<body class="urdp-premium">
+
+<main class="success-page">
+
+  <div class="success-card reveal">
+
+    <img
+      class="success-logo"
+      src="{% static 'images/urdp-logo.png' %}"
+      alt="Universal Removal Defense Project Logo"
+    >
+
+    <div class="success-icon">
+      ✓
+    </div>
+
+    <h1 class="success-title">
+      Intake Successfully Submitted
+    </h1>
+
+    <p class="success-message">
+      Thank you for contacting Universal Removal Defense Project.
+      Your intake has been securely submitted for preliminary review.
+    </p>
+
+    <div class="success-notice">
+
+      <p>
+        Submission of this intake form does not create an attorney-client or representative relationship.
+      </p>
+
+      <p>
+        URDP must complete conflict screening and determine eligibility before representation may begin.
+      </p>
+
+    </div>
+
+    <div class="success-next-steps">
+
+      <h2>What Happens Next?</h2>
+
+      <ul>
+        <li>Your submission will be reviewed by URDP staff.</li>
+        <li>Additional information or documentation may be requested.</li>
+        <li>If accepted, you will be contacted regarding next steps.</li>
+        <li>Please monitor your email and phone for follow-up communication.</li>
+      </ul>
+
+    </div>
+
+    <div class="success-buttons">
+
+      <a href="/asylum-intake/" class="btn btn-secondary">
+        Submit Another Intake
+      </a>
+
+      <a href="/" class="btn btn-primary">
+        Return Home
+      </a>
+
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>
