@@ -1,20 +1,19 @@
-{% load static %}
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
 
 <!doctype html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <title>Asylum Intake | Universal Removal Defense Project</title>
-
+  <title>{% translate "Asylum Intake | Universal Removal Defense Project" %}</title>
   <meta
     name="description"
-    content="Secure multilingual asylum intake form for Universal Removal Defense Project."
+    content="{% translate 'Secure multilingual asylum intake form for Universal Removal Defense Project.' %}"
   />
 
   <link rel="stylesheet" href="{% static 'styles.css' %}" />
-
   <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}" />
   <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}" />
   <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}" />
@@ -22,215 +21,221 @@
 </head>
 
 <body class="intake-page">
+<a class="skip-link" href="#intake-form">{% translate "Skip to intake form" %}</a>
 
 <header class="topbar">
-  <div class="topbar-left">▣ Secure • Confidential • Multilingual • For All Cultures</div>
-  <div class="topbar-right">Every person deserves access to justice.</div>
+  <div class="topbar-left">{% translate "Secure | Confidential | Multilingual | For All Cultures" %}</div>
+  <div class="topbar-right">{% translate "Every person deserves access to justice." %}</div>
 </header>
 
 <main class="intake-main">
-
-  <section class="brand-hero">
-    <img class="hero-logo" src="{% static 'images/urdp-logo.png' %}" alt="Universal Removal Defense Project Logo">
-
-    <h1>Universal Removal Defense Project</h1>
-    <p>All Cultures, All Languages.</p>
+  <section class="brand-hero" aria-label="{% translate 'Universal Removal Defense Project' %}">
+    <img class="hero-logo" src="{% static 'images/urdp-logo.png' %}" alt="{% translate 'Universal Removal Defense Project logo' %}">
+    <h1>{% translate "Universal Removal Defense Project" %}</h1>
+    <p>{% translate "All Cultures, All Languages." %}</p>
   </section>
 
-  <section class="important-notice">
-    <div class="notice-shield">🔒</div>
+  <section class="important-notice" aria-labelledby="notice-title">
+    <div class="notice-shield" aria-hidden="true">i</div>
     <div>
-      <h2>Important Notice</h2>
+      <h2 id="notice-title">{% translate "Important Notice" %}</h2>
       <p>
-        Submitting this form <strong>does not</strong> create an attorney-client relationship.
-        URDP must review your intake, complete conflict screening, and provide written
-        acceptance before representation begins.
+        {% blocktranslate trimmed %}
+          Submitting this form <strong>does not</strong> create an attorney-client relationship.
+          URDP must review your intake, complete conflict screening, and provide written
+          acceptance before representation begins.
+        {% endblocktranslate %}
       </p>
     </div>
   </section>
 
-  <form method="post" class="intake-form">
+  <form method="post" class="intake-form" id="intake-form">
     {% csrf_token %}
 
-    {% if form.non_field_errors %}
-      <div class="form-errors">
-        {{ form.non_field_errors }}
+    {% if form.errors %}
+      <div class="form-errors form-error-summary" role="alert" aria-labelledby="form-errors-title">
+        <h2 id="form-errors-title">{% translate "Please correct the highlighted information." %}</h2>
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><a href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
       </div>
     {% endif %}
 
-    <section class="form-section">
-      <div class="section-title">
-        <span>1</span>
-        <h2>Personal Information</h2>
-      </div>
+    <fieldset class="form-section">
+      <legend class="section-title">
+        <span aria-hidden="true">1</span>
+        {% translate "Personal Information" %}
+      </legend>
 
       <div class="form-grid four">
-        <div class="field">
+        <div class="field{% if form.full_name.errors %} field-error{% endif %}">
           {{ form.full_name.label_tag }}
           {{ form.full_name }}
           {{ form.full_name.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.date_of_birth.errors %} field-error{% endif %}">
           {{ form.date_of_birth.label_tag }}
           {{ form.date_of_birth }}
           {{ form.date_of_birth.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.country_of_origin.errors %} field-error{% endif %}">
           {{ form.country_of_origin.label_tag }}
           {{ form.country_of_origin }}
           {{ form.country_of_origin.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.preferred_language.errors %} field-error{% endif %}">
           {{ form.preferred_language.label_tag }}
           {{ form.preferred_language }}
           {{ form.preferred_language.errors }}
         </div>
       </div>
-    </section>
+    </fieldset>
 
-    <section class="form-section">
-      <div class="section-title">
-        <span>2</span>
-        <h2>Contact Information</h2>
-      </div>
+    <fieldset class="form-section">
+      <legend class="section-title">
+        <span aria-hidden="true">2</span>
+        {% translate "Contact Information" %}
+      </legend>
 
+      <p class="section-help">{% translate "Provide a safe way for our team to contact you, if available." %}</p>
       <div class="form-grid three">
-        <div class="field">
+        <div class="field{% if form.phone.errors %} field-error{% endif %}">
           {{ form.phone.label_tag }}
           {{ form.phone }}
           {{ form.phone.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.email.errors %} field-error{% endif %}">
           {{ form.email.label_tag }}
           {{ form.email }}
           {{ form.email.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.current_location.errors %} field-error{% endif %}">
           {{ form.current_location.label_tag }}
           {{ form.current_location }}
           {{ form.current_location.errors }}
         </div>
       </div>
-    </section>
+    </fieldset>
 
-    <section class="form-section">
-      <div class="section-title">
-        <span>3</span>
-        <h2>Immigration Case Information</h2>
-      </div>
+    <fieldset class="form-section">
+      <legend class="section-title">
+        <span aria-hidden="true">3</span>
+        {% translate "Immigration Case Information" %}
+      </legend>
 
       <div class="form-grid four">
-        <div class="field checkbox-field">
-          <label>Are you currently detained?</label>
-          <div class="checkbox-line">
+        <div class="field checkbox-field{% if form.detained.errors %} field-error{% endif %}">
+          <span class="field-label">{% translate "Are you currently detained?" %}</span>
+          <label class="checkbox-line" for="{{ form.detained.id_for_label }}">
             {{ form.detained }}
-            <span>Yes, I am detained</span>
-          </div>
+            <span>{% translate "Yes, I am detained" %}</span>
+          </label>
           {{ form.detained.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.immigration_court.errors %} field-error{% endif %}">
           {{ form.immigration_court.label_tag }}
           {{ form.immigration_court }}
           {{ form.immigration_court.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.a_number.errors %} field-error{% endif %}">
           {{ form.a_number.label_tag }}
           {{ form.a_number }}
           {{ form.a_number.errors }}
         </div>
-
-        <div class="field">
+        <div class="field{% if form.next_hearing_date.errors %} field-error{% endif %}">
           {{ form.next_hearing_date.label_tag }}
           {{ form.next_hearing_date }}
           {{ form.next_hearing_date.errors }}
         </div>
       </div>
-    </section>
+    </fieldset>
 
-    <section class="form-section">
-      <div class="section-title">
-        <span>4</span>
-        <h2>Asylum Screening</h2>
-      </div>
+    <fieldset class="form-section">
+      <legend class="section-title">
+        <span aria-hidden="true">4</span>
+        {% translate "Asylum Screening" %}
+      </legend>
 
-      <div class="form-grid three">
-        <div class="field textarea-field">
-          <label for="{{ form.fear_of_return_summary.id_for_label }}">
-            Why do you fear returning to your home country?
-          </label>
-          <p class="field-help">Please provide as much detail as you can.</p>
+      <div class="form-grid three screening-grid">
+        <div class="field textarea-field{% if form.fear_of_return_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.fear_of_return_summary.id_for_label }}">{% translate "Why do you fear returning to your home country?" %}</label>
+          <p class="field-help" id="fear-of-return-help">{% translate "Please provide as much detail as you safely can." %}</p>
           {{ form.fear_of_return_summary }}
           {{ form.fear_of_return_summary.errors }}
         </div>
-
-        <div class="field textarea-field">
-          <label for="{{ form.past_harm_summary.id_for_label }}">
-            Have you experienced past harm or persecution?
-          </label>
-          <p class="field-help">Please describe what happened.</p>
+        <div class="field textarea-field{% if form.past_harm_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.past_harm_summary.id_for_label }}">{% translate "Have you experienced past harm or persecution?" %}</label>
+          <p class="field-help" id="past-harm-help">{% translate "Please describe what happened, if you can." %}</p>
           {{ form.past_harm_summary }}
           {{ form.past_harm_summary.errors }}
         </div>
-
-        <div class="field checkbox-field">
-          <label>Are family members included in your case?</label>
-          <div class="checkbox-line">
+        <div class="field checkbox-field{% if form.family_members_included.errors %} field-error{% endif %}">
+          <span class="field-label">{% translate "Are family members included in your case?" %}</span>
+          <label class="checkbox-line" for="{{ form.family_members_included.id_for_label }}">
             {{ form.family_members_included }}
-            <span>Yes, family members are included</span>
-          </div>
+            <span>{% translate "Yes, family members are included" %}</span>
+          </label>
           {{ form.family_members_included.errors }}
         </div>
       </div>
-    </section>
+    </fieldset>
 
-    <section class="form-section">
-      <div class="section-title">
-        <span>5</span>
-        <h2>Consent & Acknowledgment</h2>
-      </div>
+    <fieldset class="form-section">
+      <legend class="section-title">
+        <span aria-hidden="true">5</span>
+        {% translate "Consent and Acknowledgment" %}
+      </legend>
 
-      <div class="consent-list">
-        <label class="checkbox-line">
+      <div class="consent-list{% if form.consent_acknowledged.errors %} field-error{% endif %}">
+        <label class="checkbox-line" for="{{ form.consent_acknowledged.id_for_label }}">
           {{ form.consent_acknowledged }}
-          <span>
-            I understand that submitting this form does not create an attorney-client relationship.
-          </span>
+          <span>{{ form.consent_acknowledged.label }}</span>
         </label>
         {{ form.consent_acknowledged.errors }}
       </div>
-    </section>
+    </fieldset>
 
     <div class="submit-wrap">
-      <button class="submit-button" type="submit">
-        🔒 Submit Intake
+      <button class="submit-button" type="submit" id="submit-button">
+        {% translate "Submit Intake Securely" %}
       </button>
-
-      <p class="security-note">
-        🔒 Your information is submitted for confidential intake review.
-      </p>
+      <p class="security-note">{% translate "Your information is submitted for confidential intake review." %}</p>
+      <p class="submission-status" id="submission-status" role="status" aria-live="polite"></p>
     </div>
-
   </form>
-
 </main>
 
 <footer class="intake-footer">
   <div>
-    <img src="{% static 'images/urdp-logo.png' %}" alt="URDP Logo">
-    <strong>Universal Removal Defense Project</strong>
+    <img src="{% static 'images/urdp-logo.png' %}" alt="">
+    <strong>{% translate "Universal Removal Defense Project" %}</strong>
   </div>
-
-  <p>All Cultures, All Languages.</p>
-
-  <p>❤️ Justice. Dignity. Humanity.</p>
+  <p>{% translate "All Cultures, All Languages." %}</p>
+  <p>{% translate "Justice. Dignity. Humanity." %}</p>
 </footer>
 
+{% translate "Submitting your intake securely..." as submitting_message %}
+<script>
+  (function () {
+    var form = document.getElementById("intake-form");
+    var button = document.getElementById("submit-button");
+    var status = document.getElementById("submission-status");
+
+    form.addEventListener("submit", function () {
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+      form.setAttribute("aria-busy", "true");
+      status.textContent = "{{ submitting_message|escapejs }}";
+      status.classList.add("is-visible");
+    });
+  }());
+</script>
 </body>
 </html>

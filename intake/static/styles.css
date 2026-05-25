@@ -26,6 +26,22 @@ body.intake-page {
     linear-gradient(180deg, #f8fcff 0%, #edf7ff 100%);
 }
 
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -56px;
+  padding: 12px 16px;
+  border-radius: 0 0 8px 8px;
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 700;
+  z-index: 2;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 .topbar {
   min-height: 52px;
   padding: 0 40px;
@@ -92,9 +108,16 @@ body.intake-page {
 }
 
 .notice-shield {
-  font-size: 3.2rem;
-  color: var(--navy);
-  text-align: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  border-radius: 999px;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 2rem/1 Georgia, serif;
 }
 
 .important-notice h2 {
@@ -116,6 +139,8 @@ body.intake-page {
 }
 
 .form-section {
+  min-width: 0;
+  margin: 0;
   background: var(--white);
   border-radius: var(--radius);
   padding: 22px 24px;
@@ -124,10 +149,16 @@ body.intake-page {
 }
 
 .section-title {
+  width: auto;
+  padding: 0;
+  border: 0;
   display: flex;
   align-items: center;
   gap: 14px;
   margin-bottom: 20px;
+  color: var(--navy);
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  font-weight: 700;
 }
 
 .section-title span {
@@ -144,10 +175,10 @@ body.intake-page {
   flex-shrink: 0;
 }
 
-.section-title h2 {
-  margin: 0;
-  color: var(--navy);
-  font-size: clamp(1.25rem, 2vw, 1.6rem);
+.section-help {
+  margin: -10px 0 20px 50px;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .form-grid {
@@ -169,10 +200,15 @@ body.intake-page {
   gap: 8px;
 }
 
-.field label {
+.field label,
+.field-label {
   color: var(--text);
   font-weight: 800;
   font-size: 0.95rem;
+}
+
+.field-label {
+  display: block;
 }
 
 .field-help {
@@ -196,12 +232,25 @@ textarea {
   transition: border-color .18s ease, box-shadow .18s ease;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: #607891;
+  opacity: 1;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--blue);
   outline: none;
   box-shadow: 0 0 0 3px rgba(11, 111, 198, 0.15);
+}
+
+.field-error input:not([type="checkbox"]),
+.field-error textarea,
+.field-error select {
+  border-color: #b91c1c;
+  background: #fffafa;
 }
 
 textarea {
@@ -224,6 +273,7 @@ textarea {
   color: var(--text);
   font-weight: 600;
   line-height: 1.45;
+  cursor: pointer;
 }
 
 .checkbox-line input {
@@ -232,6 +282,12 @@ textarea {
   min-height: auto;
   padding: 0;
   flex-shrink: 0;
+  accent-color: var(--blue);
+}
+
+.checkbox-line input:focus-visible {
+  outline: 3px solid rgba(11, 111, 198, 0.25);
+  outline-offset: 3px;
 }
 
 .consent-list {
@@ -266,11 +322,37 @@ textarea {
   box-shadow: 0 14px 30px rgba(6, 53, 122, 0.28);
 }
 
+.submit-button:focus-visible,
+.skip-link:focus-visible {
+  outline: 3px solid rgba(11, 111, 198, 0.38);
+  outline-offset: 3px;
+}
+
+.submit-button:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
 .security-note {
   margin: 10px 0 0;
   color: var(--navy);
   font-size: 0.92rem;
   font-weight: 700;
+}
+
+.submission-status {
+  min-height: 1.5rem;
+  margin: 8px 0 0;
+  color: var(--blue);
+  font-size: 0.95rem;
+  font-weight: 700;
+  visibility: hidden;
+}
+
+.submission-status.is-visible {
+  visibility: visible;
 }
 
 .intake-footer {
@@ -317,6 +399,29 @@ textarea {
   list-style-position: inside;
 }
 
+.field .errorlist,
+.consent-list .errorlist {
+  margin-top: 0;
+}
+
+.form-error-summary {
+  padding: 16px 20px;
+}
+
+.form-error-summary h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.form-error-summary ul {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.form-error-summary a {
+  color: inherit;
+}
+
 @media (max-width: 1000px) {
   .form-grid.four,
   .form-grid.three {
@@ -353,6 +458,10 @@ textarea {
 
   .form-section {
     padding: 18px;
+  }
+
+  .section-help {
+    margin-left: 0;
   }
 
   .form-grid.four,
