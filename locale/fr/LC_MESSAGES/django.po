@@ -1,0 +1,8 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: URDP Intake\n"
+"Language: fr\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Translation review required before public release.

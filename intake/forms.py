@@ -155,3 +155,10 @@ class IntakeSubmissionForm(forms.ModelForm):
                 attrs={"class": "form-check-input"}
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if name == "consent_acknowledged":
+                continue
+            field.error_messages["required"] = _("This information is required.")

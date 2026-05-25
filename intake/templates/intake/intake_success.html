@@ -1,110 +1,93 @@
-{% load static %}
+{% load static i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as LANGUAGE_INFO_LIST %}
 
 <!doctype html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
 <head>
-
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>Intake Submitted | Universal Removal Defense Project</title>
-
+  <title>{% translate "Intake Submitted | Universal Removal Defense Project" %}</title>
   <meta
     name="description"
-    content="Your intake has been securely submitted to Universal Removal Defense Project."
+    content="{% translate 'Your intake has been securely submitted to Universal Removal Defense Project.' %}"
   />
-
-  <!-- Main Stylesheet -->
   <link rel="stylesheet" href="{% static 'styles.css' %}" />
-
-  <!-- Favicons -->
-  <link
-    rel="apple-touch-icon"
-    sizes="180x180"
-    href="{% static 'favicons/apple-touch-icon.png' %}"
-  />
-
-  <link
-    rel="icon"
-    type="image/png"
-    sizes="32x32"
-    href="{% static 'favicons/favicon-32x32.png' %}"
-  />
-
-  <link
-    rel="icon"
-    type="image/png"
-    sizes="16x16"
-    href="{% static 'favicons/favicon-16x16.png' %}"
-  />
-
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}" />
 </head>
 
-<body class="urdp-premium">
+<body class="intake-page">
+<header class="topbar">
+  <div class="topbar-left">{% translate "Secure | Confidential | Multilingual | For All Cultures" %}</div>
+  <div class="topbar-right">{% translate "Every person deserves access to justice." %}</div>
+</header>
 
 <main class="success-page">
+  <div class="success-content">
+    <form class="language-panel success-language-panel" action="{% url 'set_language' %}" method="post">
+      {% csrf_token %}
+      <input name="next" type="hidden" value="{{ request.path }}">
+      <div>
+        <h2>{% translate "Choose your language" %}</h2>
+        <p>{% translate "View this confirmation in the language that is most comfortable for you." %}</p>
+      </div>
+      <div class="language-control">
+        <label for="success-language-select">{% translate "Language" %}</label>
+        <select
+          class="form-control"
+          id="success-language-select"
+          name="language"
+          onchange="this.form.submit();"
+        >
+          {% for language in LANGUAGE_INFO_LIST %}
+            <option
+              value="{{ language.code }}"
+              lang="{{ language.code }}"
+              dir="{% if language.bidi %}rtl{% else %}ltr{% endif %}"
+              {% if language.code == LANGUAGE_CODE %}selected{% endif %}
+            >{{ language.name_local }}</option>
+          {% endfor %}
+        </select>
+        <button class="language-button" type="submit">{% translate "Change language" %}</button>
+      </div>
+    </form>
 
-  <div class="success-card reveal">
-
-    <img
-      class="success-logo"
-      src="{% static 'images/urdp-logo.png' %}"
-      alt="Universal Removal Defense Project Logo"
-    >
-
-    <div class="success-icon">
-      ✓
-    </div>
-
-    <h1 class="success-title">
-      Intake Successfully Submitted
-    </h1>
-
-    <p class="success-message">
-      Thank you for contacting Universal Removal Defense Project.
-      Your intake has been securely submitted for preliminary review.
-    </p>
-
-    <div class="success-notice">
-
-      <p>
-        Submission of this intake form does not create an attorney-client or representative relationship.
+    <div class="success-card">
+      <img
+        class="success-logo"
+        src="{% static 'images/urdp-logo.png' %}"
+        alt="{% translate 'Universal Removal Defense Project logo' %}"
+      >
+      <div class="success-icon" aria-hidden="true">OK</div>
+      <h1 class="success-title">{% translate "Intake Successfully Submitted" %}</h1>
+      <p class="success-message">
+        {% blocktranslate trimmed %}
+          Thank you for contacting Universal Removal Defense Project.
+          Your intake has been securely submitted for preliminary review.
+        {% endblocktranslate %}
       </p>
-
-      <p>
-        URDP must complete conflict screening and determine eligibility before representation may begin.
-      </p>
-
+      <div class="success-notice">
+        <p>{% translate "Submission of this intake form does not create an attorney-client or representative relationship." %}</p>
+        <p>{% translate "URDP must complete conflict screening and determine eligibility before representation may begin." %}</p>
+      </div>
+      <div class="success-next-steps">
+        <h2>{% translate "What Happens Next?" %}</h2>
+        <ul>
+          <li>{% translate "Your submission will be reviewed by URDP staff." %}</li>
+          <li>{% translate "Additional information or documentation may be requested." %}</li>
+          <li>{% translate "If accepted, you will be contacted regarding next steps." %}</li>
+          <li>{% translate "Please monitor your email and phone for follow-up communication." %}</li>
+        </ul>
+      </div>
+      <div class="success-buttons">
+        <a href="{% url 'intake_form' %}" class="btn btn-secondary">{% translate "Submit Another Intake" %}</a>
+      </div>
     </div>
-
-    <div class="success-next-steps">
-
-      <h2>What Happens Next?</h2>
-
-      <ul>
-        <li>Your submission will be reviewed by URDP staff.</li>
-        <li>Additional information or documentation may be requested.</li>
-        <li>If accepted, you will be contacted regarding next steps.</li>
-        <li>Please monitor your email and phone for follow-up communication.</li>
-      </ul>
-
-    </div>
-
-    <div class="success-buttons">
-
-      <a href="/asylum-intake/" class="btn btn-secondary">
-        Submit Another Intake
-      </a>
-
-      <a href="/" class="btn btn-primary">
-        Return Home
-      </a>
-
-    </div>
-
   </div>
-
 </main>
-
 </body>
 </html>

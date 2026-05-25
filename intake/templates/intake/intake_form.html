@@ -1,8 +1,11 @@
 {% load static i18n %}
 {% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_available_languages as AVAILABLE_LANGUAGES %}
+{% get_language_info_list for AVAILABLE_LANGUAGES as LANGUAGE_INFO_LIST %}
 
 <!doctype html>
-<html lang="{{ LANGUAGE_CODE|default:'en' }}">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -34,6 +37,42 @@
     <p>{% translate "All Cultures, All Languages." %}</p>
   </section>
 
+  <form method="post" class="intake-form" id="intake-form">
+    {% csrf_token %}
+
+    <section class="language-panel" aria-labelledby="language-title">
+      <div>
+        <h2 id="language-title">{% translate "Choose your language" %}</h2>
+        <p>{% translate "You can complete this form in the language that is most comfortable for you." %}</p>
+      </div>
+      <div class="language-control">
+        <label for="language-select">{% translate "Language" %}</label>
+        <select
+          class="form-control"
+          id="language-select"
+          name="language"
+          onchange="this.form.requestSubmit(document.getElementById('change-language-button'));"
+        >
+          {% for language in LANGUAGE_INFO_LIST %}
+            <option
+              value="{{ language.code }}"
+              lang="{{ language.code }}"
+              dir="{% if language.bidi %}rtl{% else %}ltr{% endif %}"
+              {% if language.code == selected_language %}selected{% endif %}
+            >{{ language.name_local }}</option>
+          {% endfor %}
+        </select>
+        <button
+          class="language-button"
+          id="change-language-button"
+          type="submit"
+          name="form_action"
+          value="change_language"
+          formnovalidate
+        >{% translate "Change language" %}</button>
+      </div>
+    </section>
+
   <section class="important-notice" aria-labelledby="notice-title">
     <div class="notice-shield" aria-hidden="true">i</div>
     <div>
@@ -47,9 +86,6 @@
       </p>
     </div>
   </section>
-
-  <form method="post" class="intake-form" id="intake-form">
-    {% csrf_token %}
 
     {% if form.errors %}
       <div class="form-errors form-error-summary" role="alert" aria-labelledby="form-errors-title">
