@@ -26,22 +26,6 @@ body.intake-page {
     linear-gradient(180deg, #f8fcff 0%, #edf7ff 100%);
 }
 
-.skip-link {
-  position: absolute;
-  left: 16px;
-  top: -56px;
-  padding: 12px 16px;
-  border-radius: 0 0 8px 8px;
-  background: var(--white);
-  color: var(--navy);
-  font-weight: 700;
-  z-index: 2;
-}
-
-.skip-link:focus {
-  top: 0;
-}
-
 .topbar {
   min-height: 52px;
   padding: 0 40px;
@@ -139,8 +123,6 @@ body.intake-page {
 }
 
 .form-section {
-  min-width: 0;
-  margin: 0;
   background: var(--white);
   border-radius: var(--radius);
   padding: 22px 24px;
@@ -149,13 +131,10 @@ body.intake-page {
 }
 
 .section-title {
-  width: auto;
-  padding: 0;
-  border: 0;
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 20px;
+  margin: 0 0 20px;
   color: var(--navy);
   font-size: clamp(1.25rem, 2vw, 1.6rem);
   font-weight: 700;
@@ -193,6 +172,14 @@ body.intake-page {
 
 .form-grid.three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.screening-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.family-screening-field {
+  grid-column: 1 / -1;
 }
 
 .field {
@@ -322,8 +309,7 @@ textarea {
   box-shadow: 0 14px 30px rgba(6, 53, 122, 0.28);
 }
 
-.submit-button:focus-visible,
-.skip-link:focus-visible {
+.submit-button:focus-visible {
   outline: 3px solid rgba(11, 111, 198, 0.38);
   outline-offset: 3px;
 }
@@ -424,7 +410,8 @@ textarea {
 
 @media (max-width: 1000px) {
   .form-grid.four,
-  .form-grid.three {
+  .form-grid.three,
+  .screening-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -465,7 +452,8 @@ textarea {
   }
 
   .form-grid.four,
-  .form-grid.three {
+  .form-grid.three,
+  .screening-grid {
     grid-template-columns: 1fr;
   }
 

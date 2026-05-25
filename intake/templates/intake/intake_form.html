@@ -21,7 +21,6 @@
 </head>
 
 <body class="intake-page">
-<a class="skip-link" href="#intake-form">{% translate "Skip to intake form" %}</a>
 
 <header class="topbar">
   <div class="topbar-left">{% translate "Secure | Confidential | Multilingual | For All Cultures" %}</div>
@@ -68,11 +67,11 @@
       </div>
     {% endif %}
 
-    <fieldset class="form-section">
-      <legend class="section-title">
+    <section class="form-section" aria-labelledby="personal-information-title">
+      <h2 class="section-title" id="personal-information-title">
         <span aria-hidden="true">1</span>
         {% translate "Personal Information" %}
-      </legend>
+      </h2>
 
       <div class="form-grid four">
         <div class="field{% if form.full_name.errors %} field-error{% endif %}">
@@ -96,13 +95,13 @@
           {{ form.preferred_language.errors }}
         </div>
       </div>
-    </fieldset>
+    </section>
 
-    <fieldset class="form-section">
-      <legend class="section-title">
+    <section class="form-section" aria-labelledby="contact-information-title">
+      <h2 class="section-title" id="contact-information-title">
         <span aria-hidden="true">2</span>
         {% translate "Contact Information" %}
-      </legend>
+      </h2>
 
       <p class="section-help">{% translate "Provide a safe way for our team to contact you, if available." %}</p>
       <div class="form-grid three">
@@ -122,13 +121,13 @@
           {{ form.current_location.errors }}
         </div>
       </div>
-    </fieldset>
+    </section>
 
-    <fieldset class="form-section">
-      <legend class="section-title">
+    <section class="form-section" aria-labelledby="case-information-title">
+      <h2 class="section-title" id="case-information-title">
         <span aria-hidden="true">3</span>
         {% translate "Immigration Case Information" %}
-      </legend>
+      </h2>
 
       <div class="form-grid four">
         <div class="field checkbox-field{% if form.detained.errors %} field-error{% endif %}">
@@ -155,15 +154,15 @@
           {{ form.next_hearing_date.errors }}
         </div>
       </div>
-    </fieldset>
+    </section>
 
-    <fieldset class="form-section">
-      <legend class="section-title">
+    <section class="form-section" aria-labelledby="asylum-screening-title">
+      <h2 class="section-title" id="asylum-screening-title">
         <span aria-hidden="true">4</span>
         {% translate "Asylum Screening" %}
-      </legend>
+      </h2>
 
-      <div class="form-grid three screening-grid">
+      <div class="form-grid screening-grid">
         <div class="field textarea-field{% if form.fear_of_return_summary.errors %} field-error{% endif %}">
           <label for="{{ form.fear_of_return_summary.id_for_label }}">{% translate "Why do you fear returning to your home country?" %}</label>
           <p class="field-help" id="fear-of-return-help">{% translate "Please provide as much detail as you safely can." %}</p>
@@ -176,7 +175,13 @@
           {{ form.past_harm_summary }}
           {{ form.past_harm_summary.errors }}
         </div>
-        <div class="field checkbox-field{% if form.family_members_included.errors %} field-error{% endif %}">
+        <div class="field textarea-field{% if form.countries_traveled_asylum_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.countries_traveled_asylum_summary.id_for_label }}">{% translate "What countries did you travel through, and did you apply for asylum in those countries?" %}</label>
+          <p class="field-help" id="countries-traveled-help">{% translate "List each country and whether you requested protection there, if applicable." %}</p>
+          {{ form.countries_traveled_asylum_summary }}
+          {{ form.countries_traveled_asylum_summary.errors }}
+        </div>
+        <div class="field checkbox-field family-screening-field{% if form.family_members_included.errors %} field-error{% endif %}">
           <span class="field-label">{% translate "Are family members included in your case?" %}</span>
           <label class="checkbox-line" for="{{ form.family_members_included.id_for_label }}">
             {{ form.family_members_included }}
@@ -185,13 +190,13 @@
           {{ form.family_members_included.errors }}
         </div>
       </div>
-    </fieldset>
+    </section>
 
-    <fieldset class="form-section">
-      <legend class="section-title">
+    <section class="form-section" aria-labelledby="consent-title">
+      <h2 class="section-title" id="consent-title">
         <span aria-hidden="true">5</span>
         {% translate "Consent and Acknowledgment" %}
-      </legend>
+      </h2>
 
       <div class="consent-list{% if form.consent_acknowledged.errors %} field-error{% endif %}">
         <label class="checkbox-line" for="{{ form.consent_acknowledged.id_for_label }}">
@@ -200,7 +205,7 @@
         </label>
         {{ form.consent_acknowledged.errors }}
       </div>
-    </fieldset>
+    </section>
 
     <div class="submit-wrap">
       <button class="submit-button" type="submit" id="submit-button">

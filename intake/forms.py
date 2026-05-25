@@ -33,6 +33,7 @@ class IntakeSubmissionForm(forms.ModelForm):
             'next_hearing_date',
             'fear_of_return_summary',
             'past_harm_summary',
+            'countries_traveled_asylum_summary',
             'family_members_included',
             'consent_acknowledged',
         ]
@@ -50,6 +51,9 @@ class IntakeSubmissionForm(forms.ModelForm):
             "next_hearing_date": _("Next hearing date"),
             "fear_of_return_summary": _("Reason for fearing return"),
             "past_harm_summary": _("Past harm or persecution"),
+            "countries_traveled_asylum_summary": _(
+                "Countries traveled through and asylum applications"
+            ),
             "family_members_included": _("Family members included"),
         }
         widgets = {
@@ -135,6 +139,16 @@ class IntakeSubmissionForm(forms.ModelForm):
                     "placeholder": _("Describe any past harm, threats, or persecution."),
                     "rows": 5,
                     "aria-describedby": "past-harm-help",
+                }
+            ),
+            "countries_traveled_asylum_summary": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": _(
+                        "List countries traveled through and whether you applied for asylum."
+                    ),
+                    "rows": 5,
+                    "aria-describedby": "countries-traveled-help",
                 }
             ),
             "family_members_included": forms.CheckboxInput(

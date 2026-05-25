@@ -27,6 +27,7 @@ class IntakeSubmission(models.Model):
     next_hearing_date = models.CharField(max_length=100, blank=True)
     fear_of_return_summary = models.TextField()
     past_harm_summary = models.TextField(blank=True)
+    countries_traveled_asylum_summary = models.TextField(blank=True)
     family_members_included = models.BooleanField(default=False)
     consent_acknowledged = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='new')
