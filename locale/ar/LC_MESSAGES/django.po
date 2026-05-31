@@ -1,8 +1,409 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: URDP Intake\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-31 06:10+0000\n"
 "Language: ar\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# Translation review required before public release.
+#: intake/forms.py:10
+msgid ""
+"I understand that submitting this form does not create an attorney-client "
+"relationship."
+msgstr ""
+"أفهم أن تقديم هذا النموذج لا ينشئ علاقة محامٍ وموكل."
+
+#: intake/forms.py:15
+msgid "Please acknowledge this notice before submitting your intake."
+msgstr "يرجى تأكيد هذا الإشعار قبل تقديم طلبك."
+
+#: intake/forms.py:41
+msgid "Full name"
+msgstr "الاسم الكامل"
+
+#: intake/forms.py:42
+msgid "Date of birth"
+msgstr "تاريخ الميلاد"
+
+#: intake/forms.py:43
+msgid "Country of origin"
+msgstr "بلد الأصل"
+
+#: intake/forms.py:44
+msgid "Preferred language"
+msgstr "اللغة المفضلة"
+
+#: intake/forms.py:45
+msgid "Phone number"
+msgstr "رقم الهاتف"
+
+#: intake/forms.py:46
+msgid "Email address"
+msgstr "عنوان البريد الإلكتروني"
+
+#: intake/forms.py:47
+msgid "Current city or location"
+msgstr "المدينة أو الموقع الحالي"
+
+#: intake/forms.py:48
+msgid "Currently detained"
+msgstr "محتجز/ة حالياً"
+
+#: intake/forms.py:49
+msgid "Immigration court"
+msgstr "محكمة الهجرة"
+
+#: intake/forms.py:50
+msgid "A-number"
+msgstr "رقم A"
+
+#: intake/forms.py:51
+msgid "Next hearing date"
+msgstr "تاريخ الجلسة القادمة"
+
+#: intake/forms.py:52
+msgid "Reason for fearing return"
+msgstr "سبب الخوف من العودة"
+
+#: intake/forms.py:53
+msgid "Past harm or persecution"
+msgstr "الأذى أو الاضطهاد السابق"
+
+#: intake/forms.py:55
+msgid "Countries traveled through and asylum applications"
+msgstr "الدول التي مررت بها وطلبات اللجوء"
+
+#: intake/forms.py:57
+msgid "Family members included"
+msgstr "أفراد الأسرة المشمولون"
+
+#: intake/forms.py:63
+msgid "Enter your full name"
+msgstr "أدخل اسمك الكامل"
+
+#: intake/forms.py:77
+msgid "Country where you are from"
+msgstr "البلد الذي أتيت منه"
+
+#: intake/forms.py:84
+msgid "Language you prefer for communication"
+msgstr "اللغة التي تفضلها للتواصل"
+
+#: intake/forms.py:91
+msgid "Best phone number to reach you"
+msgstr "أفضل رقم هاتف للتواصل معك"
+
+#: intake/forms.py:99
+msgid "Email address, if available"
+msgstr "عنوان البريد الإلكتروني، إن توفر"
+
+#: intake/forms.py:107
+msgid "City, state, or detention facility"
+msgstr "المدينة أو الولاية أو مرفق الاحتجاز"
+
+#: intake/forms.py:115
+msgid "Court name or city, if known"
+msgstr "اسم المحكمة أو المدينة، إن كان معروفاً"
+
+#: intake/forms.py:121
+msgid "Example: A123456789"
+msgstr "مثال: A123456789"
+
+#: intake/forms.py:131
+msgid "Describe why returning would be unsafe for you."
+msgstr "صف سبب عدم أمان العودة بالنسبة لك."
+
+#: intake/forms.py:139
+msgid "Describe any past harm, threats, or persecution."
+msgstr "صف أي أذى أو تهديدات أو اضطهاد سابق."
+
+#: intake/forms.py:148
+msgid "List countries traveled through and whether you applied for asylum."
+msgstr "اذكر الدول التي مررت بها وما إذا كنت قد طلبت اللجوء فيها."
+
+#: intake/forms.py:164
+msgid "This information is required."
+msgstr "هذه المعلومات مطلوبة."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:30
+#: intake/models.py:37
+msgid "Language used while completing the intake form."
+msgstr "اللغة المستخدمة عند ملء النموذج."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:41
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:51
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:61
+#: intake/models.py:52 intake/models.py:56 intake/models.py:60
+msgid "Staff translation only. The original response is preserved separately."
+msgstr "للترجمة من قبل الموظفين فقط. يتم حفظ الرد الأصلي بشكل منفصل."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:83
+#: intake/models.py:66
+msgid "Language of any staff-entered translated responses."
+msgstr "لغة الردود المترجمة التي أدخلها الموظفون."
+
+#: intake/models.py:7 urdp/settings.py:113
+msgid "English"
+msgstr "الإنجليزية"
+
+#: intake/models.py:8 urdp/settings.py:114
+msgid "Spanish"
+msgstr "الإسبانية"
+
+#: intake/models.py:9 urdp/settings.py:115
+msgid "French"
+msgstr "الفرنسية"
+
+#: intake/models.py:10 urdp/settings.py:116
+msgid "Arabic"
+msgstr "العربية"
+
+#: intake/models.py:11 urdp/settings.py:117
+msgid "Haitian Creole"
+msgstr "الكريولية الهايتية"
+
+#: intake/models.py:12 urdp/settings.py:118
+msgid "Russian"
+msgstr "الروسية"
+
+#: intake/models.py:13 urdp/settings.py:119
+msgid "Hindi"
+msgstr "الهندية"
+
+#: intake/models.py:14 urdp/settings.py:120
+msgid "Punjabi"
+msgstr "البنجابية"
+
+#: intake/models.py:15 urdp/settings.py:121
+msgid "Portuguese"
+msgstr "البرتغالية"
+
+#: intake/models.py:16 urdp/settings.py:122
+msgid "Chinese (Simplified)"
+msgstr "الصينية (المبسطة)"
+
+#: intake/templates/intake/intake_form.html:13
+msgid "Asylum Intake | Universal Removal Defense Project"
+msgstr "طلب اللجوء | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:16
+msgid ""
+"Secure multilingual asylum intake form for Universal Removal Defense Project."
+msgstr ""
+"نموذج آمن متعدد اللغات لطلب اللجوء من Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_form.html:29
+#: intake/templates/intake/intake_success.html:25
+msgid "Secure | Confidential | Multilingual | For All Cultures"
+msgstr "آمن | سري | متعدد اللغات | لجميع الثقافات"
+
+#: intake/templates/intake/intake_form.html:30
+#: intake/templates/intake/intake_success.html:26
+msgid "Every person deserves access to justice."
+msgstr "كل شخص يستحق الوصول إلى العدالة."
+
+#: intake/templates/intake/intake_form.html:34
+#: intake/templates/intake/intake_form.html:36
+#: intake/templates/intake/intake_form.html:259
+msgid "Universal Removal Defense Project"
+msgstr "Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:35
+#: intake/templates/intake/intake_success.html:63
+msgid "Universal Removal Defense Project logo"
+msgstr "شعار Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:37
+#: intake/templates/intake/intake_form.html:261
+msgid "All Cultures, All Languages."
+msgstr "جميع الثقافات، جميع اللغات."
+
+#: intake/templates/intake/intake_form.html:45
+#: intake/templates/intake/intake_success.html:35
+msgid "Choose your language"
+msgstr "اختر لغتك"
+
+#: intake/templates/intake/intake_form.html:46
+msgid ""
+"You can complete this form in the language that is most comfortable for you."
+msgstr ""
+"يمكنك إكمال هذا النموذج باللغة التي تشعر بالراحة معها."
+
+#: intake/templates/intake/intake_form.html:49
+#: intake/templates/intake/intake_success.html:39
+msgid "Language"
+msgstr "اللغة"
+
+#: intake/templates/intake/intake_form.html:72
+#: intake/templates/intake/intake_success.html:55
+msgid "Change language"
+msgstr "تغيير اللغة"
+
+#: intake/templates/intake/intake_form.html:79
+msgid "Important Notice"
+msgstr "إشعار مهم"
+
+#: intake/templates/intake/intake_form.html:81
+msgid ""
+"Submitting this form <strong>does not</strong> create an attorney-client "
+"relationship. URDP must review your intake, complete conflict screening, and "
+"provide written acceptance before representation begins."
+msgstr ""
+"تقديم هذا النموذج <strong>لا</strong> ينشئ علاقة محامٍ وموكل. "
+"يجب على URDP مراجعة طلبك وإجراء فحص التعارض وتقديم قبول خطي قبل بدء التمثيل."
+
+#: intake/templates/intake/intake_form.html:92
+msgid "Please correct the highlighted information."
+msgstr "يرجى تصحيح المعلومات المميزة."
+
+#: intake/templates/intake/intake_form.html:109
+msgid "Personal Information"
+msgstr "المعلومات الشخصية"
+
+#: intake/templates/intake/intake_form.html:139
+msgid "Contact Information"
+msgstr "معلومات الاتصال"
+
+#: intake/templates/intake/intake_form.html:142
+msgid "Provide a safe way for our team to contact you, if available."
+msgstr "قدم طريقة آمنة لفريقنا للتواصل معك، إن أمكن."
+
+#: intake/templates/intake/intake_form.html:165
+msgid "Immigration Case Information"
+msgstr "معلومات قضية الهجرة"
+
+#: intake/templates/intake/intake_form.html:170
+msgid "Are you currently detained?"
+msgstr "هل أنت محتجز/ة حالياً؟"
+
+#: intake/templates/intake/intake_form.html:173
+msgid "Yes, I am detained"
+msgstr "نعم، أنا محتجز/ة"
+
+#: intake/templates/intake/intake_form.html:198
+msgid "Asylum Screening"
+msgstr "تقييم طلب اللجوء"
+
+#: intake/templates/intake/intake_form.html:203
+msgid "Why do you fear returning to your home country?"
+msgstr "لماذا تخشى العودة إلى بلدك الأصلي؟"
+
+#: intake/templates/intake/intake_form.html:204
+msgid "Please provide as much detail as you safely can."
+msgstr "يرجى تقديم أكبر قدر من التفاصيل بأمان."
+
+#: intake/templates/intake/intake_form.html:209
+msgid "Have you experienced past harm or persecution?"
+msgstr "هل تعرضت لأذى أو اضطهاد في الماضي؟"
+
+#: intake/templates/intake/intake_form.html:210
+msgid "Please describe what happened, if you can."
+msgstr "يرجى وصف ما حدث، إن أمكنك ذلك."
+
+#: intake/templates/intake/intake_form.html:215
+msgid ""
+"What countries did you travel through, and did you apply for asylum in those "
+"countries?"
+msgstr ""
+"ما الدول التي سافرت عبرها، وهل طلبت اللجوء في تلك الدول؟"
+
+#: intake/templates/intake/intake_form.html:216
+msgid ""
+"List each country and whether you requested protection there, if applicable."
+msgstr ""
+"اذكر كل دولة وما إذا كنت قد طلبت الحماية هناك، إن انطبق ذلك."
+
+#: intake/templates/intake/intake_form.html:221
+msgid "Are family members included in your case?"
+msgstr "هل يشمل قضيتك أفراد من عائلتك؟"
+
+#: intake/templates/intake/intake_form.html:224
+msgid "Yes, family members are included"
+msgstr "نعم، يشمل القضية أفراد من العائلة"
+
+#: intake/templates/intake/intake_form.html:234
+msgid "Consent and Acknowledgment"
+msgstr "الموافقة والإقرار"
+
+#: intake/templates/intake/intake_form.html:248
+msgid "Submit Intake Securely"
+msgstr "تقديم الطلب بشكل آمن"
+
+#: intake/templates/intake/intake_form.html:250
+msgid "Your information is submitted for confidential intake review."
+msgstr "يتم تقديم معلوماتك لمراجعة سرية."
+
+#: intake/templates/intake/intake_form.html:262
+msgid "Justice. Dignity. Humanity."
+msgstr "العدالة. الكرامة. الإنسانية."
+
+#: intake/templates/intake/intake_form.html:265
+msgid "Submitting your intake securely..."
+msgstr "جارٍ تقديم طلبك بشكل آمن..."
+
+#: intake/templates/intake/intake_success.html:12
+msgid "Intake Submitted | Universal Removal Defense Project"
+msgstr "تم تقديم الطلب | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_success.html:15
+msgid ""
+"Your intake has been securely submitted to Universal Removal Defense Project."
+msgstr ""
+"تم تقديم طلبك بشكل آمن إلى Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_success.html:36
+msgid ""
+"View this confirmation in the language that is most comfortable for you."
+msgstr ""
+"اعرض هذا التأكيد باللغة التي تشعر بالراحة معها."
+
+#: intake/templates/intake/intake_success.html:66
+msgid "Intake Successfully Submitted"
+msgstr "تم تقديم الطلب بنجاح"
+
+#: intake/templates/intake/intake_success.html:68
+msgid ""
+"Thank you for contacting Universal Removal Defense Project. Your intake has "
+"been securely submitted for preliminary review."
+msgstr ""
+"شكراً لتواصلك مع Universal Removal Defense Project. تم تقديم طلبك "
+"بشكل آمن للمراجعة الأولية."
+
+#: intake/templates/intake/intake_success.html:74
+msgid ""
+"Submission of this intake form does not create an attorney-client or "
+"representative relationship."
+msgstr ""
+"تقديم هذا النموذج لا ينشئ علاقة محامٍ وموكل أو علاقة تمثيل."
+
+#: intake/templates/intake/intake_success.html:75
+msgid ""
+"URDP must complete conflict screening and determine eligibility before "
+"representation may begin."
+msgstr ""
+"يجب على URDP إكمال فحص التعارض وتحديد الأهلية قبل بدء التمثيل."
+
+#: intake/templates/intake/intake_success.html:78
+msgid "What Happens Next?"
+msgstr "ماذا يحدث بعد ذلك؟"
+
+#: intake/templates/intake/intake_success.html:80
+msgid "Your submission will be reviewed by URDP staff."
+msgstr "سيتم مراجعة طلبك من قبل موظفي URDP."
+
+#: intake/templates/intake/intake_success.html:81
+msgid "Additional information or documentation may be requested."
+msgstr "قد يُطلب منك تقديم معلومات أو وثائق إضافية."
+
+#: intake/templates/intake/intake_success.html:82
+msgid "If accepted, you will be contacted regarding next steps."
+msgstr "إذا تمت الموافقة، سيتم التواصل معك بشأن الخطوات التالية."
+
+#: intake/templates/intake/intake_success.html:83
+msgid "Please monitor your email and phone for follow-up communication."
+msgstr "يرجى متابعة بريدك الإلكتروني وهاتفك للتواصل المتابع."
+
+#: intake/templates/intake/intake_success.html:87
+msgid "Submit Another Intake"
+msgstr "تقديم طلب آخر"
