@@ -1,8 +1,410 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: URDP Intake\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-31 06:10+0000\n"
 "Language: pa\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# Translation review required before public release.
+#: intake/forms.py:10
+msgid ""
+"I understand that submitting this form does not create an attorney-client "
+"relationship."
+msgstr ""
+"ਮੈਂ ਸਮਝਦਾ/ਸਮਝਦੀ ਹਾਂ ਕਿ ਇਸ ਫਾਰਮ ਨੂੰ ਜਮ੍ਹਾਂ ਕਰਨ ਨਾਲ ਵਕੀਲ-ਮੁਵੱਕਿਲ ਸੰਬੰਧ ਨਹੀਂ ਬਣਦਾ।"
+
+#: intake/forms.py:15
+msgid "Please acknowledge this notice before submitting your intake."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਆਪਣੀ ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਇਸ ਨੋਟਿਸ ਨੂੰ ਸਵੀਕਾਰ ਕਰੋ।"
+
+#: intake/forms.py:41
+msgid "Full name"
+msgstr "ਪੂਰਾ ਨਾਮ"
+
+#: intake/forms.py:42
+msgid "Date of birth"
+msgstr "ਜਨਮ ਤਾਰੀਖ"
+
+#: intake/forms.py:43
+msgid "Country of origin"
+msgstr "ਮੂਲ ਦੇਸ਼"
+
+#: intake/forms.py:44
+msgid "Preferred language"
+msgstr "ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ"
+
+#: intake/forms.py:45
+msgid "Phone number"
+msgstr "ਫ਼ੋਨ ਨੰਬਰ"
+
+#: intake/forms.py:46
+msgid "Email address"
+msgstr "ਈਮੇਲ ਪਤਾ"
+
+#: intake/forms.py:47
+msgid "Current city or location"
+msgstr "ਮੌਜੂਦਾ ਸ਼ਹਿਰ ਜਾਂ ਸਥਾਨ"
+
+#: intake/forms.py:48
+msgid "Currently detained"
+msgstr "ਵਰਤਮਾਨ ਵਿੱਚ ਨਜ਼ਰਬੰਦ"
+
+#: intake/forms.py:49
+msgid "Immigration court"
+msgstr "ਇਮੀਗ੍ਰੇਸ਼ਨ ਅਦਾਲਤ"
+
+#: intake/forms.py:50
+msgid "A-number"
+msgstr "A-ਨੰਬਰ"
+
+#: intake/forms.py:51
+msgid "Next hearing date"
+msgstr "ਅਗਲੀ ਸੁਣਵਾਈ ਦੀ ਤਾਰੀਖ"
+
+#: intake/forms.py:52
+msgid "Reason for fearing return"
+msgstr "ਵਾਪਸੀ ਤੋਂ ਡਰਨ ਦਾ ਕਾਰਨ"
+
+#: intake/forms.py:53
+msgid "Past harm or persecution"
+msgstr "ਪਿਛਲਾ ਨੁਕਸਾਨ ਜਾਂ ਅਤਿਆਚਾਰ"
+
+#: intake/forms.py:55
+msgid "Countries traveled through and asylum applications"
+msgstr "ਜਿਨ੍ਹਾਂ ਦੇਸ਼ਾਂ ਵਿੱਚੋਂ ਦੀ ਲੰਘੇ ਅਤੇ ਸ਼ਰਣ ਅਰਜ਼ੀਆਂ"
+
+#: intake/forms.py:57
+msgid "Family members included"
+msgstr "ਸ਼ਾਮਲ ਪਰਿਵਾਰਕ ਮੈਂਬਰ"
+
+#: intake/forms.py:63
+msgid "Enter your full name"
+msgstr "ਆਪਣਾ ਪੂਰਾ ਨਾਮ ਦਰਜ ਕਰੋ"
+
+#: intake/forms.py:77
+msgid "Country where you are from"
+msgstr "ਉਹ ਦੇਸ਼ ਜਿੱਥੋਂ ਤੁਸੀਂ ਹੋ"
+
+#: intake/forms.py:84
+msgid "Language you prefer for communication"
+msgstr "ਸੰਚਾਰ ਲਈ ਤੁਹਾਡੀ ਪਸੰਦੀਦਾ ਭਾਸ਼ਾ"
+
+#: intake/forms.py:91
+msgid "Best phone number to reach you"
+msgstr "ਤੁਹਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ ਫ਼ੋਨ ਨੰਬਰ"
+
+#: intake/forms.py:99
+msgid "Email address, if available"
+msgstr "ਈਮੇਲ ਪਤਾ, ਜੇ ਉਪਲਬਧ ਹੋਵੇ"
+
+#: intake/forms.py:107
+msgid "City, state, or detention facility"
+msgstr "ਸ਼ਹਿਰ, ਰਾਜ, ਜਾਂ ਨਜ਼ਰਬੰਦੀ ਸਹੂਲਤ"
+
+#: intake/forms.py:115
+msgid "Court name or city, if known"
+msgstr "ਅਦਾਲਤ ਦਾ ਨਾਮ ਜਾਂ ਸ਼ਹਿਰ, ਜੇ ਪਤਾ ਹੋਵੇ"
+
+#: intake/forms.py:121
+msgid "Example: A123456789"
+msgstr "ਉਦਾਹਰਨ: A123456789"
+
+#: intake/forms.py:131
+msgid "Describe why returning would be unsafe for you."
+msgstr "ਦੱਸੋ ਕਿ ਵਾਪਸ ਜਾਣਾ ਤੁਹਾਡੇ ਲਈ ਕਿਉਂ ਅਸੁਰੱਖਿਅਤ ਹੋਵੇਗਾ।"
+
+#: intake/forms.py:139
+msgid "Describe any past harm, threats, or persecution."
+msgstr "ਕਿਸੇ ਵੀ ਪਿਛਲੇ ਨੁਕਸਾਨ, ਧਮਕੀਆਂ, ਜਾਂ ਅਤਿਆਚਾਰ ਦਾ ਵਰਣਨ ਕਰੋ।"
+
+#: intake/forms.py:148
+msgid "List countries traveled through and whether you applied for asylum."
+msgstr "ਉਨ੍ਹਾਂ ਦੇਸ਼ਾਂ ਦੀ ਸੂਚੀ ਬਣਾਓ ਜਿਨ੍ਹਾਂ ਵਿੱਚੋਂ ਲੰਘੇ ਅਤੇ ਦੱਸੋ ਕਿ ਕੀ ਤੁਸੀਂ ਸ਼ਰਣ ਲਈ ਅਰਜ਼ੀ ਦਿੱਤੀ।"
+
+#: intake/forms.py:164
+msgid "This information is required."
+msgstr "ਇਹ ਜਾਣਕਾਰੀ ਲਾਜ਼ਮੀ ਹੈ।"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:30
+#: intake/models.py:37
+msgid "Language used while completing the intake form."
+msgstr "ਫਾਰਮ ਭਰਨ ਵੇਲੇ ਵਰਤੀ ਗਈ ਭਾਸ਼ਾ।"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:41
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:51
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:61
+#: intake/models.py:52 intake/models.py:56 intake/models.py:60
+msgid "Staff translation only. The original response is preserved separately."
+msgstr "ਕੇਵਲ ਸਟਾਫ ਅਨੁਵਾਦ। ਮੂਲ ਜਵਾਬ ਵੱਖਰੇ ਤੌਰ 'ਤੇ ਸੁਰੱਖਿਅਤ ਕੀਤਾ ਗਿਆ ਹੈ।"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:83
+#: intake/models.py:66
+msgid "Language of any staff-entered translated responses."
+msgstr "ਸਟਾਫ ਦੁਆਰਾ ਦਰਜ ਅਨੁਵਾਦਿਤ ਜਵਾਬਾਂ ਦੀ ਭਾਸ਼ਾ।"
+
+#: intake/models.py:7 urdp/settings.py:113
+msgid "English"
+msgstr "ਅੰਗਰੇਜ਼ੀ"
+
+#: intake/models.py:8 urdp/settings.py:114
+msgid "Spanish"
+msgstr "ਸਪੇਨੀ"
+
+#: intake/models.py:9 urdp/settings.py:115
+msgid "French"
+msgstr "ਫਰਾਂਸੀਸੀ"
+
+#: intake/models.py:10 urdp/settings.py:116
+msgid "Arabic"
+msgstr "ਅਰਬੀ"
+
+#: intake/models.py:11 urdp/settings.py:117
+msgid "Haitian Creole"
+msgstr "ਹੈਤੀਆਈ ਕ੍ਰੀਓਲ"
+
+#: intake/models.py:12 urdp/settings.py:118
+msgid "Russian"
+msgstr "ਰੂਸੀ"
+
+#: intake/models.py:13 urdp/settings.py:119
+msgid "Hindi"
+msgstr "ਹਿੰਦੀ"
+
+#: intake/models.py:14 urdp/settings.py:120
+msgid "Punjabi"
+msgstr "ਪੰਜਾਬੀ"
+
+#: intake/models.py:15 urdp/settings.py:121
+msgid "Portuguese"
+msgstr "ਪੁਰਤਗਾਲੀ"
+
+#: intake/models.py:16 urdp/settings.py:122
+msgid "Chinese (Simplified)"
+msgstr "ਚੀਨੀ (ਸਰਲੀਕ੍ਰਿਤ)"
+
+#: intake/templates/intake/intake_form.html:13
+msgid "Asylum Intake | Universal Removal Defense Project"
+msgstr "ਸ਼ਰਣ ਅਰਜ਼ੀ | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:16
+msgid ""
+"Secure multilingual asylum intake form for Universal Removal Defense Project."
+msgstr ""
+"Universal Removal Defense Project ਲਈ ਸੁਰੱਖਿਅਤ ਬਹੁਭਾਸ਼ੀ ਸ਼ਰਣ ਅਰਜ਼ੀ ਫਾਰਮ।"
+
+#: intake/templates/intake/intake_form.html:29
+#: intake/templates/intake/intake_success.html:25
+msgid "Secure | Confidential | Multilingual | For All Cultures"
+msgstr "ਸੁਰੱਖਿਅਤ | ਗੁਪਤ | ਬਹੁਭਾਸ਼ੀ | ਸਾਰੀਆਂ ਸੰਸਕ੍ਰਿਤੀਆਂ ਲਈ"
+
+#: intake/templates/intake/intake_form.html:30
+#: intake/templates/intake/intake_success.html:26
+msgid "Every person deserves access to justice."
+msgstr "ਹਰ ਵਿਅਕਤੀ ਨਿਆਂ ਤੱਕ ਪਹੁੰਚ ਦਾ ਹੱਕਦਾਰ ਹੈ।"
+
+#: intake/templates/intake/intake_form.html:34
+#: intake/templates/intake/intake_form.html:36
+#: intake/templates/intake/intake_form.html:259
+msgid "Universal Removal Defense Project"
+msgstr "Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:35
+#: intake/templates/intake/intake_success.html:63
+msgid "Universal Removal Defense Project logo"
+msgstr "Universal Removal Defense Project ਲੋਗੋ"
+
+#: intake/templates/intake/intake_form.html:37
+#: intake/templates/intake/intake_form.html:261
+msgid "All Cultures, All Languages."
+msgstr "ਸਾਰੀਆਂ ਸੰਸਕ੍ਰਿਤੀਆਂ, ਸਾਰੀਆਂ ਭਾਸ਼ਾਵਾਂ।"
+
+#: intake/templates/intake/intake_form.html:45
+#: intake/templates/intake/intake_success.html:35
+msgid "Choose your language"
+msgstr "ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ"
+
+#: intake/templates/intake/intake_form.html:46
+msgid ""
+"You can complete this form in the language that is most comfortable for you."
+msgstr ""
+"ਤੁਸੀਂ ਇਹ ਫਾਰਮ ਉਸ ਭਾਸ਼ਾ ਵਿੱਚ ਭਰ ਸਕਦੇ ਹੋ ਜੋ ਤੁਹਾਨੂੰ ਸਭ ਤੋਂ ਆਰਾਮਦਾਇਕ ਲੱਗਦੀ ਹੈ।"
+
+#: intake/templates/intake/intake_form.html:49
+#: intake/templates/intake/intake_success.html:39
+msgid "Language"
+msgstr "ਭਾਸ਼ਾ"
+
+#: intake/templates/intake/intake_form.html:72
+#: intake/templates/intake/intake_success.html:55
+msgid "Change language"
+msgstr "ਭਾਸ਼ਾ ਬਦਲੋ"
+
+#: intake/templates/intake/intake_form.html:79
+msgid "Important Notice"
+msgstr "ਮਹੱਤਵਪੂਰਨ ਨੋਟਿਸ"
+
+#: intake/templates/intake/intake_form.html:81
+msgid ""
+"Submitting this form <strong>does not</strong> create an attorney-client "
+"relationship. URDP must review your intake, complete conflict screening, and "
+"provide written acceptance before representation begins."
+msgstr ""
+"ਇਹ ਫਾਰਮ ਜਮ੍ਹਾਂ ਕਰਨ ਨਾਲ ਵਕੀਲ-ਮੁਵੱਕਿਲ ਸੰਬੰਧ <strong>ਨਹੀਂ</strong> ਬਣਦਾ। "
+"URDP ਨੂੰ ਤੁਹਾਡੀ ਅਰਜ਼ੀ ਦੀ ਸਮੀਖਿਆ ਕਰਨੀ ਹੋਵੇਗੀ, ਟਕਰਾਅ ਜਾਂਚ ਪੂਰੀ ਕਰਨੀ ਹੋਵੇਗੀ, ਅਤੇ "
+"ਪ੍ਰਤੀਨਿਧਤਾ ਸ਼ੁਰੂ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ ਲਿਖਤੀ ਸਵੀਕ੍ਰਿਤੀ ਦੇਣੀ ਹੋਵੇਗੀ।"
+
+#: intake/templates/intake/intake_form.html:92
+msgid "Please correct the highlighted information."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਹਾਈਲਾਈਟ ਕੀਤੀ ਜਾਣਕਾਰੀ ਨੂੰ ਠੀਕ ਕਰੋ।"
+
+#: intake/templates/intake/intake_form.html:109
+msgid "Personal Information"
+msgstr "ਨਿੱਜੀ ਜਾਣਕਾਰੀ"
+
+#: intake/templates/intake/intake_form.html:139
+msgid "Contact Information"
+msgstr "ਸੰਪਰਕ ਜਾਣਕਾਰੀ"
+
+#: intake/templates/intake/intake_form.html:142
+msgid "Provide a safe way for our team to contact you, if available."
+msgstr "ਜੇ ਉਪਲਬਧ ਹੋਵੇ ਤਾਂ ਸਾਡੀ ਟੀਮ ਲਈ ਤੁਹਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਦਾ ਇੱਕ ਸੁਰੱਖਿਅਤ ਤਰੀਕਾ ਦੱਸੋ।"
+
+#: intake/templates/intake/intake_form.html:165
+msgid "Immigration Case Information"
+msgstr "ਇਮੀਗ੍ਰੇਸ਼ਨ ਕੇਸ ਦੀ ਜਾਣਕਾਰੀ"
+
+#: intake/templates/intake/intake_form.html:170
+msgid "Are you currently detained?"
+msgstr "ਕੀ ਤੁਸੀਂ ਵਰਤਮਾਨ ਵਿੱਚ ਨਜ਼ਰਬੰਦ ਹੋ?"
+
+#: intake/templates/intake/intake_form.html:173
+msgid "Yes, I am detained"
+msgstr "ਹਾਂ, ਮੈਂ ਨਜ਼ਰਬੰਦ ਹਾਂ"
+
+#: intake/templates/intake/intake_form.html:198
+msgid "Asylum Screening"
+msgstr "ਸ਼ਰਣ ਜਾਂਚ"
+
+#: intake/templates/intake/intake_form.html:203
+msgid "Why do you fear returning to your home country?"
+msgstr "ਤੁਸੀਂ ਆਪਣੇ ਦੇਸ਼ ਵਾਪਸ ਜਾਣ ਤੋਂ ਕਿਉਂ ਡਰਦੇ ਹੋ?"
+
+#: intake/templates/intake/intake_form.html:204
+msgid "Please provide as much detail as you safely can."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਜਿੰਨਾ ਸੁਰੱਖਿਅਤ ਹੋ ਸਕੇ ਓਨੀ ਜਾਣਕਾਰੀ ਦਿਓ।"
+
+#: intake/templates/intake/intake_form.html:209
+msgid "Have you experienced past harm or persecution?"
+msgstr "ਕੀ ਤੁਸੀਂ ਪਿਛਲੇ ਸਮੇਂ ਵਿੱਚ ਨੁਕਸਾਨ ਜਾਂ ਅਤਿਆਚਾਰ ਦਾ ਸਾਹਮਣਾ ਕੀਤਾ ਹੈ?"
+
+#: intake/templates/intake/intake_form.html:210
+msgid "Please describe what happened, if you can."
+msgstr "ਜੇ ਹੋ ਸਕੇ ਤਾਂ ਕਿਰਪਾ ਕਰਕੇ ਦੱਸੋ ਕੀ ਹੋਇਆ ਸੀ।"
+
+#: intake/templates/intake/intake_form.html:215
+msgid ""
+"What countries did you travel through, and did you apply for asylum in those "
+"countries?"
+msgstr ""
+"ਤੁਸੀਂ ਕਿਹੜੇ ਦੇਸ਼ਾਂ ਵਿੱਚੋਂ ਦੀ ਲੰਘੇ, ਅਤੇ ਕੀ ਤੁਸੀਂ ਉਨ੍ਹਾਂ ਦੇਸ਼ਾਂ ਵਿੱਚ ਸ਼ਰਣ ਲਈ ਅਰਜ਼ੀ ਦਿੱਤੀ?"
+
+#: intake/templates/intake/intake_form.html:216
+msgid ""
+"List each country and whether you requested protection there, if applicable."
+msgstr ""
+"ਹਰ ਦੇਸ਼ ਦੀ ਸੂਚੀ ਬਣਾਓ ਅਤੇ ਦੱਸੋ ਕਿ ਕੀ ਤੁਸੀਂ ਉੱਥੇ ਸੁਰੱਖਿਆ ਮੰਗੀ, ਜੇ ਲਾਗੂ ਹੋਵੇ।"
+
+#: intake/templates/intake/intake_form.html:221
+msgid "Are family members included in your case?"
+msgstr "ਕੀ ਤੁਹਾਡੇ ਕੇਸ ਵਿੱਚ ਪਰਿਵਾਰਕ ਮੈਂਬਰ ਸ਼ਾਮਲ ਹਨ?"
+
+#: intake/templates/intake/intake_form.html:224
+msgid "Yes, family members are included"
+msgstr "ਹਾਂ, ਪਰਿਵਾਰਕ ਮੈਂਬਰ ਸ਼ਾਮਲ ਹਨ"
+
+#: intake/templates/intake/intake_form.html:234
+msgid "Consent and Acknowledgment"
+msgstr "ਸਹਿਮਤੀ ਅਤੇ ਸਵੀਕ੍ਰਿਤੀ"
+
+#: intake/templates/intake/intake_form.html:248
+msgid "Submit Intake Securely"
+msgstr "ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ ਕਰੋ"
+
+#: intake/templates/intake/intake_form.html:250
+msgid "Your information is submitted for confidential intake review."
+msgstr "ਤੁਹਾਡੀ ਜਾਣਕਾਰੀ ਗੁਪਤ ਸਮੀਖਿਆ ਲਈ ਜਮ੍ਹਾਂ ਕੀਤੀ ਗਈ ਹੈ।"
+
+#: intake/templates/intake/intake_form.html:262
+msgid "Justice. Dignity. Humanity."
+msgstr "ਨਿਆਂ। ਮਾਣ। ਮਨੁੱਖਤਾ।"
+
+#: intake/templates/intake/intake_form.html:265
+msgid "Submitting your intake securely..."
+msgstr "ਤੁਹਾਡੀ ਅਰਜ਼ੀ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਜਮ੍ਹਾਂ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ..."
+
+#: intake/templates/intake/intake_success.html:12
+msgid "Intake Submitted | Universal Removal Defense Project"
+msgstr "ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ ਹੋਈ | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_success.html:15
+msgid ""
+"Your intake has been securely submitted to Universal Removal Defense Project."
+msgstr ""
+"ਤੁਹਾਡੀ ਅਰਜ਼ੀ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ Universal Removal Defense Project ਨੂੰ ਜਮ੍ਹਾਂ ਕਰ ਦਿੱਤੀ ਗਈ ਹੈ।"
+
+#: intake/templates/intake/intake_success.html:36
+msgid ""
+"View this confirmation in the language that is most comfortable for you."
+msgstr ""
+"ਇਸ ਪੁਸ਼ਟੀਕਰਨ ਨੂੰ ਉਸ ਭਾਸ਼ਾ ਵਿੱਚ ਦੇਖੋ ਜੋ ਤੁਹਾਨੂੰ ਸਭ ਤੋਂ ਆਰਾਮਦਾਇਕ ਲੱਗਦੀ ਹੈ।"
+
+#: intake/templates/intake/intake_success.html:66
+msgid "Intake Successfully Submitted"
+msgstr "ਅਰਜ਼ੀ ਸਫਲਤਾਪੂਰਵਕ ਜਮ੍ਹਾਂ ਹੋਈ"
+
+#: intake/templates/intake/intake_success.html:68
+msgid ""
+"Thank you for contacting Universal Removal Defense Project. Your intake has "
+"been securely submitted for preliminary review."
+msgstr ""
+"Universal Removal Defense Project ਨਾਲ ਸੰਪਰਕ ਕਰਨ ਲਈ ਧੰਨਵਾਦ। ਤੁਹਾਡੀ ਅਰਜ਼ੀ "
+"ਪ੍ਰਾਰੰਭਿਕ ਸਮੀਖਿਆ ਲਈ ਸੁਰੱਖਿਅਤ ਢੰਗ ਨਾਲ ਜਮ੍ਹਾਂ ਕਰ ਦਿੱਤੀ ਗਈ ਹੈ।"
+
+#: intake/templates/intake/intake_success.html:74
+msgid ""
+"Submission of this intake form does not create an attorney-client or "
+"representative relationship."
+msgstr ""
+"ਇਸ ਫਾਰਮ ਨੂੰ ਜਮ੍ਹਾਂ ਕਰਨ ਨਾਲ ਵਕੀਲ-ਮੁਵੱਕਿਲ ਜਾਂ ਪ੍ਰਤੀਨਿਧਤਾ ਸੰਬੰਧ ਨਹੀਂ ਬਣਦਾ।"
+
+#: intake/templates/intake/intake_success.html:75
+msgid ""
+"URDP must complete conflict screening and determine eligibility before "
+"representation may begin."
+msgstr ""
+"URDP ਨੂੰ ਪ੍ਰਤੀਨਿਧਤਾ ਸ਼ੁਰੂ ਹੋਣ ਤੋਂ ਪਹਿਲਾਂ ਟਕਰਾਅ ਜਾਂਚ ਪੂਰੀ ਕਰਨੀ ਹੋਵੇਗੀ ਅਤੇ ਯੋਗਤਾ ਨਿਰਧਾਰਿਤ ਕਰਨੀ ਹੋਵੇਗੀ।"
+
+#: intake/templates/intake/intake_success.html:78
+msgid "What Happens Next?"
+msgstr "ਅੱਗੇ ਕੀ ਹੋਵੇਗਾ?"
+
+#: intake/templates/intake/intake_success.html:80
+msgid "Your submission will be reviewed by URDP staff."
+msgstr "ਤੁਹਾਡੀ ਅਰਜ਼ੀ URDP ਸਟਾਫ ਦੁਆਰਾ ਸਮੀਖਿਆ ਕੀਤੀ ਜਾਵੇਗੀ।"
+
+#: intake/templates/intake/intake_success.html:81
+msgid "Additional information or documentation may be requested."
+msgstr "ਵਾਧੂ ਜਾਣਕਾਰੀ ਜਾਂ ਦਸਤਾਵੇਜ਼ੀਕਰਨ ਦੀ ਬੇਨਤੀ ਕੀਤੀ ਜਾ ਸਕਦੀ ਹੈ।"
+
+#: intake/templates/intake/intake_success.html:82
+msgid "If accepted, you will be contacted regarding next steps."
+msgstr "ਜੇ ਸਵੀਕਾਰ ਕੀਤਾ ਗਿਆ, ਤਾਂ ਅਗਲੇ ਕਦਮਾਂ ਬਾਰੇ ਤੁਹਾਡੇ ਨਾਲ ਸੰਪਰਕ ਕੀਤਾ ਜਾਵੇਗਾ।"
+
+#: intake/templates/intake/intake_success.html:83
+msgid "Please monitor your email and phone for follow-up communication."
+msgstr "ਕਿਰਪਾ ਕਰਕੇ ਅਗਲੇਰੀ ਗੱਲਬਾਤ ਲਈ ਆਪਣੀ ਈਮੇਲ ਅਤੇ ਫ਼ੋਨ ਦੇਖਦੇ ਰਹੋ।"
+
+#: intake/templates/intake/intake_success.html:87
+msgid "Submit Another Intake"
+msgstr "ਇੱਕ ਹੋਰ ਅਰਜ਼ੀ ਜਮ੍ਹਾਂ ਕਰੋ"

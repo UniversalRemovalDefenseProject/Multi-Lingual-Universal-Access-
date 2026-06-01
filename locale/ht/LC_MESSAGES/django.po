@@ -1,8 +1,409 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: URDP Intake\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-31 06:10+0000\n"
 "Language: ht\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# Translation review required before public release.
+#: intake/forms.py:10
+msgid ""
+"I understand that submitting this form does not create an attorney-client "
+"relationship."
+msgstr ""
+"Mwen konprann ke soumèt fòm sa a pa kreye yon relasyon avoka-kliyan."
+
+#: intake/forms.py:15
+msgid "Please acknowledge this notice before submitting your intake."
+msgstr "Tanpri konfime avi sa a anvan ou soumèt demann ou."
+
+#: intake/forms.py:41
+msgid "Full name"
+msgstr "Non konplè"
+
+#: intake/forms.py:42
+msgid "Date of birth"
+msgstr "Dat nesans"
+
+#: intake/forms.py:43
+msgid "Country of origin"
+msgstr "Peyi orijin"
+
+#: intake/forms.py:44
+msgid "Preferred language"
+msgstr "Lang prefere"
+
+#: intake/forms.py:45
+msgid "Phone number"
+msgstr "Nimewo telefòn"
+
+#: intake/forms.py:46
+msgid "Email address"
+msgstr "Adrès imèl"
+
+#: intake/forms.py:47
+msgid "Current city or location"
+msgstr "Vil oswa kote aktyèl"
+
+#: intake/forms.py:48
+msgid "Currently detained"
+msgstr "Aktyèlman detni"
+
+#: intake/forms.py:49
+msgid "Immigration court"
+msgstr "Tribinal imigrasyon"
+
+#: intake/forms.py:50
+msgid "A-number"
+msgstr "Nimewo A"
+
+#: intake/forms.py:51
+msgid "Next hearing date"
+msgstr "Dat pwochen odyans"
+
+#: intake/forms.py:52
+msgid "Reason for fearing return"
+msgstr "Rezon pou pè retounen"
+
+#: intake/forms.py:53
+msgid "Past harm or persecution"
+msgstr "Dòmaj oswa pèsekisyon nan pase"
+
+#: intake/forms.py:55
+msgid "Countries traveled through and asylum applications"
+msgstr "Peyi ou te vwayaje atravè ak demann azil"
+
+#: intake/forms.py:57
+msgid "Family members included"
+msgstr "Manm fanmi enkli"
+
+#: intake/forms.py:63
+msgid "Enter your full name"
+msgstr "Antre non konplè ou"
+
+#: intake/forms.py:77
+msgid "Country where you are from"
+msgstr "Peyi kote ou soti"
+
+#: intake/forms.py:84
+msgid "Language you prefer for communication"
+msgstr "Lang ou prefere pou kominikasyon"
+
+#: intake/forms.py:91
+msgid "Best phone number to reach you"
+msgstr "Pi bon nimewo telefòn pou kontakte ou"
+
+#: intake/forms.py:99
+msgid "Email address, if available"
+msgstr "Adrès imèl, si disponib"
+
+#: intake/forms.py:107
+msgid "City, state, or detention facility"
+msgstr "Vil, eta, oswa sant detansyon"
+
+#: intake/forms.py:115
+msgid "Court name or city, if known"
+msgstr "Non tribinal oswa vil, si li konnen"
+
+#: intake/forms.py:121
+msgid "Example: A123456789"
+msgstr "Egzanp: A123456789"
+
+#: intake/forms.py:131
+msgid "Describe why returning would be unsafe for you."
+msgstr "Dekri poukisa retounen ta danjere pou ou."
+
+#: intake/forms.py:139
+msgid "Describe any past harm, threats, or persecution."
+msgstr "Dekri nenpòt dòmaj, menas, oswa pèsekisyon nan pase."
+
+#: intake/forms.py:148
+msgid "List countries traveled through and whether you applied for asylum."
+msgstr "Liste peyi ou te vwayaje atravè ak si ou te mande azil."
+
+#: intake/forms.py:164
+msgid "This information is required."
+msgstr "Enfòmasyon sa a obligatwa."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:30
+#: intake/models.py:37
+msgid "Language used while completing the intake form."
+msgstr "Lang itilize pandan yo ranpli fòm nan."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:41
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:51
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:61
+#: intake/models.py:52 intake/models.py:56 intake/models.py:60
+msgid "Staff translation only. The original response is preserved separately."
+msgstr "Tradiksyon pèsonèl sèlman. Repons orijinal la konsève separeman."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:83
+#: intake/models.py:66
+msgid "Language of any staff-entered translated responses."
+msgstr "Lang repons tradui pèsonèl yo te antre."
+
+#: intake/models.py:7 urdp/settings.py:113
+msgid "English"
+msgstr "Anglè"
+
+#: intake/models.py:8 urdp/settings.py:114
+msgid "Spanish"
+msgstr "Espanyòl"
+
+#: intake/models.py:9 urdp/settings.py:115
+msgid "French"
+msgstr "Fransè"
+
+#: intake/models.py:10 urdp/settings.py:116
+msgid "Arabic"
+msgstr "Arab"
+
+#: intake/models.py:11 urdp/settings.py:117
+msgid "Haitian Creole"
+msgstr "Kreyòl Ayisyen"
+
+#: intake/models.py:12 urdp/settings.py:118
+msgid "Russian"
+msgstr "Ris"
+
+#: intake/models.py:13 urdp/settings.py:119
+msgid "Hindi"
+msgstr "Endyen"
+
+#: intake/models.py:14 urdp/settings.py:120
+msgid "Punjabi"
+msgstr "Punjabi"
+
+#: intake/models.py:15 urdp/settings.py:121
+msgid "Portuguese"
+msgstr "Pòtigè"
+
+#: intake/models.py:16 urdp/settings.py:122
+msgid "Chinese (Simplified)"
+msgstr "Chinwa (Senplifye)"
+
+#: intake/templates/intake/intake_form.html:13
+msgid "Asylum Intake | Universal Removal Defense Project"
+msgstr "Demann Azil | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:16
+msgid ""
+"Secure multilingual asylum intake form for Universal Removal Defense Project."
+msgstr ""
+"Fòm demann azil sekirize ak plizyè lang pou Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_form.html:29
+#: intake/templates/intake/intake_success.html:25
+msgid "Secure | Confidential | Multilingual | For All Cultures"
+msgstr "Sekirize | Konfidansyèl | Plizyè Lang | Pou Tout Kilti"
+
+#: intake/templates/intake/intake_form.html:30
+#: intake/templates/intake/intake_success.html:26
+msgid "Every person deserves access to justice."
+msgstr "Chak moun merite aksè ak jistis."
+
+#: intake/templates/intake/intake_form.html:34
+#: intake/templates/intake/intake_form.html:36
+#: intake/templates/intake/intake_form.html:259
+msgid "Universal Removal Defense Project"
+msgstr "Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:35
+#: intake/templates/intake/intake_success.html:63
+msgid "Universal Removal Defense Project logo"
+msgstr "Logo Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:37
+#: intake/templates/intake/intake_form.html:261
+msgid "All Cultures, All Languages."
+msgstr "Tout Kilti, Tout Lang."
+
+#: intake/templates/intake/intake_form.html:45
+#: intake/templates/intake/intake_success.html:35
+msgid "Choose your language"
+msgstr "Chwazi lang ou"
+
+#: intake/templates/intake/intake_form.html:46
+msgid ""
+"You can complete this form in the language that is most comfortable for you."
+msgstr ""
+"Ou ka ranpli fòm sa a nan lang ki pi alèz pou ou."
+
+#: intake/templates/intake/intake_form.html:49
+#: intake/templates/intake/intake_success.html:39
+msgid "Language"
+msgstr "Lang"
+
+#: intake/templates/intake/intake_form.html:72
+#: intake/templates/intake/intake_success.html:55
+msgid "Change language"
+msgstr "Chanje lang"
+
+#: intake/templates/intake/intake_form.html:79
+msgid "Important Notice"
+msgstr "Avi Enpòtan"
+
+#: intake/templates/intake/intake_form.html:81
+msgid ""
+"Submitting this form <strong>does not</strong> create an attorney-client "
+"relationship. URDP must review your intake, complete conflict screening, and "
+"provide written acceptance before representation begins."
+msgstr ""
+"Soumèt fòm sa a <strong>pa</strong> kreye yon relasyon avoka-kliyan. "
+"URDP dwe revize demann ou, fè verifikasyon konfli, ak bay akseptasyon ekri anvan reprezantasyon kòmanse."
+
+#: intake/templates/intake/intake_form.html:92
+msgid "Please correct the highlighted information."
+msgstr "Tanpri korije enfòmasyon ki mete anfas yo."
+
+#: intake/templates/intake/intake_form.html:109
+msgid "Personal Information"
+msgstr "Enfòmasyon Pèsonèl"
+
+#: intake/templates/intake/intake_form.html:139
+msgid "Contact Information"
+msgstr "Enfòmasyon Kontak"
+
+#: intake/templates/intake/intake_form.html:142
+msgid "Provide a safe way for our team to contact you, if available."
+msgstr "Bay yon fason sekirize pou ekip nou an kontakte ou, si disponib."
+
+#: intake/templates/intake/intake_form.html:165
+msgid "Immigration Case Information"
+msgstr "Enfòmasyon Ka Imigrasyon"
+
+#: intake/templates/intake/intake_form.html:170
+msgid "Are you currently detained?"
+msgstr "Èske ou aktyèlman detni?"
+
+#: intake/templates/intake/intake_form.html:173
+msgid "Yes, I am detained"
+msgstr "Wi, mwen detni"
+
+#: intake/templates/intake/intake_form.html:198
+msgid "Asylum Screening"
+msgstr "Evalyasyon Azil"
+
+#: intake/templates/intake/intake_form.html:203
+msgid "Why do you fear returning to your home country?"
+msgstr "Poukisa ou pè retounen nan peyi ou?"
+
+#: intake/templates/intake/intake_form.html:204
+msgid "Please provide as much detail as you safely can."
+msgstr "Tanpri bay plis detay ou ka bay an sekirite."
+
+#: intake/templates/intake/intake_form.html:209
+msgid "Have you experienced past harm or persecution?"
+msgstr "Èske ou te sibi dòmaj oswa pèsekisyon nan pase?"
+
+#: intake/templates/intake/intake_form.html:210
+msgid "Please describe what happened, if you can."
+msgstr "Tanpri dekri sa ki te pase, si ou ka."
+
+#: intake/templates/intake/intake_form.html:215
+msgid ""
+"What countries did you travel through, and did you apply for asylum in those "
+"countries?"
+msgstr ""
+"Ki peyi ou te vwayaje atravè, epi èske ou te mande azil nan peyi sa yo?"
+
+#: intake/templates/intake/intake_form.html:216
+msgid ""
+"List each country and whether you requested protection there, if applicable."
+msgstr ""
+"Liste chak peyi ak si ou te mande pwoteksyon la, si sa aplikab."
+
+#: intake/templates/intake/intake_form.html:221
+msgid "Are family members included in your case?"
+msgstr "Èske manm fanmi enkli nan ka ou?"
+
+#: intake/templates/intake/intake_form.html:224
+msgid "Yes, family members are included"
+msgstr "Wi, manm fanmi enkli"
+
+#: intake/templates/intake/intake_form.html:234
+msgid "Consent and Acknowledgment"
+msgstr "Konsantman ak Rekonesans"
+
+#: intake/templates/intake/intake_form.html:248
+msgid "Submit Intake Securely"
+msgstr "Soumèt Demann an Sekirize"
+
+#: intake/templates/intake/intake_form.html:250
+msgid "Your information is submitted for confidential intake review."
+msgstr "Enfòmasyon ou soumèt pou revizyon konfidansyèl."
+
+#: intake/templates/intake/intake_form.html:262
+msgid "Justice. Dignity. Humanity."
+msgstr "Jistis. Diyite. Imanite."
+
+#: intake/templates/intake/intake_form.html:265
+msgid "Submitting your intake securely..."
+msgstr "Soumèt demann ou an sekirite..."
+
+#: intake/templates/intake/intake_success.html:12
+msgid "Intake Submitted | Universal Removal Defense Project"
+msgstr "Demann Soumèt | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_success.html:15
+msgid ""
+"Your intake has been securely submitted to Universal Removal Defense Project."
+msgstr ""
+"Demann ou te soumèt an sekirite bay Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_success.html:36
+msgid ""
+"View this confirmation in the language that is most comfortable for you."
+msgstr ""
+"Wè konfirmasyon sa a nan lang ki pi alèz pou ou."
+
+#: intake/templates/intake/intake_success.html:66
+msgid "Intake Successfully Submitted"
+msgstr "Demann Soumèt Avèk Siksè"
+
+#: intake/templates/intake/intake_success.html:68
+msgid ""
+"Thank you for contacting Universal Removal Defense Project. Your intake has "
+"been securely submitted for preliminary review."
+msgstr ""
+"Mèsi pou kontakte Universal Removal Defense Project. Demann ou te soumèt "
+"an sekirite pou revizyon preliminè."
+
+#: intake/templates/intake/intake_success.html:74
+msgid ""
+"Submission of this intake form does not create an attorney-client or "
+"representative relationship."
+msgstr ""
+"Soumèt fòm sa a pa kreye yon relasyon avoka-kliyan oswa reprezantasyon."
+
+#: intake/templates/intake/intake_success.html:75
+msgid ""
+"URDP must complete conflict screening and determine eligibility before "
+"representation may begin."
+msgstr ""
+"URDP dwe fini verifikasyon konfli ak detèmine elejiblite anvan reprezantasyon ka kòmanse."
+
+#: intake/templates/intake/intake_success.html:78
+msgid "What Happens Next?"
+msgstr "Kisa Ki Pase Apre?"
+
+#: intake/templates/intake/intake_success.html:80
+msgid "Your submission will be reviewed by URDP staff."
+msgstr "Demann ou pral revize pa pèsonèl URDP."
+
+#: intake/templates/intake/intake_success.html:81
+msgid "Additional information or documentation may be requested."
+msgstr "Enfòmasyon oswa dokiman siplemantè ka mande."
+
+#: intake/templates/intake/intake_success.html:82
+msgid "If accepted, you will be contacted regarding next steps."
+msgstr "Si aksepte, yo pral kontakte ou konsènan pwochen etap yo."
+
+#: intake/templates/intake/intake_success.html:83
+msgid "Please monitor your email and phone for follow-up communication."
+msgstr "Tanpri sivèye imèl ak telefòn ou pou kominikasyon sivit."
+
+#: intake/templates/intake/intake_success.html:87
+msgid "Submit Another Intake"
+msgstr "Soumèt Yon Lòt Demann"

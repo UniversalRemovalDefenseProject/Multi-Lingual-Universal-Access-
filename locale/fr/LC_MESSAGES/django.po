@@ -1,8 +1,411 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: URDP Intake\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-31 06:10+0000\n"
 "Language: fr\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# Translation review required before public release.
+#: intake/forms.py:10
+msgid ""
+"I understand that submitting this form does not create an attorney-client "
+"relationship."
+msgstr ""
+"Je comprends que la soumission de ce formulaire ne crée pas de relation avocat-client."
+
+#: intake/forms.py:15
+msgid "Please acknowledge this notice before submitting your intake."
+msgstr "Veuillez confirmer cet avis avant de soumettre votre demande."
+
+#: intake/forms.py:41
+msgid "Full name"
+msgstr "Nom complet"
+
+#: intake/forms.py:42
+msgid "Date of birth"
+msgstr "Date de naissance"
+
+#: intake/forms.py:43
+msgid "Country of origin"
+msgstr "Pays d'origine"
+
+#: intake/forms.py:44
+msgid "Preferred language"
+msgstr "Langue préférée"
+
+#: intake/forms.py:45
+msgid "Phone number"
+msgstr "Numéro de téléphone"
+
+#: intake/forms.py:46
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+#: intake/forms.py:47
+msgid "Current city or location"
+msgstr "Ville ou lieu actuel"
+
+#: intake/forms.py:48
+msgid "Currently detained"
+msgstr "Actuellement détenu(e)"
+
+#: intake/forms.py:49
+msgid "Immigration court"
+msgstr "Tribunal d'immigration"
+
+#: intake/forms.py:50
+msgid "A-number"
+msgstr "Numéro A"
+
+#: intake/forms.py:51
+msgid "Next hearing date"
+msgstr "Date de la prochaine audience"
+
+#: intake/forms.py:52
+msgid "Reason for fearing return"
+msgstr "Raison de craindre le retour"
+
+#: intake/forms.py:53
+msgid "Past harm or persecution"
+msgstr "Préjudices ou persécutions passés"
+
+#: intake/forms.py:55
+msgid "Countries traveled through and asylum applications"
+msgstr "Pays traversés et demandes d'asile"
+
+#: intake/forms.py:57
+msgid "Family members included"
+msgstr "Membres de la famille inclus"
+
+#: intake/forms.py:63
+msgid "Enter your full name"
+msgstr "Entrez votre nom complet"
+
+#: intake/forms.py:77
+msgid "Country where you are from"
+msgstr "Pays dont vous êtes originaire"
+
+#: intake/forms.py:84
+msgid "Language you prefer for communication"
+msgstr "Langue que vous préférez pour la communication"
+
+#: intake/forms.py:91
+msgid "Best phone number to reach you"
+msgstr "Meilleur numéro de téléphone pour vous joindre"
+
+#: intake/forms.py:99
+msgid "Email address, if available"
+msgstr "Adresse e-mail, si disponible"
+
+#: intake/forms.py:107
+msgid "City, state, or detention facility"
+msgstr "Ville, état ou centre de détention"
+
+#: intake/forms.py:115
+msgid "Court name or city, if known"
+msgstr "Nom du tribunal ou ville, si connu"
+
+#: intake/forms.py:121
+msgid "Example: A123456789"
+msgstr "Exemple : A123456789"
+
+#: intake/forms.py:131
+msgid "Describe why returning would be unsafe for you."
+msgstr "Décrivez pourquoi le retour serait dangereux pour vous."
+
+#: intake/forms.py:139
+msgid "Describe any past harm, threats, or persecution."
+msgstr "Décrivez tout préjudice, menace ou persécution passée."
+
+#: intake/forms.py:148
+msgid "List countries traveled through and whether you applied for asylum."
+msgstr "Listez les pays traversés et si vous avez demandé l'asile."
+
+#: intake/forms.py:164
+msgid "This information is required."
+msgstr "Cette information est obligatoire."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:30
+#: intake/models.py:37
+msgid "Language used while completing the intake form."
+msgstr "Langue utilisée lors de la complétion du formulaire."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:41
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:51
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:61
+#: intake/models.py:52 intake/models.py:56 intake/models.py:60
+msgid "Staff translation only. The original response is preserved separately."
+msgstr "Traduction du personnel uniquement. La réponse originale est conservée séparément."
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:83
+#: intake/models.py:66
+msgid "Language of any staff-entered translated responses."
+msgstr "Langue des réponses traduites saisies par le personnel."
+
+#: intake/models.py:7 urdp/settings.py:113
+msgid "English"
+msgstr "Anglais"
+
+#: intake/models.py:8 urdp/settings.py:114
+msgid "Spanish"
+msgstr "Espagnol"
+
+#: intake/models.py:9 urdp/settings.py:115
+msgid "French"
+msgstr "Français"
+
+#: intake/models.py:10 urdp/settings.py:116
+msgid "Arabic"
+msgstr "Arabe"
+
+#: intake/models.py:11 urdp/settings.py:117
+msgid "Haitian Creole"
+msgstr "Créole haïtien"
+
+#: intake/models.py:12 urdp/settings.py:118
+msgid "Russian"
+msgstr "Russe"
+
+#: intake/models.py:13 urdp/settings.py:119
+msgid "Hindi"
+msgstr "Hindi"
+
+#: intake/models.py:14 urdp/settings.py:120
+msgid "Punjabi"
+msgstr "Pendjabi"
+
+#: intake/models.py:15 urdp/settings.py:121
+msgid "Portuguese"
+msgstr "Portugais"
+
+#: intake/models.py:16 urdp/settings.py:122
+msgid "Chinese (Simplified)"
+msgstr "Chinois (simplifié)"
+
+#: intake/templates/intake/intake_form.html:13
+msgid "Asylum Intake | Universal Removal Defense Project"
+msgstr "Demande d'asile | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:16
+msgid ""
+"Secure multilingual asylum intake form for Universal Removal Defense Project."
+msgstr ""
+"Formulaire de demande d'asile sécurisé et multilingue pour le Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_form.html:29
+#: intake/templates/intake/intake_success.html:25
+msgid "Secure | Confidential | Multilingual | For All Cultures"
+msgstr "Sécurisé | Confidentiel | Multilingue | Pour toutes les cultures"
+
+#: intake/templates/intake/intake_form.html:30
+#: intake/templates/intake/intake_success.html:26
+msgid "Every person deserves access to justice."
+msgstr "Chaque personne mérite d'avoir accès à la justice."
+
+#: intake/templates/intake/intake_form.html:34
+#: intake/templates/intake/intake_form.html:36
+#: intake/templates/intake/intake_form.html:259
+msgid "Universal Removal Defense Project"
+msgstr "Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:35
+#: intake/templates/intake/intake_success.html:63
+msgid "Universal Removal Defense Project logo"
+msgstr "Logo du Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:37
+#: intake/templates/intake/intake_form.html:261
+msgid "All Cultures, All Languages."
+msgstr "Toutes les cultures, toutes les langues."
+
+#: intake/templates/intake/intake_form.html:45
+#: intake/templates/intake/intake_success.html:35
+msgid "Choose your language"
+msgstr "Choisissez votre langue"
+
+#: intake/templates/intake/intake_form.html:46
+msgid ""
+"You can complete this form in the language that is most comfortable for you."
+msgstr ""
+"Vous pouvez remplir ce formulaire dans la langue avec laquelle vous vous sentez le plus à l'aise."
+
+#: intake/templates/intake/intake_form.html:49
+#: intake/templates/intake/intake_success.html:39
+msgid "Language"
+msgstr "Langue"
+
+#: intake/templates/intake/intake_form.html:72
+#: intake/templates/intake/intake_success.html:55
+msgid "Change language"
+msgstr "Changer de langue"
+
+#: intake/templates/intake/intake_form.html:79
+msgid "Important Notice"
+msgstr "Avis important"
+
+#: intake/templates/intake/intake_form.html:81
+msgid ""
+"Submitting this form <strong>does not</strong> create an attorney-client "
+"relationship. URDP must review your intake, complete conflict screening, and "
+"provide written acceptance before representation begins."
+msgstr ""
+"La soumission de ce formulaire ne crée <strong>pas</strong> de relation avocat-client. "
+"URDP doit examiner votre demande, effectuer une vérification des conflits et "
+"fournir une acceptation écrite avant que la représentation commence."
+
+#: intake/templates/intake/intake_form.html:92
+msgid "Please correct the highlighted information."
+msgstr "Veuillez corriger les informations surlignées."
+
+#: intake/templates/intake/intake_form.html:109
+msgid "Personal Information"
+msgstr "Informations personnelles"
+
+#: intake/templates/intake/intake_form.html:139
+msgid "Contact Information"
+msgstr "Informations de contact"
+
+#: intake/templates/intake/intake_form.html:142
+msgid "Provide a safe way for our team to contact you, if available."
+msgstr "Fournissez un moyen sûr pour notre équipe de vous contacter, si disponible."
+
+#: intake/templates/intake/intake_form.html:165
+msgid "Immigration Case Information"
+msgstr "Informations sur le dossier d'immigration"
+
+#: intake/templates/intake/intake_form.html:170
+msgid "Are you currently detained?"
+msgstr "Êtes-vous actuellement détenu(e) ?"
+
+#: intake/templates/intake/intake_form.html:173
+msgid "Yes, I am detained"
+msgstr "Oui, je suis détenu(e)"
+
+#: intake/templates/intake/intake_form.html:198
+msgid "Asylum Screening"
+msgstr "Évaluation de la demande d'asile"
+
+#: intake/templates/intake/intake_form.html:203
+msgid "Why do you fear returning to your home country?"
+msgstr "Pourquoi craignez-vous de retourner dans votre pays d'origine ?"
+
+#: intake/templates/intake/intake_form.html:204
+msgid "Please provide as much detail as you safely can."
+msgstr "Veuillez fournir autant de détails que vous pouvez en toute sécurité."
+
+#: intake/templates/intake/intake_form.html:209
+msgid "Have you experienced past harm or persecution?"
+msgstr "Avez-vous subi des préjudices ou des persécutions par le passé ?"
+
+#: intake/templates/intake/intake_form.html:210
+msgid "Please describe what happened, if you can."
+msgstr "Veuillez décrire ce qui s'est passé, si vous le pouvez."
+
+#: intake/templates/intake/intake_form.html:215
+msgid ""
+"What countries did you travel through, and did you apply for asylum in those "
+"countries?"
+msgstr ""
+"Par quels pays avez-vous voyagé et avez-vous demandé l'asile dans ces pays ?"
+
+#: intake/templates/intake/intake_form.html:216
+msgid ""
+"List each country and whether you requested protection there, if applicable."
+msgstr ""
+"Listez chaque pays et si vous y avez demandé une protection, le cas échéant."
+
+#: intake/templates/intake/intake_form.html:221
+msgid "Are family members included in your case?"
+msgstr "Des membres de votre famille sont-ils inclus dans votre dossier ?"
+
+#: intake/templates/intake/intake_form.html:224
+msgid "Yes, family members are included"
+msgstr "Oui, des membres de la famille sont inclus"
+
+#: intake/templates/intake/intake_form.html:234
+msgid "Consent and Acknowledgment"
+msgstr "Consentement et reconnaissance"
+
+#: intake/templates/intake/intake_form.html:248
+msgid "Submit Intake Securely"
+msgstr "Soumettre la demande en toute sécurité"
+
+#: intake/templates/intake/intake_form.html:250
+msgid "Your information is submitted for confidential intake review."
+msgstr "Vos informations sont soumises pour un examen confidentiel."
+
+#: intake/templates/intake/intake_form.html:262
+msgid "Justice. Dignity. Humanity."
+msgstr "Justice. Dignité. Humanité."
+
+#: intake/templates/intake/intake_form.html:265
+msgid "Submitting your intake securely..."
+msgstr "Soumission de votre demande en toute sécurité..."
+
+#: intake/templates/intake/intake_success.html:12
+msgid "Intake Submitted | Universal Removal Defense Project"
+msgstr "Demande soumise | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_success.html:15
+msgid ""
+"Your intake has been securely submitted to Universal Removal Defense Project."
+msgstr ""
+"Votre demande a été soumise en toute sécurité au Universal Removal Defense Project."
+
+#: intake/templates/intake/intake_success.html:36
+msgid ""
+"View this confirmation in the language that is most comfortable for you."
+msgstr ""
+"Consultez cette confirmation dans la langue avec laquelle vous vous sentez le plus à l'aise."
+
+#: intake/templates/intake/intake_success.html:66
+msgid "Intake Successfully Submitted"
+msgstr "Demande soumise avec succès"
+
+#: intake/templates/intake/intake_success.html:68
+msgid ""
+"Thank you for contacting Universal Removal Defense Project. Your intake has "
+"been securely submitted for preliminary review."
+msgstr ""
+"Merci de contacter le Universal Removal Defense Project. Votre demande a "
+"été soumise en toute sécurité pour examen préliminaire."
+
+#: intake/templates/intake/intake_success.html:74
+msgid ""
+"Submission of this intake form does not create an attorney-client or "
+"representative relationship."
+msgstr ""
+"La soumission de ce formulaire ne crée pas de relation avocat-client ou de représentation."
+
+#: intake/templates/intake/intake_success.html:75
+msgid ""
+"URDP must complete conflict screening and determine eligibility before "
+"representation may begin."
+msgstr ""
+"URDP doit effectuer une vérification des conflits et déterminer l'éligibilité "
+"avant que la représentation puisse commencer."
+
+#: intake/templates/intake/intake_success.html:78
+msgid "What Happens Next?"
+msgstr "Que se passe-t-il ensuite ?"
+
+#: intake/templates/intake/intake_success.html:80
+msgid "Your submission will be reviewed by URDP staff."
+msgstr "Votre demande sera examinée par le personnel de URDP."
+
+#: intake/templates/intake/intake_success.html:81
+msgid "Additional information or documentation may be requested."
+msgstr "Des informations ou documents supplémentaires peuvent être demandés."
+
+#: intake/templates/intake/intake_success.html:82
+msgid "If accepted, you will be contacted regarding next steps."
+msgstr "Si accepté(e), vous serez contacté(e) concernant les prochaines étapes."
+
+#: intake/templates/intake/intake_success.html:83
+msgid "Please monitor your email and phone for follow-up communication."
+msgstr "Veuillez surveiller votre e-mail et votre téléphone pour les communications de suivi."
+
+#: intake/templates/intake/intake_success.html:87
+msgid "Submit Another Intake"
+msgstr "Soumettre une autre demande"

@@ -1,8 +1,408 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: URDP Intake\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-31 06:10+0000\n"
 "Language: zh_Hans\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-# Translation review required before public release.
+#: intake/forms.py:10
+msgid ""
+"I understand that submitting this form does not create an attorney-client "
+"relationship."
+msgstr ""
+"我理解提交此表格不会建立律师-当事人关系。"
+
+#: intake/forms.py:15
+msgid "Please acknowledge this notice before submitting your intake."
+msgstr "请在提交申请前确认此通知。"
+
+#: intake/forms.py:41
+msgid "Full name"
+msgstr "全名"
+
+#: intake/forms.py:42
+msgid "Date of birth"
+msgstr "出生日期"
+
+#: intake/forms.py:43
+msgid "Country of origin"
+msgstr "原籍国"
+
+#: intake/forms.py:44
+msgid "Preferred language"
+msgstr "首选语言"
+
+#: intake/forms.py:45
+msgid "Phone number"
+msgstr "电话号码"
+
+#: intake/forms.py:46
+msgid "Email address"
+msgstr "电子邮件地址"
+
+#: intake/forms.py:47
+msgid "Current city or location"
+msgstr "当前城市或位置"
+
+#: intake/forms.py:48
+msgid "Currently detained"
+msgstr "目前被拘留"
+
+#: intake/forms.py:49
+msgid "Immigration court"
+msgstr "移民法庭"
+
+#: intake/forms.py:50
+msgid "A-number"
+msgstr "A号码"
+
+#: intake/forms.py:51
+msgid "Next hearing date"
+msgstr "下次听证日期"
+
+#: intake/forms.py:52
+msgid "Reason for fearing return"
+msgstr "害怕返回的原因"
+
+#: intake/forms.py:53
+msgid "Past harm or persecution"
+msgstr "过去的伤害或迫害"
+
+#: intake/forms.py:55
+msgid "Countries traveled through and asylum applications"
+msgstr "途经国家及庇护申请情况"
+
+#: intake/forms.py:57
+msgid "Family members included"
+msgstr "包含的家庭成员"
+
+#: intake/forms.py:63
+msgid "Enter your full name"
+msgstr "请输入您的全名"
+
+#: intake/forms.py:77
+msgid "Country where you are from"
+msgstr "您来自的国家"
+
+#: intake/forms.py:84
+msgid "Language you prefer for communication"
+msgstr "您偏好的沟通语言"
+
+#: intake/forms.py:91
+msgid "Best phone number to reach you"
+msgstr "联系您的最佳电话号码"
+
+#: intake/forms.py:99
+msgid "Email address, if available"
+msgstr "电子邮件地址（如有）"
+
+#: intake/forms.py:107
+msgid "City, state, or detention facility"
+msgstr "城市、州或拘留设施"
+
+#: intake/forms.py:115
+msgid "Court name or city, if known"
+msgstr "法庭名称或城市（如已知）"
+
+#: intake/forms.py:121
+msgid "Example: A123456789"
+msgstr "示例：A123456789"
+
+#: intake/forms.py:131
+msgid "Describe why returning would be unsafe for you."
+msgstr "请描述为什么返回对您来说是不安全的。"
+
+#: intake/forms.py:139
+msgid "Describe any past harm, threats, or persecution."
+msgstr "请描述您经历过的任何伤害、威胁或迫害。"
+
+#: intake/forms.py:148
+msgid "List countries traveled through and whether you applied for asylum."
+msgstr "请列出您途经的国家以及是否在那里申请了庇护。"
+
+#: intake/forms.py:164
+msgid "This information is required."
+msgstr "此信息为必填项。"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:30
+#: intake/models.py:37
+msgid "Language used while completing the intake form."
+msgstr "填写接待表格时使用的语言。"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:41
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:51
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:61
+#: intake/models.py:52 intake/models.py:56 intake/models.py:60
+msgid "Staff translation only. The original response is preserved separately."
+msgstr "仅供工作人员翻译使用。原始回复单独保存。"
+
+#: intake/migrations/0005_intakesubmission_language_translation_fields.py:83
+#: intake/models.py:66
+msgid "Language of any staff-entered translated responses."
+msgstr "工作人员输入的翻译回复所用的语言。"
+
+#: intake/models.py:7 urdp/settings.py:113
+msgid "English"
+msgstr "英语"
+
+#: intake/models.py:8 urdp/settings.py:114
+msgid "Spanish"
+msgstr "西班牙语"
+
+#: intake/models.py:9 urdp/settings.py:115
+msgid "French"
+msgstr "法语"
+
+#: intake/models.py:10 urdp/settings.py:116
+msgid "Arabic"
+msgstr "阿拉伯语"
+
+#: intake/models.py:11 urdp/settings.py:117
+msgid "Haitian Creole"
+msgstr "海地克里奥尔语"
+
+#: intake/models.py:12 urdp/settings.py:118
+msgid "Russian"
+msgstr "俄语"
+
+#: intake/models.py:13 urdp/settings.py:119
+msgid "Hindi"
+msgstr "印地语"
+
+#: intake/models.py:14 urdp/settings.py:120
+msgid "Punjabi"
+msgstr "旁遮普语"
+
+#: intake/models.py:15 urdp/settings.py:121
+msgid "Portuguese"
+msgstr "葡萄牙语"
+
+#: intake/models.py:16 urdp/settings.py:122
+msgid "Chinese (Simplified)"
+msgstr "中文（简体）"
+
+#: intake/templates/intake/intake_form.html:13
+msgid "Asylum Intake | Universal Removal Defense Project"
+msgstr "庇护申请 | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:16
+msgid ""
+"Secure multilingual asylum intake form for Universal Removal Defense Project."
+msgstr ""
+"Universal Removal Defense Project 的安全多语言庇护申请表。"
+
+#: intake/templates/intake/intake_form.html:29
+#: intake/templates/intake/intake_success.html:25
+msgid "Secure | Confidential | Multilingual | For All Cultures"
+msgstr "安全 | 保密 | 多语言 | 面向所有文化"
+
+#: intake/templates/intake/intake_form.html:30
+#: intake/templates/intake/intake_success.html:26
+msgid "Every person deserves access to justice."
+msgstr "每个人都应享有获得公正的权利。"
+
+#: intake/templates/intake/intake_form.html:34
+#: intake/templates/intake/intake_form.html:36
+#: intake/templates/intake/intake_form.html:259
+msgid "Universal Removal Defense Project"
+msgstr "Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_form.html:35
+#: intake/templates/intake/intake_success.html:63
+msgid "Universal Removal Defense Project logo"
+msgstr "Universal Removal Defense Project 标志"
+
+#: intake/templates/intake/intake_form.html:37
+#: intake/templates/intake/intake_form.html:261
+msgid "All Cultures, All Languages."
+msgstr "所有文化，所有语言。"
+
+#: intake/templates/intake/intake_form.html:45
+#: intake/templates/intake/intake_success.html:35
+msgid "Choose your language"
+msgstr "选择您的语言"
+
+#: intake/templates/intake/intake_form.html:46
+msgid ""
+"You can complete this form in the language that is most comfortable for you."
+msgstr ""
+"您可以用最适合您的语言填写此表格。"
+
+#: intake/templates/intake/intake_form.html:49
+#: intake/templates/intake/intake_success.html:39
+msgid "Language"
+msgstr "语言"
+
+#: intake/templates/intake/intake_form.html:72
+#: intake/templates/intake/intake_success.html:55
+msgid "Change language"
+msgstr "更改语言"
+
+#: intake/templates/intake/intake_form.html:79
+msgid "Important Notice"
+msgstr "重要通知"
+
+#: intake/templates/intake/intake_form.html:81
+msgid ""
+"Submitting this form <strong>does not</strong> create an attorney-client "
+"relationship. URDP must review your intake, complete conflict screening, and "
+"provide written acceptance before representation begins."
+msgstr ""
+"提交此表格<strong>不会</strong>建立律师-当事人关系。"
+"URDP 必须审查您的申请、完成利益冲突审查，并在代理开始前提供书面接受通知。"
+
+#: intake/templates/intake/intake_form.html:92
+msgid "Please correct the highlighted information."
+msgstr "请更正高亮显示的信息。"
+
+#: intake/templates/intake/intake_form.html:109
+msgid "Personal Information"
+msgstr "个人信息"
+
+#: intake/templates/intake/intake_form.html:139
+msgid "Contact Information"
+msgstr "联系信息"
+
+#: intake/templates/intake/intake_form.html:142
+msgid "Provide a safe way for our team to contact you, if available."
+msgstr "如有可能，请提供我们团队联系您的安全方式。"
+
+#: intake/templates/intake/intake_form.html:165
+msgid "Immigration Case Information"
+msgstr "移民案件信息"
+
+#: intake/templates/intake/intake_form.html:170
+msgid "Are you currently detained?"
+msgstr "您目前是否被拘留？"
+
+#: intake/templates/intake/intake_form.html:173
+msgid "Yes, I am detained"
+msgstr "是的，我被拘留了"
+
+#: intake/templates/intake/intake_form.html:198
+msgid "Asylum Screening"
+msgstr "庇护资格审查"
+
+#: intake/templates/intake/intake_form.html:203
+msgid "Why do you fear returning to your home country?"
+msgstr "您为什么害怕返回您的母国？"
+
+#: intake/templates/intake/intake_form.html:204
+msgid "Please provide as much detail as you safely can."
+msgstr "请在安全范围内尽可能详细地描述。"
+
+#: intake/templates/intake/intake_form.html:209
+msgid "Have you experienced past harm or persecution?"
+msgstr "您是否曾经历过伤害或迫害？"
+
+#: intake/templates/intake/intake_form.html:210
+msgid "Please describe what happened, if you can."
+msgstr "如果可以，请描述发生了什么。"
+
+#: intake/templates/intake/intake_form.html:215
+msgid ""
+"What countries did you travel through, and did you apply for asylum in those "
+"countries?"
+msgstr ""
+"您途经了哪些国家，您是否在这些国家申请过庇护？"
+
+#: intake/templates/intake/intake_form.html:216
+msgid ""
+"List each country and whether you requested protection there, if applicable."
+msgstr ""
+"请列出每个国家以及您是否在那里寻求过保护（如适用）。"
+
+#: intake/templates/intake/intake_form.html:221
+msgid "Are family members included in your case?"
+msgstr "您的案件中是否包含家庭成员？"
+
+#: intake/templates/intake/intake_form.html:224
+msgid "Yes, family members are included"
+msgstr "是的，包含家庭成员"
+
+#: intake/templates/intake/intake_form.html:234
+msgid "Consent and Acknowledgment"
+msgstr "同意与确认"
+
+#: intake/templates/intake/intake_form.html:248
+msgid "Submit Intake Securely"
+msgstr "安全提交申请"
+
+#: intake/templates/intake/intake_form.html:250
+msgid "Your information is submitted for confidential intake review."
+msgstr "您的信息将被提交进行保密审查。"
+
+#: intake/templates/intake/intake_form.html:262
+msgid "Justice. Dignity. Humanity."
+msgstr "公正。尊严。人道。"
+
+#: intake/templates/intake/intake_form.html:265
+msgid "Submitting your intake securely..."
+msgstr "正在安全提交您的申请..."
+
+#: intake/templates/intake/intake_success.html:12
+msgid "Intake Submitted | Universal Removal Defense Project"
+msgstr "申请已提交 | Universal Removal Defense Project"
+
+#: intake/templates/intake/intake_success.html:15
+msgid ""
+"Your intake has been securely submitted to Universal Removal Defense Project."
+msgstr ""
+"您的申请已安全提交至 Universal Removal Defense Project。"
+
+#: intake/templates/intake/intake_success.html:36
+msgid ""
+"View this confirmation in the language that is most comfortable for you."
+msgstr ""
+"用您最熟悉的语言查看此确认信息。"
+
+#: intake/templates/intake/intake_success.html:66
+msgid "Intake Successfully Submitted"
+msgstr "申请已成功提交"
+
+#: intake/templates/intake/intake_success.html:68
+msgid ""
+"Thank you for contacting Universal Removal Defense Project. Your intake has "
+"been securely submitted for preliminary review."
+msgstr ""
+"感谢您联系 Universal Removal Defense Project。您的申请已安全提交以进行初步审查。"
+
+#: intake/templates/intake/intake_success.html:74
+msgid ""
+"Submission of this intake form does not create an attorney-client or "
+"representative relationship."
+msgstr ""
+"提交此申请表不会建立律师-当事人关系或代理关系。"
+
+#: intake/templates/intake/intake_success.html:75
+msgid ""
+"URDP must complete conflict screening and determine eligibility before "
+"representation may begin."
+msgstr ""
+"URDP 必须完成利益冲突审查并确定资格，代理才能开始。"
+
+#: intake/templates/intake/intake_success.html:78
+msgid "What Happens Next?"
+msgstr "接下来会发生什么？"
+
+#: intake/templates/intake/intake_success.html:80
+msgid "Your submission will be reviewed by URDP staff."
+msgstr "您的申请将由 URDP 工作人员审查。"
+
+#: intake/templates/intake/intake_success.html:81
+msgid "Additional information or documentation may be requested."
+msgstr "可能会要求您提供额外信息或文件。"
+
+#: intake/templates/intake/intake_success.html:82
+msgid "If accepted, you will be contacted regarding next steps."
+msgstr "如果被接受，我们将与您联系告知后续步骤。"
+
+#: intake/templates/intake/intake_success.html:83
+msgid "Please monitor your email and phone for follow-up communication."
+msgstr "请留意您的电子邮件和电话，以便接收后续通讯。"
+
+#: intake/templates/intake/intake_success.html:87
+msgid "Submit Another Intake"
+msgstr "提交另一份申请"
