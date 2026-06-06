@@ -1,46 +1,24 @@
+{% extends "intake/base.html" %}
 {% load static i18n %}
-{% get_current_language as LANGUAGE_CODE %}
-{% get_current_language_bidi as LANGUAGE_BIDI %}
-{% get_available_languages as AVAILABLE_LANGUAGES %}
-{% get_language_info_list for AVAILABLE_LANGUAGES as LANGUAGE_INFO_LIST %}
 
-<!doctype html>
-<html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{% translate "Intake Submitted | Universal Removal Defense Project" %}</title>
-  <meta
-    name="description"
-    content="{% translate 'Your intake has been securely submitted to Universal Removal Defense Project.' %}"
-  />
-  <link rel="stylesheet" href="{% static 'styles.css' %}" />
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}" />
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}" />
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}" />
-</head>
+{% block title %}{% translate "Intake Submitted | Universal Removal Defense Project" %}{% endblock %}
+{% block description %}{% translate "Your intake has been securely submitted to Universal Removal Defense Project." %}{% endblock %}
 
-<body class="intake-page">
-<header class="topbar">
-  <div class="topbar-left">{% translate "Secure | Confidential | Multilingual | For All Cultures" %}</div>
-  <div class="topbar-right">{% translate "Every person deserves access to justice." %}</div>
-</header>
-
+{% block body %}
 <main class="success-page">
   <div class="success-content">
-    <form class="language-panel success-language-panel" action="{% url 'set_language' %}" method="post">
+
+    <form class="langbar" action="{% url 'set_language' %}" method="post">
       {% csrf_token %}
-      <input name="next" type="hidden" value="{{ request.path }}">
-      <div>
-        <h2>{% translate "Choose your language" %}</h2>
-        <p>{% translate "View this confirmation in the language that is most comfortable for you." %}</p>
-      </div>
-      <div class="language-control">
-        <label for="success-language-select">{% translate "Language" %}</label>
+      <input name="next" type="hidden" value="{{ request.path }}" />
+      <div class="langbar-inner">
+        <div class="lb-label">
+          <b>{% translate "Choose your language" %}</b><br />
+          {% translate "View this confirmation in the language that is most comfortable for you." %}
+        </div>
         <select
-          class="form-control"
-          id="success-language-select"
           name="language"
+          aria-label="{% translate 'Language' %}"
           onchange="this.form.submit();"
         >
           {% for language in LANGUAGE_INFO_LIST %}
@@ -52,7 +30,6 @@
             >{{ language.name_local }}</option>
           {% endfor %}
         </select>
-        <button class="language-button" type="submit">{% translate "Change language" %}</button>
       </div>
     </form>
 
@@ -61,8 +38,8 @@
         class="success-logo"
         src="{% static 'images/urdp-logo.png' %}"
         alt="{% translate 'Universal Removal Defense Project logo' %}"
-      >
-      <div class="success-icon" aria-hidden="true">OK</div>
+      />
+      <div class="success-icon" aria-hidden="true">✓</div>
       <h1 class="success-title">{% translate "Intake Successfully Submitted" %}</h1>
       <p class="success-message">
         {% blocktranslate trimmed %}
@@ -84,10 +61,10 @@
         </ul>
       </div>
       <div class="success-buttons">
-        <a href="{% url 'intake_form' %}" class="btn btn-secondary">{% translate "Submit Another Intake" %}</a>
+        <a href="{% url 'intake_form' %}" class="btn-secondary">{% translate "Submit Another Intake" %}</a>
       </div>
     </div>
+
   </div>
 </main>
-</body>
-</html>
+{% endblock %}
