@@ -1,82 +1,50 @@
+{% extends "intake/base.html" %}
 {% load static i18n %}
-{% get_current_language as LANGUAGE_CODE %}
-{% get_current_language_bidi as LANGUAGE_BIDI %}
-{% get_available_languages as AVAILABLE_LANGUAGES %}
-{% get_language_info_list for AVAILABLE_LANGUAGES as LANGUAGE_INFO_LIST %}
 
-<!doctype html>
-<html lang="{{ LANGUAGE_CODE|default:'en' }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+{% block title %}{% translate "Asylum Intake | Universal Removal Defense Project" %}{% endblock %}
+{% block description %}{% translate "Secure multilingual asylum intake form for Universal Removal Defense Project." %}{% endblock %}
 
-  <title>{% translate "Asylum Intake | Universal Removal Defense Project" %}</title>
-  <meta
-    name="description"
-    content="{% translate 'Secure multilingual asylum intake form for Universal Removal Defense Project.' %}"
-  />
+{% block body %}
+<div class="wrap">
 
-  <link rel="stylesheet" href="{% static 'styles.css' %}" />
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicons/apple-touch-icon.png' %}" />
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}" />
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}" />
-  <link rel="shortcut icon" href="{% static 'favicons/favicon.ico' %}" />
-</head>
-
-<body class="intake-page">
-
-<header class="topbar">
-  <div class="topbar-left">{% translate "Secure | Confidential | Multilingual | For All Cultures" %}</div>
-  <div class="topbar-right">{% translate "Every person deserves access to justice." %}</div>
-</header>
-
-<main class="intake-main">
-  <section class="brand-hero" aria-label="{% translate 'Universal Removal Defense Project' %}">
-    <img class="hero-logo" src="{% static 'images/urdp-logo.png' %}" alt="{% translate 'Universal Removal Defense Project logo' %}">
+  <header class="masthead">
+    <div class="logo-chip">
+      <img src="{% static 'images/urdp-logo.png' %}" alt="{% translate 'Universal Removal Defense Project logo' %}" />
+    </div>
     <h1>{% translate "Universal Removal Defense Project" %}</h1>
-    <p>{% translate "All Cultures, All Languages." %}</p>
-  </section>
+    <p class="tag">{% translate "All Cultures, All Languages." %}</p>
+  </header>
 
-  <form method="post" class="intake-form" id="intake-form">
+  <form action="{% url 'set_language' %}" method="post" class="langbar">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.path }}" />
+    <div class="langbar-inner">
+      <div class="lb-label">
+        <b>{% translate "Choose your language" %}</b><br />
+        {% translate "You can complete this form in the language that is most comfortable for you." %}
+      </div>
+      <select
+        name="language"
+        aria-label="{% translate 'Language' %}"
+        onchange="this.form.submit();"
+      >
+        {% for language in LANGUAGE_INFO_LIST %}
+          <option
+            value="{{ language.code }}"
+            lang="{{ language.code }}"
+            dir="{% if language.bidi %}rtl{% else %}ltr{% endif %}"
+            {% if language.code == selected_language %}selected{% endif %}
+          >{{ language.name_local }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <form method="post" id="intake-form">
     {% csrf_token %}
 
-    <section class="language-panel" aria-labelledby="language-title">
-      <div>
-        <h2 id="language-title">{% translate "Choose your language" %}</h2>
-        <p>{% translate "You can complete this form in the language that is most comfortable for you." %}</p>
-      </div>
-      <div class="language-control">
-        <label for="language-select">{% translate "Language" %}</label>
-        <select
-          class="form-control"
-          id="language-select"
-          name="language"
-          onchange="this.form.requestSubmit(document.getElementById('change-language-button'));"
-        >
-          {% for language in LANGUAGE_INFO_LIST %}
-            <option
-              value="{{ language.code }}"
-              lang="{{ language.code }}"
-              dir="{% if language.bidi %}rtl{% else %}ltr{% endif %}"
-              {% if language.code == selected_language %}selected{% endif %}
-            >{{ language.name_local }}</option>
-          {% endfor %}
-        </select>
-        <button
-          class="language-button"
-          id="change-language-button"
-          type="submit"
-          name="form_action"
-          value="change_language"
-          formnovalidate
-        >{% translate "Change language" %}</button>
-      </div>
-    </section>
-
-  <section class="important-notice" aria-labelledby="notice-title">
-    <div class="notice-shield" aria-hidden="true">i</div>
-    <div>
-      <h2 id="notice-title">{% translate "Important Notice" %}</h2>
+    <div class="notice">
+      <div class="ic" aria-hidden="true">i</div>
       <p>
         {% blocktranslate trimmed %}
           Submitting this form <strong>does not</strong> create an attorney-client relationship.
@@ -85,10 +53,14 @@
         {% endblocktranslate %}
       </p>
     </div>
-  </section>
+
+    <p class="privacy">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      {% translate "Secure | Confidential | Multilingual | For All Cultures" %}
+    </p>
 
     {% if form.errors %}
-      <div class="form-errors form-error-summary" role="alert" aria-labelledby="form-errors-title">
+      <div class="form-error-summary" role="alert" aria-labelledby="form-errors-title">
         <h2 id="form-errors-title">{% translate "Please correct the highlighted information." %}</h2>
         <ul>
           {% for field in form %}
@@ -103,164 +75,218 @@
       </div>
     {% endif %}
 
-    <section class="form-section" aria-labelledby="personal-information-title">
-      <h2 class="section-title" id="personal-information-title">
-        <span aria-hidden="true">1</span>
-        {% translate "Personal Information" %}
-      </h2>
+    <!-- 1 Personal Information -->
+    <section class="block" aria-labelledby="section-personal">
+      <div class="block-head">
+        <span class="num" aria-hidden="true">1</span>
+        <h2 id="section-personal">{% translate "Personal Information" %}</h2>
+      </div>
+      <div class="grid">
 
-      <div class="form-grid four">
         <div class="field{% if form.full_name.errors %} field-error{% endif %}">
-          {{ form.full_name.label_tag }}
+          <label for="{{ form.full_name.id_for_label }}">
+            {% translate "Full name" %} <span class="req">Required</span>
+          </label>
           {{ form.full_name }}
           {{ form.full_name.errors }}
         </div>
+
         <div class="field{% if form.date_of_birth.errors %} field-error{% endif %}">
-          {{ form.date_of_birth.label_tag }}
+          <label for="{{ form.date_of_birth.id_for_label }}">
+            {% translate "Date of birth" %} <span class="req">Required</span>
+          </label>
           {{ form.date_of_birth }}
           {{ form.date_of_birth.errors }}
         </div>
+
         <div class="field{% if form.country_of_origin.errors %} field-error{% endif %}">
-          {{ form.country_of_origin.label_tag }}
+          <label for="{{ form.country_of_origin.id_for_label }}">
+            {% translate "Country of origin" %} <span class="req">Required</span>
+          </label>
           {{ form.country_of_origin }}
           {{ form.country_of_origin.errors }}
         </div>
+
         <div class="field{% if form.preferred_language.errors %} field-error{% endif %}">
-          {{ form.preferred_language.label_tag }}
+          <label for="{{ form.preferred_language.id_for_label }}">
+            {% translate "Preferred language" %} <span class="req">Required</span>
+          </label>
           {{ form.preferred_language }}
           {{ form.preferred_language.errors }}
         </div>
+
       </div>
     </section>
 
-    <section class="form-section" aria-labelledby="contact-information-title">
-      <h2 class="section-title" id="contact-information-title">
-        <span aria-hidden="true">2</span>
-        {% translate "Contact Information" %}
-      </h2>
+    <!-- 2 Contact Information -->
+    <section class="block" aria-labelledby="section-contact">
+      <div class="block-head">
+        <span class="num" aria-hidden="true">2</span>
+        <h2 id="section-contact">{% translate "Contact Information" %}</h2>
+      </div>
+      <p class="block-sub">{% translate "Provide a safe way for our team to contact you, if available." %}</p>
+      <div class="grid">
 
-      <p class="section-help">{% translate "Provide a safe way for our team to contact you, if available." %}</p>
-      <div class="form-grid three">
-        <div class="field{% if form.phone.errors %} field-error{% endif %}">
-          {{ form.phone.label_tag }}
+        <div class="field full{% if form.phone.errors %} field-error{% endif %}">
+          <label for="{{ form.phone.id_for_label }}">
+            {% translate "Phone number" %} <span class="opt">Optional</span>
+          </label>
           {{ form.phone }}
           {{ form.phone.errors }}
         </div>
+
         <div class="field{% if form.email.errors %} field-error{% endif %}">
-          {{ form.email.label_tag }}
+          <label for="{{ form.email.id_for_label }}">
+            {% translate "Email address" %} <span class="opt">Optional</span>
+          </label>
           {{ form.email }}
           {{ form.email.errors }}
         </div>
+
         <div class="field{% if form.current_location.errors %} field-error{% endif %}">
-          {{ form.current_location.label_tag }}
+          <label for="{{ form.current_location.id_for_label }}">
+            {% translate "Current city or location" %} <span class="opt">Optional</span>
+          </label>
           {{ form.current_location }}
           {{ form.current_location.errors }}
         </div>
+
       </div>
+      <p class="safe-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2 4 6v6c0 5 3.5 8 8 10 4.5-2 8-5 8-10V6z"/></svg>
+        {% translate "Every person deserves access to justice." %}
+      </p>
     </section>
 
-    <section class="form-section" aria-labelledby="case-information-title">
-      <h2 class="section-title" id="case-information-title">
-        <span aria-hidden="true">3</span>
-        {% translate "Immigration Case Information" %}
-      </h2>
+    <!-- 3 Immigration Case Information -->
+    <section class="block" aria-labelledby="section-case">
+      <div class="block-head">
+        <span class="num" aria-hidden="true">3</span>
+        <h2 id="section-case">{% translate "Immigration Case Information" %}</h2>
+      </div>
+      <p class="block-sub">{% translate "Only fill in what you know — it's okay to leave parts blank." %}</p>
+      <div class="grid">
 
-      <div class="form-grid four">
-        <div class="field checkbox-field{% if form.detained.errors %} field-error{% endif %}">
-          <span class="field-label">{% translate "Are you currently detained?" %}</span>
-          <label class="checkbox-line" for="{{ form.detained.id_for_label }}">
+        <div class="field full{% if form.detained.errors %} field-error{% endif %}">
+          <label class="check" for="{{ form.detained.id_for_label }}">
             {{ form.detained }}
-            <span>{% translate "Yes, I am detained" %}</span>
+            <span>
+              <span class="ctxt">{% translate "Yes, I am detained" %}</span>
+              <span class="csub">{% translate "Are you currently detained?" %}</span>
+            </span>
           </label>
           {{ form.detained.errors }}
         </div>
+
         <div class="field{% if form.immigration_court.errors %} field-error{% endif %}">
-          {{ form.immigration_court.label_tag }}
+          <label for="{{ form.immigration_court.id_for_label }}">
+            {% translate "Immigration court" %} <span class="opt">Optional</span>
+          </label>
           {{ form.immigration_court }}
           {{ form.immigration_court.errors }}
         </div>
+
         <div class="field{% if form.a_number.errors %} field-error{% endif %}">
-          {{ form.a_number.label_tag }}
+          <label for="{{ form.a_number.id_for_label }}">
+            {% translate "A-number" %} <span class="opt">Optional</span>
+          </label>
           {{ form.a_number }}
           {{ form.a_number.errors }}
         </div>
-        <div class="field{% if form.next_hearing_date.errors %} field-error{% endif %}">
-          {{ form.next_hearing_date.label_tag }}
+
+        <div class="field full{% if form.next_hearing_date.errors %} field-error{% endif %}">
+          <label for="{{ form.next_hearing_date.id_for_label }}">
+            {% translate "Next hearing date" %} <span class="opt">Optional</span>
+          </label>
           {{ form.next_hearing_date }}
           {{ form.next_hearing_date.errors }}
         </div>
+
       </div>
     </section>
 
-    <section class="form-section" aria-labelledby="asylum-screening-title">
-      <h2 class="section-title" id="asylum-screening-title">
-        <span aria-hidden="true">4</span>
-        {% translate "Asylum Screening" %}
-      </h2>
+    <!-- 4 Asylum Screening -->
+    <section class="block" aria-labelledby="section-asylum">
+      <div class="block-head">
+        <span class="num" aria-hidden="true">4</span>
+        <h2 id="section-asylum">{% translate "Asylum Screening" %}</h2>
+      </div>
+      <p class="block-sub">{% translate "Share only what you feel safe sharing. There is no wrong answer." %}</p>
+      <div class="grid">
 
-      <div class="form-grid screening-grid">
-        <div class="field textarea-field{% if form.fear_of_return_summary.errors %} field-error{% endif %}">
-          <label for="{{ form.fear_of_return_summary.id_for_label }}">{% translate "Why do you fear returning to your home country?" %}</label>
-          <p class="field-help" id="fear-of-return-help">{% translate "Please provide as much detail as you safely can." %}</p>
+        <div class="field full{% if form.fear_of_return_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.fear_of_return_summary.id_for_label }}">
+            {% translate "Why do you fear returning to your home country?" %} <span class="req">Required</span>
+          </label>
+          <p class="hint">{% translate "Please provide as much detail as you safely can." %}</p>
           {{ form.fear_of_return_summary }}
           {{ form.fear_of_return_summary.errors }}
         </div>
-        <div class="field textarea-field{% if form.past_harm_summary.errors %} field-error{% endif %}">
-          <label for="{{ form.past_harm_summary.id_for_label }}">{% translate "Have you experienced past harm or persecution?" %}</label>
-          <p class="field-help" id="past-harm-help">{% translate "Please describe what happened, if you can." %}</p>
+
+        <div class="field full{% if form.past_harm_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.past_harm_summary.id_for_label }}">
+            {% translate "Have you experienced past harm or persecution?" %} <span class="opt">Optional</span>
+          </label>
+          <p class="hint">{% translate "Please describe what happened, if you can." %}</p>
           {{ form.past_harm_summary }}
           {{ form.past_harm_summary.errors }}
         </div>
-        <div class="field textarea-field{% if form.countries_traveled_asylum_summary.errors %} field-error{% endif %}">
-          <label for="{{ form.countries_traveled_asylum_summary.id_for_label }}">{% translate "What countries did you travel through, and did you apply for asylum in those countries?" %}</label>
-          <p class="field-help" id="countries-traveled-help">{% translate "List each country and whether you requested protection there, if applicable." %}</p>
+
+        <div class="field full{% if form.countries_traveled_asylum_summary.errors %} field-error{% endif %}">
+          <label for="{{ form.countries_traveled_asylum_summary.id_for_label }}">
+            {% translate "What countries did you travel through, and did you apply for asylum in those countries?" %} <span class="opt">Optional</span>
+          </label>
+          <p class="hint">{% translate "List each country and whether you requested protection there, if applicable." %}</p>
           {{ form.countries_traveled_asylum_summary }}
           {{ form.countries_traveled_asylum_summary.errors }}
         </div>
-        <div class="field checkbox-field family-screening-field{% if form.family_members_included.errors %} field-error{% endif %}">
-          <span class="field-label">{% translate "Are family members included in your case?" %}</span>
-          <label class="checkbox-line" for="{{ form.family_members_included.id_for_label }}">
+
+        <div class="field full{% if form.family_members_included.errors %} field-error{% endif %}">
+          <label class="check" for="{{ form.family_members_included.id_for_label }}">
             {{ form.family_members_included }}
-            <span>{% translate "Yes, family members are included" %}</span>
+            <span>
+              <span class="ctxt">{% translate "Yes, family members are included" %}</span>
+              <span class="csub">{% translate "Are family members included in your case?" %}</span>
+            </span>
           </label>
           {{ form.family_members_included.errors }}
+        </div>
+
+      </div>
+      <p class="safe-note">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+        {% translate "Your information is submitted for confidential intake review." %}
+      </p>
+    </section>
+
+    <!-- 5 Consent -->
+    <section class="block consent" aria-labelledby="section-consent">
+      <div class="block-head">
+        <span class="num" aria-hidden="true">5</span>
+        <h2 id="section-consent">{% translate "Consent and Acknowledgment" %}</h2>
+      </div>
+      <div class="grid">
+        <div class="field full{% if form.consent_acknowledged.errors %} field-error{% endif %}">
+          <label class="check" for="{{ form.consent_acknowledged.id_for_label }}" style="background: var(--paper);">
+            {{ form.consent_acknowledged }}
+            <span>
+              <span class="ctxt">{{ form.consent_acknowledged.label }} <span class="req">Required</span></span>
+            </span>
+          </label>
+          {{ form.consent_acknowledged.errors }}
         </div>
       </div>
     </section>
 
-    <section class="form-section" aria-labelledby="consent-title">
-      <h2 class="section-title" id="consent-title">
-        <span aria-hidden="true">5</span>
-        {% translate "Consent and Acknowledgment" %}
-      </h2>
-
-      <div class="consent-list{% if form.consent_acknowledged.errors %} field-error{% endif %}">
-        <label class="checkbox-line" for="{{ form.consent_acknowledged.id_for_label }}">
-          {{ form.consent_acknowledged }}
-          <span>{{ form.consent_acknowledged.label }}</span>
-        </label>
-        {{ form.consent_acknowledged.errors }}
-      </div>
-    </section>
-
-    <div class="submit-wrap">
-      <button class="submit-button" type="submit" id="submit-button">
+    <div class="actions">
+      <button class="submit" type="submit" id="submit-button">
         {% translate "Submit Intake Securely" %}
       </button>
-      <p class="security-note">{% translate "Your information is submitted for confidential intake review." %}</p>
       <p class="submission-status" id="submission-status" role="status" aria-live="polite"></p>
     </div>
-  </form>
-</main>
 
-<footer class="intake-footer">
-  <div>
-    <img src="{% static 'images/urdp-logo.png' %}" alt="">
-    <strong>{% translate "Universal Removal Defense Project" %}</strong>
-  </div>
-  <p>{% translate "All Cultures, All Languages." %}</p>
-  <p>{% translate "Justice. Dignity. Humanity." %}</p>
-</footer>
+  </form>
+</div>
 
 {% translate "Submitting your intake securely..." as submitting_message %}
 <script>
@@ -269,7 +295,7 @@
     var button = document.getElementById("submit-button");
     var status = document.getElementById("submission-status");
 
-    form.addEventListener("submit", function () {
+    form.addEventListener("submit", function (e) {
       button.disabled = true;
       button.setAttribute("aria-disabled", "true");
       form.setAttribute("aria-busy", "true");
@@ -278,5 +304,4 @@
     });
   }());
 </script>
-</body>
-</html>
+{% endblock %}

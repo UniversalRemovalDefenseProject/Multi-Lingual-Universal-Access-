@@ -14,7 +14,7 @@ class IntakeSubmissionForm(forms.ModelForm):
         error_messages={
             "required": _("Please acknowledge this notice before submitting your intake.")
         },
-        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        widget=forms.CheckboxInput(),
     )
 
     class Meta:
@@ -59,35 +59,30 @@ class IntakeSubmissionForm(forms.ModelForm):
         widgets = {
             "full_name": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Enter your full name"),
                     "autocomplete": "name",
                 }
             ),
             "date_of_birth": forms.DateInput(
                 attrs={
-                    "class": "form-control",
                     "type": "date",
                     "autocomplete": "bday",
                 }
             ),
             "country_of_origin": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Country where you are from"),
                     "autocomplete": "country-name",
                 }
             ),
             "preferred_language": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Language you prefer for communication"),
                     "autocomplete": "language",
                 }
             ),
             "phone": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Best phone number to reach you"),
                     "autocomplete": "tel",
                     "inputmode": "tel",
@@ -95,7 +90,6 @@ class IntakeSubmissionForm(forms.ModelForm):
             ),
             "email": forms.EmailInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Email address, if available"),
                     "autocomplete": "email",
                     "inputmode": "email",
@@ -103,57 +97,46 @@ class IntakeSubmissionForm(forms.ModelForm):
             ),
             "current_location": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("City, state, or detention facility"),
                     "autocomplete": "address-level2",
                 }
             ),
-            "detained": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "detained": forms.CheckboxInput(),
             "immigration_court": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Court name or city, if known"),
                 }
             ),
             "a_number": forms.TextInput(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Example: A123456789"),
                     "autocomplete": "off",
                 }
             ),
             "next_hearing_date": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
+                attrs={"type": "date"}
             ),
             "fear_of_return_summary": forms.Textarea(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Describe why returning would be unsafe for you."),
                     "rows": 5,
-                    "aria-describedby": "fear-of-return-help",
                 }
             ),
             "past_harm_summary": forms.Textarea(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _("Describe any past harm, threats, or persecution."),
                     "rows": 5,
-                    "aria-describedby": "past-harm-help",
                 }
             ),
             "countries_traveled_asylum_summary": forms.Textarea(
                 attrs={
-                    "class": "form-control",
                     "placeholder": _(
                         "List countries traveled through and whether you applied for asylum."
                     ),
                     "rows": 5,
-                    "aria-describedby": "countries-traveled-help",
                 }
             ),
-            "family_members_included": forms.CheckboxInput(
-                attrs={"class": "form-check-input"}
-            ),
+            "family_members_included": forms.CheckboxInput(),
         }
 
     def __init__(self, *args, **kwargs):
