@@ -64,3 +64,11 @@ class IntakeLanguageWorkflowTests(TestCase):
 
         self.assertRedirects(response, reverse('intake_success'))
         self.assertEqual(IntakeSubmission.objects.get().language_preference, 'en')
+
+
+class IntakeTranslationRenderingTests(TestCase):
+    def test_spanish_locale_renders_translated_form(self):
+        # Fails if the .mo catalogs were never compiled — the heading falls back to English.
+        response = self.client.get(reverse('intake_form'), headers={'Accept-Language': 'es'})
+
+        self.assertContains(response, 'Información personal')
