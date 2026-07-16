@@ -36,6 +36,21 @@ Visit `http://localhost:8000` for the intake form and `http://localhost:8000/adm
 docker-compose exec web python manage.py createsuperuser
 ```
 
+### Without Docker
+
+Django reads compiled `.mo` files, and those are gitignored — so `compilemessages` must run
+before the server, or the form serves English only. Requires `gettext` on your PATH.
+
+```bash
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py compilemessages --ignore='*/site-packages/*'
+python manage.py runserver
+```
+
+Run `compilemessages` before `python manage.py test` too — the test suite asserts on translated
+output. The Docker paths handle this for you via `entrypoint.sh`.
+
 ---
 
 ## Project Structure
