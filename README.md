@@ -29,7 +29,7 @@ cd Multi-Lingual-Universal-Access-
 docker-compose up --build
 ```
 
-Visit `http://localhost:8000` for the intake form and `http://localhost:8000/admin` for the admin dashboard.
+Visit `http://localhost:8000/asylum-intake/` for the intake form and `http://localhost:8000/admin` for the admin dashboard.
 
 **Create an admin account:**
 ```bash
