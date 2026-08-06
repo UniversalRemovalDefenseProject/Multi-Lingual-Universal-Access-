@@ -9,7 +9,7 @@ Secure, multilingual asylum intake platform for [Universal Removal Defense Proje
 ## Tech Stack
 
 - **Backend:** Python, Django 6
-- **Database:** SQLite (dev) → PostgreSQL (production)
+- **Database:** PostgreSQL 18 (Docker for local dev)
 - **Infrastructure:** Docker, DigitalOcean
 - **i18n:** Django i18n — 10 languages with RTL support
 
@@ -26,20 +26,29 @@ Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Do
 ```bash
 git clone https://github.com/UniversalRemovalDefenseProject/Multi-Lingual-Universal-Access-.git
 cd Multi-Lingual-Universal-Access-
+cp .env.example .env    # Windows: copy .env.example .env
 docker-compose up --build
 ```
+
+Fill in `SECRET_KEY` and `POSTGRES_PASSWORD` in `.env` before starting. The key
+generation command is in `.env.example`. All other defaults work as-is.
 
 Visit `http://localhost:8000/asylum-intake/` for the intake form and `http://localhost:8000/admin` for the admin dashboard.
 
 **Create an admin account:**
+
 ```bash
 docker-compose exec web python manage.py createsuperuser
 ```
 
 ### Without Docker
 
+You'll need a local PostgreSQL 18 instance and `gettext` on your PATH. Set
+`POSTGRES_HOST=localhost` in your `.env` and point the other `POSTGRES_*`
+variables at your instance.
+
 Django reads compiled `.mo` files, and those are gitignored — so `compilemessages` must run
-before the server, or the form serves English only. Requires `gettext` on your PATH.
+before the server, or the form serves English only.
 
 ```bash
 pip install -r requirements.txt
