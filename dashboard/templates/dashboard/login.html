@@ -1,0 +1,24 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Log in | Case Manager Dashboard{% endblock %}
+
+{% block content %}
+  <h2>Staff log in</h2>
+
+  {% if form.errors %}
+    <p class="form-error" role="alert">Your username and password did not match. Please try again.</p>
+  {% endif %}
+
+  <form method="post" class="login">
+    {% csrf_token %}
+    <div class="field">
+      <label for="{{ form.username.id_for_label }}">Username</label>
+      {{ form.username }}
+    </div>
+    <div class="field">
+      <label for="{{ form.password.id_for_label }}">Password</label>
+      {{ form.password }}
+    </div>
+    <button type="submit">Log in</button>
+  </form>
+{% endblock %}

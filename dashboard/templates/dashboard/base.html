@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Case Manager Dashboard{% endblock %}</title>
+  <style>
+    :root { --line: #d8d8d8; --muted: #5a5a5a; --bg: #f6f6f4; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #1a1a1a;
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    header.bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+    header.bar h1 { font-size: 1.05rem; margin: 0; }
+    .user { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
+    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--line); }
+    th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+    /* Applicant text can be any script, including RTL. Isolating each value keeps an
+       Arabic name from reordering the punctuation and columns around it. */
+    .applicant-text { unicode-bidi: isolate; }
+    .badge {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f0f0ee;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    caption { text-align: left; padding: 0.6rem 0.75rem; color: var(--muted); font-size: 0.85rem; }
+    .filters { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .pager { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.9rem; }
+    .login { max-width: 20rem; }
+    .login .field { margin-bottom: 0.75rem; }
+    .login label { display: block; font-size: 0.85rem; color: var(--muted); }
+    .login input { width: 100%; padding: 0.4rem; border: 1px solid var(--line); }
+    .form-error { color: #8a1a1a; }
+    button, select { font: inherit; padding: 0.35rem 0.6rem; }
+    .linkish {
+      background: none;
+      border: none;
+      padding: 0;
+      color: #1a4f8a;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <h1>Case Manager Dashboard</h1>
+    {% if user.is_authenticated %}
+      <div class="user">
+        <span>{{ user.get_username }}</span>
+        <form action="{% url 'dashboard:logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="linkish">Log out</button>
+        </form>
+      </div>
+    {% endif %}
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

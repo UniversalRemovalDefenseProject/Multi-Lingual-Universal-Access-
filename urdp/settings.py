@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'intake'
+    'intake',
+    'dashboard',
 ]
 
 MIDDLEWARE = [
@@ -97,6 +98,13 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+
+# Staff dashboard auth. Both point at the dashboard's own login so LogoutView never
+# falls through to contrib.admin's registration/logged_out.html.
+LOGIN_URL = 'dashboard:login'
+# Without this, a login with no ?next= falls back to Django's /accounts/profile/ default.
+LOGIN_REDIRECT_URL = 'dashboard:queue'
+LOGOUT_REDIRECT_URL = 'dashboard:login'
 
 AUTH_PASSWORD_VALIDATORS = [
     {

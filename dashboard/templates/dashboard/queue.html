@@ -1,0 +1,54 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Case Queue | Case Manager Dashboard{% endblock %}
+
+{% block content %}
+  <form method="get" class="filters">
+    <label for="status">Status</label>
+    <select name="status" id="status">
+      <option value=""{% if not selected_status %} selected{% endif %}>All</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}"{% if value == selected_status %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">Filter</button>
+  </form>
+
+  <table>
+    <caption>Intake submissions, newest first</caption>
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Country of origin</th>
+        <th scope="col">Preferred language</th>
+        <th scope="col">Status</th>
+        <th scope="col">Submitted</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for submission in submissions %}
+        <tr>
+          <td class="applicant-text" dir="auto">{{ submission.full_name }}</td>
+          <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
+          <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
+          <td><span class="badge">{{ submission.get_status_display }}</span></td>
+          <td>{{ submission.created_at|date:"Y-m-d H:i" }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5">No intake submissions match this filter.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if page_obj.has_other_pages %}
+    <nav class="pager" aria-label="Pagination">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}">Previous</a>
+      {% endif %}
+      <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}">Next</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

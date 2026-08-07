@@ -70,5 +70,10 @@ class IntakeSubmission(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='new')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        permissions = [
+            ('access_dashboard', 'Can access the case manager dashboard'),
+        ]
+
     def __str__(self):
         return self.full_name
