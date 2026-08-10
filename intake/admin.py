@@ -12,6 +12,7 @@ class IntakeSubmissionAdmin(admin.ModelAdmin):
         'country_of_origin',
         'detained',
         'status',
+        'assigned_to',
         'created_at',
     )
     list_filter = ('language_preference', 'preferred_language', 'detained', 'status', 'created_at')
@@ -36,6 +37,7 @@ class IntakeSubmissionAdmin(admin.ModelAdmin):
                     'family_members_included',
                     'consent_acknowledged',
                     'status',
+                    'assigned_to',
                 )
             },
         ),

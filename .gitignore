@@ -5,3 +5,11 @@ __pycache__/
 .env
 db.sqlite3
 .vscode/
+.DS_Store
+
+# Project docs (local only)
+about.md
+architecture.ipynb
+
+CLAUDE.md
+CLAUDE_TASK_case_assignment_and_notes.md

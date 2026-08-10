@@ -1,0 +1,144 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}{{ submission.full_name }} | Case Manager Dashboard{% endblock %}
+
+{% block content %}
+  <a class="back-link" href="{% url 'dashboard:queue' %}">&larr; Back to queue</a>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Case overview</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Name</label>
+        <p class="applicant-text" dir="auto">{{ submission.full_name }}</p>
+      </div>
+      <div class="field-item">
+        <label>Date of birth</label>
+        <p>{{ submission.date_of_birth|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Country of origin</label>
+        <p class="applicant-text" dir="auto">{{ submission.country_of_origin }}</p>
+      </div>
+      <div class="field-item">
+        <label>Preferred language</label>
+        <p class="applicant-text" dir="auto">{{ submission.preferred_language }}</p>
+      </div>
+      <div class="field-item">
+        <label>Phone</label>
+        <p>{{ submission.phone|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Email</label>
+        <p>{{ submission.email|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Current location</label>
+        <p class="applicant-text" dir="auto">{{ submission.current_location|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Detained</label>
+        <p>{{ submission.detained|yesno:"Yes,No" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Immigration court</label>
+        <p>{{ submission.immigration_court|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>A-number</label>
+        <p>{{ submission.a_number|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Next hearing date</label>
+        <p>{{ submission.next_hearing_date|default:"—" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Status</label>
+        <p><span class="badge">{{ submission.get_status_display }}</span></p>
+      </div>
+      <div class="field-item">
+        <label>Submitted</label>
+        <p>{{ submission.created_at|date:"Y-m-d H:i" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Staff notes</h2>
+      </div>
+      {% if notes %}
+        <ul class="notes-list" style="margin-bottom:16px;">
+          {% for note in notes %}
+            <li>
+              <p class="note-meta">{{ note.author.get_full_name|default:note.author.username }} &middot; {{ note.created_at|date:"Y-m-d H:i" }}</p>
+              <p class="note-body">{{ note.body }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p style="color:var(--ink-faint);font-size:14px;margin:0 0 16px;">No notes yet.</p>
+      {% endif %}
+
+      <div id="note-toggle-wrap">
+        <button type="button" id="note-toggle" class="note-toggle-btn">+ Add a note</button>
+      </div>
+
+      <div id="note-field" style="display:none;">
+        {{ note_form.body }}
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+          <button type="button" id="note-cancel" class="note-cancel-btn">Cancel</button>
+        </div>
+        {% if note_form.body.errors %}
+          <p class="form-error" style="margin-top:6px;">{{ note_form.body.errors }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Update case</h2>
+      </div>
+      <div class="field-item" style="margin-bottom:20px;">
+        <label for="{{ assign_form.assigned_to.id_for_label }}">Assigned to</label>
+        <div style="margin-top:6px;">{{ assign_form.assigned_to }}</div>
+        {% if assign_form.assigned_to.errors %}
+          <p class="form-error" style="margin-top:6px;">{{ assign_form.assigned_to.errors }}</p>
+        {% endif %}
+      </div>
+      <button type="submit" class="btn">Update changes</button>
+    </div>
+  </form>
+
+  <script>
+    (function () {
+      var toggle     = document.getElementById('note-toggle');
+      var toggleWrap = document.getElementById('note-toggle-wrap');
+      var field      = document.getElementById('note-field');
+      var cancel     = document.getElementById('note-cancel');
+
+      // Auto-reveal if server returned errors on the note body
+      if ({{ note_form.body.errors|yesno:"true,false" }}) {
+        field.style.display = 'block';
+        toggleWrap.style.display = 'none';
+      }
+
+      toggle.addEventListener('click', function () {
+        field.style.display = 'block';
+        toggleWrap.style.display = 'none';
+        field.querySelector('textarea').focus();
+      });
+
+      cancel.addEventListener('click', function () {
+        field.style.display = 'none';
+        toggleWrap.style.display = 'block';
+        field.querySelector('textarea').value = '';
+      });
+    })();
+  </script>
+{% endblock %}
