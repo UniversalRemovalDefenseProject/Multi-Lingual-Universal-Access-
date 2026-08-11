@@ -182,6 +182,19 @@ class CaseQueueAssigneeTests(TestCase):
 
         self.assertContains(response, 'Case Alpha')
 
+    def test_deactivated_case_manager_excluded_from_assignee_filter(self):
+        # A deactivated Case Manager should not appear in the assignee filter
+        # dropdown — they're no longer selectable even if PROTECT on StaffNote
+        # prevents their account from being fully deleted.
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertNotContains(response, 'inactive_mgr')
+        self.assertContains(response, self.manager.username)
+
     def test_queue_rows_link_to_detail_view(self):
         sub = make_submission()
 
@@ -293,6 +306,16 @@ class CaseAssignmentTests(TestCase):
 
         self.assertContains(response, self.manager.username)
         self.assertNotContains(response, 'outsider')
+
+    def test_deactivated_case_manager_excluded_from_assign_dropdown(self):
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+
+        response = self.client.get(self.url)
+
+        self.assertNotContains(response, 'inactive_mgr')
+        self.assertContains(response, self.manager.username)
 
 
 class StaffNoteTests(TestCase):

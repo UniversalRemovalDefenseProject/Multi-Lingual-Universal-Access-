@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
@@ -469,7 +470,7 @@
   <header class="topnav">
     <div class="topnav-brand">
       <div class="topnav-logo">
-        <img src="/static/images/urdp-logo.png" alt="URDP logo" />
+        <img src="{% static 'images/urdp-logo.png' %}" alt="URDP logo" />
       </div>
       <div class="topnav-text">
         <span class="org">Universal Removal Defense Project</span>

@@ -14,7 +14,7 @@ _UNASSIGNED = 'unassigned'
 
 
 def _assignable_users():
-    return User.objects.filter(groups__name='Case Manager').order_by('username')
+    return User.objects.filter(groups__name='Case Manager', is_active=True).order_by('username')
 
 
 class CaseQueueView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
