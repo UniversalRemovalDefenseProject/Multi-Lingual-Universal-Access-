@@ -105,7 +105,7 @@ class CaseQueueTests(TestCase):
         self.assertContains(response, 'Accepted Applicant')
         self.assertContains(response, 'New Applicant')
         # "All" is selected and the rejected value is never echoed back into the page.
-        self.assertContains(response, '<option value="" selected>All</option>', html=True)
+        self.assertContains(response, '<option value="" selected>All statuses</option>', html=True)
         self.assertNotContains(response, 'evil')
 
     def test_arabic_applicant_text_renders_isolated_and_intact(self):
