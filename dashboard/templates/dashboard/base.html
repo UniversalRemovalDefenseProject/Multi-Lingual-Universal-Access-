@@ -1,78 +1,511 @@
+{% load static %}
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Case Manager Dashboard{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { --line: #d8d8d8; --muted: #5a5a5a; --bg: #f6f6f4; }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: #1a1a1a;
-      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    :root {
+      --bg: oklch(0.972 0.012 78);
+      --paper: oklch(0.995 0.004 78);
+      --ink: oklch(0.285 0.018 55);
+      --ink-soft: oklch(0.46 0.02 55);
+      --ink-faint: oklch(0.6 0.018 55);
+      --line: oklch(0.9 0.012 70);
+      --line-strong: oklch(0.84 0.016 65);
+      --accent: oklch(0.585 0.13 42);
+      --accent-deep: oklch(0.46 0.11 40);
+      --accent-wash: oklch(0.95 0.03 60);
+      --red-bg: oklch(0.95 0.06 25);
+      --red-text: oklch(0.4 0.12 25);
+      --red-border: oklch(0.88 0.08 25);
+      --warn-bg: oklch(0.96 0.055 70);
+      --warn-text: oklch(0.42 0.1 55);
+      --warn-border: oklch(0.87 0.07 65);
+      --radius: 14px;
+      --radius-sm: 9px;
+      --shadow: 0 1px 2px oklch(0.4 0.05 60 / 0.04), 0 8px 24px -12px oklch(0.4 0.05 60 / 0.12);
     }
-    header.bar {
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Public Sans", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 60px;
+    }
+
+    /* ── Top nav ── */
+    header.topnav {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 0 24px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       gap: 1rem;
-      padding: 0.75rem 1.25rem;
-      background: #fff;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topnav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      line-height: 1.2;
+    }
+
+    .topnav-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      overflow: hidden;
+    }
+
+    .topnav-logo img {
+      width: 30px;
+      height: auto;
+      display: block;
+    }
+
+    .topnav-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topnav-brand .org {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .topnav-brand .section {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .topnav-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    .topnav-user .username {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    /* ── Page wrapper ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+
+    /* ── Cards / sections ── */
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 26px 28px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-head {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
       border-bottom: 1px solid var(--line);
     }
-    header.bar h1 { font-size: 1.05rem; margin: 0; }
-    .user { display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; }
-    main { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.25rem; }
-    table { width: 100%; border-collapse: collapse; background: #fff; }
-    th, td { padding: 0.6rem 0.75rem; text-align: left; border-bottom: 1px solid var(--line); }
-    th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
-    /* Applicant text can be any script, including RTL. Isolating each value keeps an
-       Arabic name from reordering the punctuation and columns around it. */
-    .applicant-text { unicode-bidi: isolate; }
+
+    .card-head h2 {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--ink);
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Field grid (detail view) ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+      gap: 16px 24px;
+    }
+
+    .field-item label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 4px;
+    }
+
+    .field-item p {
+      margin: 0;
+      font-size: 15px;
+      color: var(--ink);
+    }
+
+    /* ── Inputs ── */
+    input[type=text],
+    input[type=password],
+    input[type=email],
+    input[type=date],
+    textarea,
+    select {
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--ink);
+      padding: 10px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px oklch(0.585 0.13 42 / 0.14);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.05s;
+      display: inline-block;
+    }
+
+    .btn:hover { background: var(--accent-deep); }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible {
+      outline: 3px solid oklch(0.585 0.13 42 / 0.35);
+      outline-offset: 3px;
+    }
+
+    /* ── Badges ── */
     .badge {
       display: inline-block;
-      padding: 0.15rem 0.5rem;
-      border: 1px solid var(--line);
+      padding: 2px 10px;
+      border: 1px solid var(--line-strong);
       border-radius: 999px;
-      background: #f0f0ee;
-      font-size: 0.8rem;
+      background: var(--accent-wash);
+      color: var(--accent-deep);
+      font-size: 12px;
+      font-weight: 600;
       white-space: nowrap;
     }
-    caption { text-align: left; padding: 0.6rem 0.75rem; color: var(--muted); font-size: 0.85rem; }
-    .filters { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .pager { display: flex; align-items: center; gap: 1rem; margin-top: 1rem; font-size: 0.9rem; }
-    .login { max-width: 20rem; }
-    .login .field { margin-bottom: 0.75rem; }
-    .login label { display: block; font-size: 0.85rem; color: var(--muted); }
-    .login input { width: 100%; padding: 0.4rem; border: 1px solid var(--line); }
-    .form-error { color: #8a1a1a; }
-    button, select { font: inherit; padding: 0.35rem 0.6rem; }
-    .linkish {
+
+    .badge--unassigned {
+      border-color: var(--warn-border);
+      background: var(--warn-bg);
+      color: var(--warn-text);
+    }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    caption {
+      text-align: left;
+      padding: 14px 20px 10px;
+      font-size: 13px;
+      color: var(--ink-faint);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    th {
+      padding: 10px 20px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-faint);
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    td {
+      padding: 12px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      font-size: 14.5px;
+      color: var(--ink);
+      vertical-align: middle;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    tbody tr:hover { background: oklch(0.98 0.008 78); }
+
+    td a {
+      color: var(--accent-deep);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    td a:hover { text-decoration: underline; }
+
+    /* unicode-bidi isolation for mixed-script applicant text */
+    .applicant-text { unicode-bidi: isolate; }
+
+    /* ── Filters bar ── */
+    .filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .filters label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      white-space: nowrap;
+    }
+
+    .filters select { width: auto; min-width: 140px; }
+
+    /* ── Pagination ── */
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      font-size: 13px;
+      color: var(--ink-soft);
+      border-top: 1px solid var(--line);
+    }
+
+    .pager a {
+      color: var(--accent-deep);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .pager a:hover { text-decoration: underline; }
+
+    /* ── Staff notes ── */
+    .notes-list { list-style: none; padding: 0; margin: 0; }
+
+    .notes-list li {
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .notes-list li:last-child { border-bottom: none; }
+
+    .note-meta {
+      font-size: 12px;
+      color: var(--ink-faint);
+      font-weight: 500;
+      margin: 0 0 5px;
+    }
+
+    .note-body {
+      margin: 0;
+      font-size: 15px;
+      white-space: pre-wrap;
+      color: var(--ink);
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    .back-link:hover { color: var(--accent-deep); }
+
+    /* ── Form errors ── */
+    .form-error {
+      color: var(--red-text);
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      margin: 6px 0 0;
+    }
+
+    /* ── Flash messages ── */
+    .flash-success {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: oklch(0.95 0.05 150);
+      border: 1px solid oklch(0.84 0.08 150);
+      border-radius: var(--radius-sm);
+      color: oklch(0.32 0.1 150);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      animation: fadein 0.2s ease;
+    }
+
+    @keyframes fadein { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+    /* ── Note toggle link-button ── */
+    .note-toggle-btn {
       background: none;
       border: none;
       padding: 0;
-      color: #1a4f8a;
-      text-decoration: underline;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent-deep);
       cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .note-toggle-btn:hover { color: var(--accent); }
+
+    .note-cancel-btn {
+      background: none;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      padding: 4px 12px;
+      font: inherit;
+      font-size: 13px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .note-cancel-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+
+    /* ── Logout button ── */
+    .btn-ghost {
+      background: none;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      padding: 5px 12px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent-deep); }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      .page { padding: 18px 16px; }
+      header.topnav { padding: 0 16px; }
+      .card { padding: 18px; }
+      .field-grid { grid-template-columns: 1fr 1fr; }
+      th, td { padding: 10px 14px; }
+    }
+
+    @media (max-width: 440px) {
+      .field-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <header class="bar">
-    <h1>Case Manager Dashboard</h1>
+  <header class="topnav">
+    <div class="topnav-brand">
+      <div class="topnav-logo">
+        <img src="{% static 'images/urdp-logo.png' %}" alt="URDP logo" />
+      </div>
+      <div class="topnav-text">
+        <span class="org">Universal Removal Defense Project</span>
+        <span class="section">Case Manager Dashboard</span>
+      </div>
+    </div>
     {% if user.is_authenticated %}
-      <div class="user">
-        <span>{{ user.get_username }}</span>
+      <div class="topnav-user">
+        <span class="username">{{ user.get_username }}</span>
         <form action="{% url 'dashboard:logout' %}" method="post">
           {% csrf_token %}
-          <button type="submit" class="linkish">Log out</button>
+          <button type="submit" class="btn-ghost">Log out</button>
         </form>
       </div>
     {% endif %}
   </header>
-  <main>
+  <div class="page">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="flash-success" role="status">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          {{ message }}
+        </div>
+      {% endfor %}
+      <script>
+        setTimeout(function () {
+          document.querySelectorAll('.flash-success').forEach(function (el) {
+            el.style.transition = 'opacity 0.4s ease';
+            el.style.opacity = '0';
+            setTimeout(function () { el.remove(); }, 420);
+          });
+        }, 4000);
+      </script>
+    {% endif %}
     {% block content %}{% endblock %}
-  </main>
+  </div>
 </body>
 </html>

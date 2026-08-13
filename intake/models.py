@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -64,6 +65,13 @@ class IntakeSubmission(models.Model):
         blank=True,
         choices=LANGUAGE_CHOICES,
         help_text=_('Language of any staff-entered translated responses.'),
+    )
+    assigned_to = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='assigned_intakes',
     )
     family_members_included = models.BooleanField(default=False)
     consent_acknowledged = models.BooleanField(default=False)
