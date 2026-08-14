@@ -231,6 +231,7 @@
         <input type="hidden" name="status" value="{{ selected_status }}" />
         <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
         <input type="hidden" name="page" value="{{ selected_page }}" />
+        <input type="hidden" name="detained" value="{{ selected_detained }}" />
         <label for="new_status">Status</label>
         <select name="new_status" id="new_status">
           {% for value, label in status_choices %}
