@@ -232,6 +232,102 @@ class CaseQueueAssigneeTests(TestCase):
         self.assertContains(response, reverse('dashboard:detail', args=[sub.pk]))
 
 
+class CaseQueueDetainedTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+
+    def test_detained_case_sorts_above_newer_non_detained_case(self):
+        make_submission(full_name='Detained Applicant', detained=True)
+        make_submission(full_name='Free Applicant')
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Detained Applicant'), content.index('Free Applicant'))
+
+    def test_detained_row_renders_the_detained_badge(self):
+        make_submission(full_name='Detained Applicant', detained=True)
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'class="badge badge--detained"')
+
+    def test_queue_without_detained_rows_renders_no_detained_badge(self):
+        make_submission(full_name='Free Applicant')
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        # The CSS class definition in <style> uses ".badge--detained" (with a dot),
+        # so checking the attribute value targets only rendered elements.
+        self.assertNotContains(response, 'class="badge badge--detained"')
+
+    def test_filter_detained_yes_returns_only_detained(self):
+        make_submission(full_name='Detained Applicant', detained=True)
+        make_submission(full_name='Free Applicant')
+
+        response = self.client.get(reverse('dashboard:queue'), {'detained': 'yes'})
+
+        self.assertContains(response, 'Detained Applicant')
+        self.assertNotContains(response, 'Free Applicant')
+
+    def test_filter_detained_no_returns_only_non_detained(self):
+        make_submission(full_name='Detained Applicant', detained=True)
+        make_submission(full_name='Free Applicant')
+
+        response = self.client.get(reverse('dashboard:queue'), {'detained': 'no'})
+
+        self.assertContains(response, 'Free Applicant')
+        self.assertNotContains(response, 'Detained Applicant')
+
+    def test_unrecognized_detained_falls_back_to_unfiltered(self):
+        make_submission(full_name='Detained Applicant', detained=True)
+        make_submission(full_name='Free Applicant')
+
+        response = self.client.get(reverse('dashboard:queue'), {'detained': "evil'--"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Detained Applicant')
+        self.assertContains(response, 'Free Applicant')
+        # "All" is selected and the rejected value is never echoed back into the page.
+        self.assertContains(response, '<option value="" selected>All cases</option>', html=True)
+        self.assertNotContains(response, 'evil')
+
+    def test_detained_composes_with_status_and_assignee(self):
+        make_submission(full_name='Full Match', detained=True,
+                        status='accepted', assigned_to=self.manager)
+        make_submission(full_name='Wrong Detained', status='accepted', assigned_to=self.manager)
+        make_submission(full_name='Wrong Status', detained=True,
+                        status='new', assigned_to=self.manager)
+        make_submission(full_name='Wrong Assignee', detained=True, status='accepted')
+
+        response = self.client.get(reverse('dashboard:queue'), {
+            'status': 'accepted', 'assigned_to': str(self.manager.pk), 'detained': 'yes',
+        })
+
+        self.assertContains(response, 'Full Match')
+        self.assertNotContains(response, 'Wrong Detained')
+        self.assertNotContains(response, 'Wrong Status')
+        self.assertNotContains(response, 'Wrong Assignee')
+
+    def test_detained_composes_with_search_and_pagination(self):
+        for i in range(26):
+            make_submission(full_name=f'Match {i:02d}', detained=True)
+        make_submission(full_name='Match Free')
+        make_submission(full_name='Other Detained', detained=True)
+
+        self.client.post(reverse('dashboard:search'), {'q': 'Match'})
+        response = self.client.get(
+            reverse('dashboard:queue'), {'detained': 'yes', 'page': 2},
+        )
+
+        # 26 detained matches -> page 2 holds the oldest one; the non-detained match
+        # and the non-matching detained case are excluded by filter and search.
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Match 00')
+        self.assertNotContains(response, 'Match Free')
+        self.assertNotContains(response, 'Other Detained')
+
+
 class CaseDetailAccessTests(TestCase):
     def setUp(self):
         self.submission = make_submission()
@@ -600,6 +696,22 @@ class CaseDetailContentTests(TestCase):
 
         self.assertContains(response, self._back_href('?assigned_to=unassigned'))
 
+    def test_back_link_preserves_the_detained_filter(self):
+        submission = make_submission(detained=True)
+
+        response = self._get(submission, detained='yes')
+
+        self.assertContains(response, self._back_href('?detained=yes'))
+
+    def test_detail_status_form_carries_the_detained_filter(self):
+        submission = make_submission()
+
+        response = self._get(submission, detained='yes')
+
+        self.assertContains(
+            response, '<input type="hidden" name="detained" value="yes" />', html=True,
+        )
+
     def test_back_link_drops_unrecognized_filters(self):
         submission = make_submission()
 
@@ -724,6 +836,15 @@ class CaseSearchTests(TestCase):
             f"{reverse('dashboard:queue')}?status=accepted&assigned_to=unassigned",
         )
 
+    def test_search_redirect_keeps_the_detained_filter(self):
+        # Param order is fixed by _queue_params: status, assigned_to, detained, page.
+        response = self._search('Maria', status='accepted', detained='yes')
+
+        self.assertEqual(
+            response['Location'],
+            f"{reverse('dashboard:queue')}?status=accepted&detained=yes",
+        )
+
     def test_search_composes_with_filter_and_pagination(self):
         for i in range(26):
             make_submission(full_name=f'Match {i:02d}', status='accepted')
@@ -821,6 +942,15 @@ class CaseStatusUpdateTests(TestCase):
         self.assertEqual(
             response['Location'],
             f"{reverse('dashboard:queue')}?status=new&assigned_to=unassigned&page=2",
+        )
+
+    def test_redirect_preserves_the_detained_filter(self):
+        response = self.client.post(self.url, {
+            'new_status': 'accepted', 'detained': 'yes',
+        })
+
+        self.assertEqual(
+            response['Location'], f"{reverse('dashboard:queue')}?detained=yes",
         )
 
     def test_page_clamps_when_the_change_empties_it(self):

@@ -12,6 +12,7 @@
     {# Keeps both active filters when the search changes. Never carries the query itself. #}
     <input type="hidden" name="status" value="{{ selected_status }}" />
     <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+    <input type="hidden" name="detained" value="{{ selected_detained }}" />
     <label for="q">Search</label>
     <input type="search" name="q" id="q" dir="auto" value="{{ search_query }}"
            placeholder="Name, country, or A-number" maxlength="100" />
@@ -39,13 +40,20 @@
       {% endfor %}
     </select>
 
+    <label for="detained">Detained</label>
+    <select name="detained" id="detained" onchange="this.form.submit()">
+      <option value=""{% if not selected_detained %} selected{% endif %}>All cases</option>
+      <option value="{{ DETAINED_YES }}"{% if selected_detained == DETAINED_YES %} selected{% endif %}>Detained</option>
+      <option value="{{ DETAINED_NO }}"{% if selected_detained == DETAINED_NO %} selected{% endif %}>Not detained</option>
+    </select>
+
     <noscript><button type="submit" class="btn">Filter</button></noscript>
   </form>
 
   <div class="table-wrap">
     <table>
       <caption>
-        Intake submissions, newest first{% if search_query %} — matching
+        Detained cases first, then newest first{% if search_query %} — matching
         <span class="applicant-text" dir="auto">{{ search_query }}</span>{% endif %}
       </caption>
       <thead>
@@ -62,8 +70,9 @@
       <tbody>
         {% for submission in submissions %}
           <tr>
-            <td class="applicant-text" dir="auto">
-              <a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a>
+            <td>
+              <span class="applicant-text" dir="auto"><a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a></span>{% if submission.detained %}
+              <span class="badge badge--detained">Detained</span>{% endif %}
             </td>
             <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
             <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
@@ -82,6 +91,7 @@
                   {% csrf_token %}
                   <input type="hidden" name="status" value="{{ selected_status }}" />
                   <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+                  <input type="hidden" name="detained" value="{{ selected_detained }}" />
                   <input type="hidden" name="page" value="{{ page_obj.number }}" />
                   <label class="visually-hidden" for="new_status_{{ submission.pk }}">New status</label>
                   <select name="new_status" id="new_status_{{ submission.pk }}">
@@ -103,11 +113,11 @@
     {% if page_obj.has_other_pages %}
       <nav class="pager" aria-label="Pagination">
         {% if page_obj.has_previous %}
-          <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}{% if selected_assignee %}&amp;assigned_to={{ selected_assignee }}{% endif %}">&larr; Previous</a>
+          <a href="?page={{ page_obj.previous_page_number }}{% if filter_query %}&amp;{{ filter_query }}{% endif %}">&larr; Previous</a>
         {% endif %}
         <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
         {% if page_obj.has_next %}
-          <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}{% if selected_assignee %}&amp;assigned_to={{ selected_assignee }}{% endif %}">Next &rarr;</a>
+          <a href="?page={{ page_obj.next_page_number }}{% if filter_query %}&amp;{{ filter_query }}{% endif %}">Next &rarr;</a>
         {% endif %}
       </nav>
     {% endif %}

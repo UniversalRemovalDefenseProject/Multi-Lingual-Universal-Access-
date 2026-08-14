@@ -33,13 +33,22 @@ docker-compose up --build
 Fill in `SECRET_KEY` and `POSTGRES_PASSWORD` in `.env` before starting. The key
 generation command is in `.env.example`. All other defaults work as-is.
 
-Visit `http://localhost:8000/asylum-intake/` for the intake form and `http://localhost:8000/admin` for the admin dashboard.
+| URL | What it is |
+| --- | --- |
+| `http://localhost:8000/asylum-intake/` | Applicant intake form |
+| `http://localhost:8000/dashboard/` | Case manager dashboard (staff) |
+| `http://localhost:8000/admin` | Django admin (superusers) |
 
 **Create an admin account:**
 
 ```bash
 docker-compose exec web python manage.py createsuperuser
 ```
+
+**Grant dashboard access:** dashboard access is permission-based, not tied to
+superuser status. In `/admin`, add the user to the **Case Manager** group
+(created automatically by migrations). Status changes additionally require the
+`change_case_status` permission, which the group includes.
 
 ### Without Docker
 
@@ -62,10 +71,27 @@ output. The Docker paths handle this for you via `entrypoint.sh`.
 
 ---
 
+## Case Manager Dashboard
+
+Staff-facing dashboard at `/dashboard/`, separate from Django admin:
+
+- Case queue, newest first, detained cases prioritized and badged
+- Filters for status, assignee, and detained, combinable and preserved across pagination
+- Case detail with the full submission, narratives shown in the applicant's original language with stored translations beneath
+- Case assignment and append-only staff notes
+- Status updates gated behind a separate write permission
+- Search that keeps applicant names and A-numbers out of URLs, browser history, and server logs
+
+Applicant-entered content renders with per-element direction handling, so RTL
+text (e.g. Arabic) displays correctly inside the English staff UI.
+
+---
+
 ## Project Structure
 
 ```
 intake/          # Intake form app — models, views, forms, templates
+dashboard/       # Case manager dashboard — queue, detail, assignment, notes
 urdp/            # Django project settings and URL config
 locale/          # Translation files (.po) for all supported languages
 ```
