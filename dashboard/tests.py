@@ -1,5 +1,8 @@
 from django.contrib.auth.models import Group, User
+from django.db import connection
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from intake.models import IntakeSubmission
@@ -12,6 +15,32 @@ def make_submission(**overrides):
         'country_of_origin': 'Venezuela',
         'preferred_language': 'Spanish',
         'fear_of_return_summary': 'Original response in the applicant language.',
+    }
+    values.update(overrides)
+    return IntakeSubmission.objects.create(**values)
+
+
+def make_full_submission(**overrides):
+    """Every field populated, so a render test can prove nothing was skipped."""
+    values = {
+        'full_name': 'Maria Example',
+        'date_of_birth': '1990-01-01',
+        'country_of_origin': 'Venezuela',
+        'preferred_language': 'Spanish',
+        'language_preference': 'es',
+        'phone': '+1-555-0100',
+        'email': 'maria@example.test',
+        'current_location': 'Houston',
+        'detained': True,
+        'immigration_court': 'Houston Immigration Court',
+        'a_number': 'A-000-000-000',
+        'next_hearing_date': '2026-09-01',
+        'fear_of_return_summary': 'Original fear narrative.',
+        'past_harm_summary': 'Original past harm narrative.',
+        'countries_traveled_asylum_summary': 'Original travel narrative.',
+        'family_members_included': True,
+        'consent_acknowledged': True,
+        'status': 'legal_review',
     }
     values.update(overrides)
     return IntakeSubmission.objects.create(**values)
@@ -238,6 +267,20 @@ class CaseDetailAccessTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_permissionless_post_is_rejected_and_changes_nothing(self):
+        # The mixins cover this, but nothing pinned it: a POST must be gated by the
+        # same permission as the GET, not merely hidden from the UI.
+        User.objects.create_user(username='clerk', password='not-a-real-password')
+        self.client.login(username='clerk', password='not-a-real-password')
+
+        response = self.client.post(
+            reverse('dashboard:detail', args=[self.submission.pk]),
+            {'assigned_to': '', 'body': 'Should never be written.'},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(StaffNote.objects.count(), 0)
+
     def test_detail_is_not_reachable_from_intake_urls(self):
         # The intake app's URL conf must not expose the detail view.
         from django.urls import resolve, Resolver404
@@ -317,6 +360,16 @@ class CaseAssignmentTests(TestCase):
         self.assertNotContains(response, 'inactive_mgr')
         self.assertContains(response, self.manager.username)
 
+    def test_non_case_manager_pk_is_rejected_by_the_form(self):
+        # The dropdown hides them; this proves the queryset also rejects a posted pk.
+        outsider = User.objects.create_user(username='outsider')
+
+        response = self.client.post(self.url, {'assigned_to': outsider.pk, 'body': ''})
+
+        self.assertEqual(response.status_code, 200)  # re-render, not a redirect
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
 
 class StaffNoteTests(TestCase):
     def setUp(self):
@@ -373,8 +426,7 @@ class StaffNoteTests(TestCase):
     def test_deleting_user_who_authored_notes_is_blocked(self):
         StaffNote.objects.create(intake=self.submission, author=self.manager, body='Note')
 
-        from django.db import IntegrityError
-        with self.assertRaises(Exception):
+        with self.assertRaises(ProtectedError):
             self.manager.delete()
 
     def test_no_note_update_url_exists(self):
@@ -392,3 +444,196 @@ class StaffNoteTests(TestCase):
             self.fail('No delete route should exist for StaffNote')
         except Resolver404:
             pass
+
+    # The staging behaviour itself is client-side and Django's test client runs no JS,
+    # so these pin only that the markup the script depends on is present. The real
+    # guarantee is that every note test above still passes unmodified — the POST
+    # contract did not change.
+    def test_add_note_button_is_rendered_disabled(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'id="note-add"')
+        self.assertContains(response, 'id="note-pending"')
+
+    def test_discard_control_and_dialog_are_rendered(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'id="discard-open"')
+        self.assertContains(response, '<dialog id="discard-confirm"')
+        self.assertContains(response, 'id="discard-confirm-btn"')
+
+    def test_pending_note_container_carries_the_author_name(self):
+        # The script reads the username from this attribute rather than from an
+        # inline script literal, so it must survive on a case with no notes yet.
+        StaffNote.objects.filter(intake=self.submission).delete()
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, f'data-author="{self.manager.username}"')
+
+
+class CaseDetailContentTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+
+    def _get(self, submission, **params):
+        return self.client.get(reverse('dashboard:detail', args=[submission.pk]), params)
+
+    def _back_href(self, query=''):
+        return f'href="{reverse("dashboard:queue")}{query}"'
+
+    def test_all_field_cards_render_every_value(self):
+        submission = make_full_submission()
+
+        response = self._get(submission)
+
+        for heading in ('Identity', 'Contact', 'Case and court',
+                        'Submission details', 'Narrative responses'):
+            self.assertContains(response, heading)
+        for value in (
+            'Maria Example', '1990-01-01', 'Venezuela', 'Spanish',      # identity
+            '+1-555-0100', 'maria@example.test', 'Houston',             # contact
+            'Houston Immigration Court', 'A-000-000-000', '2026-09-01', # case and court
+            'Needs Legal Review',                                       # submission details
+            'Original fear narrative.', 'Original past harm narrative.',
+            'Original travel narrative.',                               # narratives
+        ):
+            self.assertContains(response, value)
+
+    def test_empty_optional_renders_a_directionless_placeholder(self):
+        submission = make_submission(phone='', a_number='')
+
+        response = self._get(submission)
+
+        # The em-dash must not sit inside an applicant-text/dir element.
+        self.assertContains(response, '<p class="empty">&mdash;</p>', html=True)
+
+    def test_arabic_narrative_renders_intact_with_direction(self):
+        arabic = 'أخشى العودة إلى بلدي بسبب الاضطهاد'
+        submission = make_submission(fear_of_return_summary=arabic)
+
+        response = self._get(submission)
+
+        self.assertContains(
+            response,
+            f'<p class="applicant-text narrative-text" dir="auto">{arabic}</p>',
+            html=True,
+        )
+        self.assertContains(response, '<html lang="en" dir="ltr">')
+
+    def test_populated_translation_is_labeled_with_its_language(self):
+        # translated_response_language is the language the translation is written in.
+        submission = make_submission(
+            fear_of_return_summary='النص الأصلي',
+            fear_of_return_summary_translated='Staff-entered English translation.',
+            translated_response_language='en',
+        )
+
+        response = self._get(submission)
+
+        self.assertContains(response, 'Staff translation (English)')
+        self.assertContains(response, 'Staff-entered English translation.')
+        content = response.content.decode()
+        self.assertLess(
+            content.index('النص الأصلي'),
+            content.index('Staff-entered English translation.'),
+        )
+
+    def test_translation_without_a_language_has_no_empty_parentheses(self):
+        submission = make_submission(
+            fear_of_return_summary_translated='Translation with no language recorded.',
+            translated_response_language='',
+        )
+
+        response = self._get(submission)
+
+        self.assertContains(response, 'Staff translation')
+        self.assertNotContains(response, 'Staff translation (')
+
+    def test_absent_translation_renders_no_label_at_all(self):
+        submission = make_submission(fear_of_return_summary='Only the original exists.')
+
+        response = self._get(submission)
+
+        self.assertContains(response, 'Only the original exists.')
+        self.assertNotContains(response, 'Staff translation')
+
+    def test_title_omits_the_applicant_name(self):
+        submission = make_submission(full_name='Distinctive Applicant Name')
+
+        response = self._get(submission)
+
+        self.assertContains(
+            response, '<title>Case detail | Case Manager Dashboard</title>', html=True,
+        )
+        self.assertContains(response, 'Distinctive Applicant Name')  # still in the body
+
+    def test_back_link_preserves_status_alone(self):
+        submission = make_submission(status='accepted')
+
+        response = self._get(submission, status='accepted')
+
+        self.assertContains(response, self._back_href('?status=accepted'))
+
+    def test_back_link_preserves_assignee_alone(self):
+        submission = make_submission(assigned_to=self.manager)
+
+        response = self._get(submission, assigned_to=str(self.manager.pk))
+
+        self.assertContains(response, self._back_href(f'?assigned_to={self.manager.pk}'))
+
+    def test_back_link_preserves_both_filters(self):
+        submission = make_submission(status='accepted', assigned_to=self.manager)
+
+        response = self._get(submission, status='accepted', assigned_to=str(self.manager.pk))
+
+        self.assertContains(
+            response,
+            self._back_href(f'?status=accepted&amp;assigned_to={self.manager.pk}'),
+        )
+
+    def test_back_link_preserves_the_unassigned_sentinel(self):
+        submission = make_submission()
+
+        response = self._get(submission, assigned_to='unassigned')
+
+        self.assertContains(response, self._back_href('?assigned_to=unassigned'))
+
+    def test_back_link_drops_unrecognized_filters(self):
+        submission = make_submission()
+
+        response = self._get(submission, status="evil'--", assigned_to='99999')
+
+        self.assertContains(response, self._back_href())
+        self.assertNotContains(response, 'evil')
+
+
+class QueryCountTests(TestCase):
+    """Row and note counts must not change the number of queries issued."""
+
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+
+    def _queue_queries(self, rows):
+        IntakeSubmission.objects.all().delete()
+        for i in range(rows):
+            make_submission(full_name=f'Case {i}', assigned_to=self.manager)
+        with CaptureQueriesContext(connection) as captured:
+            self.client.get(reverse('dashboard:queue'))
+        return len(captured)
+
+    def _detail_queries(self, notes):
+        submission = make_submission()
+        for i in range(notes):
+            StaffNote.objects.create(intake=submission, author=self.manager, body=f'Note {i}')
+        with CaptureQueriesContext(connection) as captured:
+            self.client.get(reverse('dashboard:detail', args=[submission.pk]))
+        return len(captured)
+
+    def test_queue_issues_no_query_per_row(self):
+        self.assertEqual(self._queue_queries(2), self._queue_queries(10))
+
+    def test_detail_issues_no_query_per_note(self):
+        self.assertEqual(self._detail_queries(2), self._detail_queries(10))

@@ -45,7 +45,7 @@
         {% for submission in submissions %}
           <tr>
             <td class="applicant-text" dir="auto">
-              <a href="{% url 'dashboard:detail' submission.pk %}">{{ submission.full_name }}</a>
+              <a href="{% url 'dashboard:detail' submission.pk %}{% if selected_status or selected_assignee != '' %}?{% if selected_status %}status={{ selected_status }}{% endif %}{% if selected_status and selected_assignee != '' %}&amp;{% endif %}{% if selected_assignee != '' %}assigned_to={{ selected_assignee }}{% endif %}{% endif %}">{{ submission.full_name }}</a>
             </td>
             <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
             <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>

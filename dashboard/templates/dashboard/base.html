@@ -301,6 +301,53 @@
     /* unicode-bidi isolation for mixed-script applicant text */
     .applicant-text { unicode-bidi: isolate; }
 
+    /* Placeholder for an unanswered optional field. Deliberately carries no
+       dir/applicant-text, so it never reads as applicant content. */
+    .empty {
+      margin: 0;
+      font-size: 15px;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    /* ── Narrative responses ── */
+    .narrative { margin-bottom: 22px; }
+
+    .narrative:last-child { margin-bottom: 0; }
+
+    .narrative > label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 6px;
+    }
+
+    .narrative-text {
+      margin: 0;
+      font-size: 15px;
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+
+    .translation {
+      margin-top: 12px;
+      padding-inline-start: 14px;
+      border-inline-start: 3px solid var(--line-strong);
+    }
+
+    .translation > label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 6px;
+    }
+
     /* ── Filters bar ── */
     .filters {
       display: flex;
@@ -435,6 +482,89 @@
     }
 
     .note-cancel-btn:hover { border-color: var(--accent); color: var(--accent-deep); }
+
+    /* ── Pending (unsaved) note ── */
+    .note-pending {
+      padding: 14px;
+      margin-bottom: 4px;
+      border: 1px dashed var(--accent);
+      border-radius: var(--radius-sm);
+      background: var(--accent-wash);
+    }
+
+    .note-pending-tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .note-pending .note-toggle-btn { margin-top: 8px; font-size: 13px; }
+
+    /* ── Button variants ── */
+    .btn-small { font-size: 13px; padding: 6px 14px; }
+
+    .btn:disabled,
+    .btn-secondary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .btn:disabled:hover { background: var(--accent); }
+
+    .btn-secondary {
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: none;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-sm);
+      padding: 10px 22px;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .btn-secondary:not(:disabled):hover {
+      border-color: var(--accent);
+      color: var(--accent-deep);
+    }
+
+    .btn-danger { background: var(--red-text); }
+    .btn-danger:hover { background: oklch(0.32 0.13 25); }
+
+    .action-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    /* ── Confirmation dialog ── */
+    .confirm-dialog {
+      max-width: 26rem;
+      padding: 24px 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: var(--shadow);
+    }
+
+    .confirm-dialog h2 {
+      font-family: "Source Serif 4", Georgia, serif;
+      font-weight: 600;
+      font-size: 18px;
+      margin: 0 0 10px;
+    }
+
+    .confirm-dialog p {
+      margin: 0 0 18px;
+      font-size: 14.5px;
+      color: var(--ink-soft);
+    }
+
+    .confirm-dialog::backdrop { background: oklch(0.285 0.018 55 / 0.45); }
 
     /* ── Logout button ── */
     .btn-ghost {

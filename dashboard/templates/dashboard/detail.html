@@ -1,22 +1,23 @@
 {% extends "dashboard/base.html" %}
 
-{% block title %}{{ submission.full_name }} | Case Manager Dashboard{% endblock %}
+{# Static title: the applicant's name must not reach browser history or a screen share. #}
+{% block title %}Case detail | Case Manager Dashboard{% endblock %}
 
 {% block content %}
-  <a class="back-link" href="{% url 'dashboard:queue' %}">&larr; Back to queue</a>
+  <a class="back-link" href="{% url 'dashboard:queue' %}{% if back_query %}?{{ back_query }}{% endif %}">&larr; Back to queue</a>
 
   <div class="card">
     <div class="card-head">
-      <h2>Case overview</h2>
+      <h2>Identity</h2>
     </div>
     <div class="field-grid">
       <div class="field-item">
-        <label>Name</label>
+        <label>Full name</label>
         <p class="applicant-text" dir="auto">{{ submission.full_name }}</p>
       </div>
       <div class="field-item">
         <label>Date of birth</label>
-        <p>{{ submission.date_of_birth|default:"—" }}</p>
+        {% if submission.date_of_birth %}<p class="applicant-text" dir="auto">{{ submission.date_of_birth }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Country of origin</label>
@@ -26,33 +27,69 @@
         <label>Preferred language</label>
         <p class="applicant-text" dir="auto">{{ submission.preferred_language }}</p>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Contact</h2>
+    </div>
+    <div class="field-grid">
       <div class="field-item">
         <label>Phone</label>
-        <p>{{ submission.phone|default:"—" }}</p>
+        {% if submission.phone %}<p class="applicant-text" dir="auto">{{ submission.phone }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Email</label>
-        <p>{{ submission.email|default:"—" }}</p>
+        {% if submission.email %}<p class="applicant-text" dir="auto">{{ submission.email }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Current location</label>
-        <p class="applicant-text" dir="auto">{{ submission.current_location|default:"—" }}</p>
+        {% if submission.current_location %}<p class="applicant-text" dir="auto">{{ submission.current_location }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Case and court</h2>
+    </div>
+    <div class="field-grid">
       <div class="field-item">
         <label>Detained</label>
         <p>{{ submission.detained|yesno:"Yes,No" }}</p>
       </div>
       <div class="field-item">
         <label>Immigration court</label>
-        <p>{{ submission.immigration_court|default:"—" }}</p>
+        {% if submission.immigration_court %}<p class="applicant-text" dir="auto">{{ submission.immigration_court }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>A-number</label>
-        <p>{{ submission.a_number|default:"—" }}</p>
+        {% if submission.a_number %}<p class="applicant-text" dir="auto">{{ submission.a_number }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Next hearing date</label>
-        <p>{{ submission.next_hearing_date|default:"—" }}</p>
+        {% if submission.next_hearing_date %}<p class="applicant-text" dir="auto">{{ submission.next_hearing_date }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Family members included</label>
+        <p>{{ submission.family_members_included|yesno:"Yes,No" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Submission details</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Form language</label>
+        <p>{{ submission.get_language_preference_display }}</p>
+      </div>
+      <div class="field-item">
+        <label>Consent acknowledged</label>
+        <p>{{ submission.consent_acknowledged|yesno:"Yes,No" }}</p>
       </div>
       <div class="field-item">
         <label>Status</label>
@@ -65,6 +102,57 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="card-head">
+      <h2>Narrative responses</h2>
+    </div>
+
+    <div class="narrative">
+      <label>Why do you fear returning to your home country?</label>
+      {% if submission.fear_of_return_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.fear_of_return_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.fear_of_return_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.fear_of_return_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="narrative">
+      <label>Have you experienced past harm or persecution?</label>
+      {% if submission.past_harm_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.past_harm_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.past_harm_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.past_harm_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="narrative">
+      <label>What countries did you travel through, and did you apply for asylum there?</label>
+      {% if submission.countries_traveled_asylum_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.countries_traveled_asylum_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.countries_traveled_asylum_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.countries_traveled_asylum_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
   <form method="post">
     {% csrf_token %}
 
@@ -74,15 +162,19 @@
       </div>
       {% if notes %}
         <ul class="notes-list" style="margin-bottom:16px;">
+          <li id="note-pending" data-author="{{ user.get_username }}" hidden></li>
           {% for note in notes %}
             <li>
               <p class="note-meta">{{ note.author.get_full_name|default:note.author.username }} &middot; {{ note.created_at|date:"Y-m-d H:i" }}</p>
-              <p class="note-body">{{ note.body }}</p>
+              <p class="note-body applicant-text" dir="auto">{{ note.body }}</p>
             </li>
           {% endfor %}
         </ul>
       {% else %}
-        <p style="color:var(--ink-faint);font-size:14px;margin:0 0 16px;">No notes yet.</p>
+        <ul class="notes-list" style="margin-bottom:16px;">
+          <li id="note-pending" data-author="{{ user.get_username }}" hidden></li>
+        </ul>
+        <p id="no-notes" style="color:var(--ink-faint);font-size:14px;margin:0 0 16px;">No notes yet.</p>
       {% endif %}
 
       <div id="note-toggle-wrap">
@@ -91,8 +183,9 @@
 
       <div id="note-field" style="display:none;">
         {{ note_form.body }}
-        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
           <button type="button" id="note-cancel" class="note-cancel-btn">Cancel</button>
+          <button type="button" id="note-add" class="btn btn-small" disabled>Add Note</button>
         </div>
         {% if note_form.body.errors %}
           <p class="form-error" style="margin-top:6px;">{{ note_form.body.errors }}</p>
@@ -111,34 +204,145 @@
           <p class="form-error" style="margin-top:6px;">{{ assign_form.assigned_to.errors }}</p>
         {% endif %}
       </div>
-      <button type="submit" class="btn">Update changes</button>
+      <div class="action-row">
+        <button type="submit" class="btn">Update changes</button>
+        <button type="button" id="discard-open" class="btn-secondary" disabled>Discard changes</button>
+      </div>
     </div>
   </form>
 
+  <dialog id="discard-confirm" class="confirm-dialog" aria-labelledby="discard-title">
+    <h2 id="discard-title">Discard unsaved changes?</h2>
+    <p>Your unsaved note and any change to the assignee will be removed. Notes already
+       saved to this case are not affected.</p>
+    <div class="action-row">
+      <button type="button" id="discard-cancel" class="btn-secondary">Keep editing</button>
+      <button type="button" id="discard-confirm-btn" class="btn btn-danger">Discard</button>
+    </div>
+  </dialog>
+
   <script>
     (function () {
+      var form       = document.querySelector('.page form[method="post"]');
       var toggle     = document.getElementById('note-toggle');
       var toggleWrap = document.getElementById('note-toggle-wrap');
       var field      = document.getElementById('note-field');
       var cancel     = document.getElementById('note-cancel');
+      var addBtn     = document.getElementById('note-add');
+      var pending    = document.getElementById('note-pending');
+      var noNotes    = document.getElementById('no-notes');
+      var textarea   = field.querySelector('textarea');
+      var assignee   = form.querySelector('[name="assigned_to"]');
+      var dialog     = document.getElementById('discard-confirm');
+      var discardBtn = document.getElementById('discard-open');
 
-      // Auto-reveal if server returned errors on the note body
-      if ({{ note_form.body.errors|yesno:"true,false" }}) {
+      // The assignee value as the page loaded, so "dirty" means changed from saved.
+      var savedAssignee = assignee ? assignee.value : '';
+      var author = pending.dataset.author;
+
+      function openCompose(focus) {
         field.style.display = 'block';
         toggleWrap.style.display = 'none';
+        if (focus) { textarea.focus(); }
       }
 
-      toggle.addEventListener('click', function () {
-        field.style.display = 'block';
-        toggleWrap.style.display = 'none';
-        field.querySelector('textarea').focus();
-      });
-
-      cancel.addEventListener('click', function () {
+      function closeCompose() {
         field.style.display = 'none';
         toggleWrap.style.display = 'block';
-        field.querySelector('textarea').value = '';
+      }
+
+      function isDirty() {
+        return textarea.value.trim() !== '' ||
+               (assignee && assignee.value !== savedAssignee);
+      }
+
+      function refreshButtons() {
+        addBtn.disabled = textarea.value.trim() === '';
+        discardBtn.disabled = !isDirty();
+      }
+
+      function showPending() {
+        // Built with textContent, never innerHTML — a note body is untrusted input.
+        pending.className = 'note-pending';
+        pending.textContent = '';
+
+        var meta = document.createElement('p');
+        meta.className = 'note-meta';
+        meta.textContent = author + ' · ';
+        var tag = document.createElement('span');
+        tag.className = 'note-pending-tag';
+        tag.textContent = 'Unsaved';
+        meta.appendChild(tag);
+
+        var body = document.createElement('p');
+        body.className = 'note-body applicant-text';
+        body.setAttribute('dir', 'auto');
+        body.textContent = textarea.value;
+
+        var edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'note-toggle-btn';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', function () {
+          hidePending();
+          openCompose(true);
+        });
+
+        pending.appendChild(meta);
+        pending.appendChild(body);
+        pending.appendChild(edit);
+        pending.hidden = false;
+        if (noNotes) { noNotes.hidden = true; }
+      }
+
+      function hidePending() {
+        pending.hidden = true;
+        pending.textContent = '';
+        if (noNotes) { noNotes.hidden = false; }
+      }
+
+      toggle.addEventListener('click', function () { openCompose(true); });
+
+      cancel.addEventListener('click', function () {
+        textarea.value = '';
+        closeCompose();
+        hidePending();
+        refreshButtons();
       });
+
+      addBtn.addEventListener('click', function () {
+        if (textarea.value.trim() === '') { return; }
+        closeCompose();
+        showPending();
+        refreshButtons();
+      });
+
+      textarea.addEventListener('input', refreshButtons);
+      if (assignee) { assignee.addEventListener('change', refreshButtons); }
+
+      discardBtn.addEventListener('click', function () { dialog.showModal(); });
+      document.getElementById('discard-cancel')
+        .addEventListener('click', function () { dialog.close(); });
+      document.getElementById('discard-confirm-btn')
+        .addEventListener('click', function () {
+          dialog.close();
+          // Native reset restores the select to its selected option and empties the
+          // textarea in one call — no manual bookkeeping to drift out of sync.
+          form.reset();
+          hidePending();
+          closeCompose();
+          refreshButtons();
+        });
+
+      // A server re-render after failed validation returns the submitted text in the
+      // textarea while the compose field is hidden. Stage it, or the note is invisible
+      // yet still queued to post.
+      if (textarea.value.trim() !== '') {
+        showPending();
+      } else if ({{ note_form.body.errors|yesno:"true,false" }}) {
+        openCompose(false);
+      }
+      refreshButtons();
     })();
   </script>
 {% endblock %}
