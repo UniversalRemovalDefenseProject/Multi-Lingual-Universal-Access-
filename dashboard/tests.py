@@ -304,7 +304,7 @@ class CaseAssignmentTests(TestCase):
         self.assertContains(response, 'name="assigned_to"')
 
     def test_assign_sets_assigned_to(self):
-        self.client.post(self.url, {'assigned_to': self.manager.pk, 'body': ''})
+        self.client.post(self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'})
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, self.manager)
@@ -314,7 +314,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': other.pk, 'body': ''})
+        self.client.post(self.url, {'assigned_to': other.pk, 'save_assignment': '1'})
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, other)
@@ -323,7 +323,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': '', 'body': ''})
+        self.client.post(self.url, {'assigned_to': '', 'save_assignment': '1'})
 
         self.submission.refresh_from_db()
         self.assertIsNone(self.submission.assigned_to)
@@ -338,7 +338,7 @@ class CaseAssignmentTests(TestCase):
         self.assertIsNone(self.submission.assigned_to)
 
     def test_assign_redirects_to_detail_on_success(self):
-        response = self.client.post(self.url, {'assigned_to': self.manager.pk, 'body': ''})
+        response = self.client.post(self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'})
 
         self.assertRedirects(response, self.url)
 
@@ -364,7 +364,7 @@ class CaseAssignmentTests(TestCase):
         # The dropdown hides them; this proves the queryset also rejects a posted pk.
         outsider = User.objects.create_user(username='outsider')
 
-        response = self.client.post(self.url, {'assigned_to': outsider.pk, 'body': ''})
+        response = self.client.post(self.url, {'assigned_to': outsider.pk, 'save_assignment': '1'})
 
         self.assertEqual(response.status_code, 200)  # re-render, not a redirect
         self.submission.refresh_from_db()
@@ -379,7 +379,7 @@ class StaffNoteTests(TestCase):
         self.url = reverse('dashboard:detail', args=[self.submission.pk])
 
     def test_add_note_creates_note_with_request_user_as_author(self):
-        self.client.post(self.url, {'assigned_to': '', 'body': 'First observation.'})
+        self.client.post(self.url, {'body': 'First observation.', 'save_note': '1'})
 
         note = StaffNote.objects.get(intake=self.submission)
         self.assertEqual(note.author, self.manager)
@@ -390,7 +390,7 @@ class StaffNoteTests(TestCase):
 
         self.client.post(
             self.url,
-            {'assigned_to': '', 'body': 'Injected note.', 'author': other.pk},
+            {'body': 'Injected note.', 'save_note': '1', 'author': other.pk},
         )
 
         note = StaffNote.objects.get(intake=self.submission)
@@ -406,12 +406,12 @@ class StaffNoteTests(TestCase):
 
     def test_empty_body_does_not_create_note(self):
         # Empty body means "no note this submit" — not a validation error, just skipped.
-        self.client.post(self.url, {'assigned_to': '', 'body': ''})
+        self.client.post(self.url, {'body': '', 'save_note': '1'})
 
         self.assertEqual(StaffNote.objects.filter(intake=self.submission).count(), 0)
 
     def test_add_note_redirects_to_detail_on_success(self):
-        response = self.client.post(self.url, {'assigned_to': '', 'body': 'A note.'})
+        response = self.client.post(self.url, {'body': 'A note.', 'save_note': '1'})
 
         self.assertRedirects(response, self.url)
 
@@ -608,6 +608,26 @@ class CaseDetailContentTests(TestCase):
         self.assertContains(response, self._back_href())
         self.assertNotContains(response, 'evil')
 
+    def test_attribution_placeholders_before_any_status_change(self):
+        submission = make_submission()
+
+        response = self._get(submission)
+
+        self.assertContains(response, 'Status last changed')
+        self.assertContains(response, '<p class="empty">Never changed</p>', html=True)
+        self.assertContains(response, '<p class="empty">Not recorded</p>', html=True)
+
+    def test_attribution_renders_after_a_status_change(self):
+        submission = make_submission()
+        self.client.post(
+            reverse('dashboard:status', args=[submission.pk]), {'new_status': 'accepted'},
+        )
+
+        response = self._get(submission)
+
+        self.assertNotContains(response, 'Never changed')
+        self.assertContains(response, self.manager.username)
+
 
 class QueryCountTests(TestCase):
     """Row and note counts must not change the number of queries issued."""
@@ -637,3 +657,302 @@ class QueryCountTests(TestCase):
 
     def test_detail_issues_no_query_per_note(self):
         self.assertEqual(self._detail_queries(2), self._detail_queries(10))
+
+
+class CaseSearchTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+
+    def _search(self, q, **extra):
+        return self.client.post(reverse('dashboard:search'), {'q': q, **extra})
+
+    def test_search_matches_on_name(self):
+        make_submission(full_name='Maria Example')
+        make_submission(full_name='Someone Else')
+
+        self._search('Maria')
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'Maria Example')
+        self.assertNotContains(response, 'Someone Else')
+
+    def test_search_matches_on_country(self):
+        make_submission(full_name='Case A', country_of_origin='Venezuela')
+        make_submission(full_name='Case B', country_of_origin='Elsewhere')
+
+        self._search('venezu')
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'Case A')
+        self.assertNotContains(response, 'Case B')
+
+    def test_search_matches_on_a_number(self):
+        make_submission(full_name='Case A', a_number='A-123-456-789')
+        make_submission(full_name='Case B', a_number='A-999-000-111')
+
+        self._search('123-456')
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'Case A')
+        self.assertNotContains(response, 'Case B')
+
+    def test_arabic_query_matches_and_renders_intact(self):
+        arabic_name = 'محمد الأحمد'
+        make_submission(full_name=arabic_name)
+        make_submission(full_name='Latin Name')
+
+        self._search('محمد')
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, arabic_name)
+        self.assertNotContains(response, 'Latin Name')
+
+    def test_query_never_appears_in_any_url(self):
+        make_submission(full_name='Maria Example')
+
+        response = self._search('Maria', status='accepted')
+
+        self.assertNotIn('Maria', response['Location'])
+        self.assertNotIn('q=', response['Location'])
+
+    def test_search_redirect_keeps_both_filters_and_resets_page(self):
+        response = self._search('Maria', status='accepted', assigned_to='unassigned')
+
+        self.assertEqual(
+            response['Location'],
+            f"{reverse('dashboard:queue')}?status=accepted&assigned_to=unassigned",
+        )
+
+    def test_search_composes_with_filter_and_pagination(self):
+        for i in range(26):
+            make_submission(full_name=f'Match {i:02d}', status='accepted')
+        make_submission(full_name='Match New', status='new')
+        make_submission(full_name='Other Accepted', status='accepted')
+
+        self._search('Match')
+        response = self.client.get(
+            reverse('dashboard:queue'), {'status': 'accepted', 'page': 2},
+        )
+
+        # 26 accepted matches -> page 2 holds the oldest one; the 'new' match and the
+        # non-matching accepted case are excluded by filter and search respectively.
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Match 00')
+        self.assertNotContains(response, 'Match New')
+        self.assertNotContains(response, 'Other Accepted')
+
+    def test_clear_button_empties_the_search(self):
+        make_submission(full_name='Maria Example')
+        make_submission(full_name='Someone Else')
+        self._search('Maria')
+
+        self._search('Maria', clear='1')
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertNotIn('dashboard_search', self.client.session)
+        self.assertContains(response, 'Someone Else')
+
+    def test_whitespace_query_clears_rather_than_storing(self):
+        self._search('Maria')
+
+        self._search('   ')
+
+        self.assertNotIn('dashboard_search', self.client.session)
+
+    def test_query_is_stripped_and_capped_at_100(self):
+        self._search('  ' + 'x' * 150 + '  ')
+
+        self.assertEqual(len(self.client.session['dashboard_search']), 100)
+
+    def test_anonymous_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.post(reverse('dashboard:search'), {'q': 'Maria'})
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse('dashboard:login'), response['Location'])
+
+    def test_user_without_permission_gets_403(self):
+        User.objects.create_user(username='clerk', password='not-a-real-password')
+        self.client.login(username='clerk', password='not-a-real-password')
+
+        response = self.client.post(reverse('dashboard:search'), {'q': 'Maria'})
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_is_rejected_while_authenticated(self):
+        # Authenticated on purpose: the login check runs before the method check.
+        self.assertEqual(self.client.get(reverse('dashboard:search')).status_code, 405)
+
+
+def make_read_only_reviewer(username='reviewer', password='not-a-real-password'):
+    """access_dashboard directly, no group: can read and leave notes, cannot write."""
+    from django.contrib.auth.models import Permission
+    user = User.objects.create_user(username=username, password=password)
+    user.user_permissions.add(Permission.objects.get(codename='access_dashboard'))
+    return user
+
+
+class CaseStatusUpdateTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:status', args=[self.submission.pk])
+
+    def test_status_change_updates_record_and_attribution(self):
+        self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'accepted')
+        self.assertIsNotNone(self.submission.status_changed_at)
+        self.assertEqual(self.submission.status_changed_by, self.manager)
+
+    def test_redirect_preserves_filters_and_page(self):
+        for _ in range(30):
+            make_submission(status='new')
+
+        response = self.client.post(self.url, {
+            'new_status': 'conflict_check',
+            'status': 'new', 'assigned_to': 'unassigned', 'page': '2',
+        })
+
+        self.assertEqual(
+            response['Location'],
+            f"{reverse('dashboard:queue')}?status=new&assigned_to=unassigned&page=2",
+        )
+
+    def test_page_clamps_when_the_change_empties_it(self):
+        # 26 'new' cases -> 2 pages. Moving the page-2 case out of 'new' leaves 25 ->
+        # one page; returning to page 2 would 404.
+        for i in range(25):
+            make_submission(full_name=f'Filler {i}', status='new')
+        # self.submission is the oldest 'new' case, i.e. the lone page-2 row.
+
+        response = self.client.post(self.url, {
+            'new_status': 'accepted', 'status': 'new', 'page': '2',
+        })
+
+        self.assertEqual(response['Location'], f"{reverse('dashboard:queue')}?status=new")
+        self.assertEqual(self.client.get(response['Location']).status_code, 200)
+
+    def test_noop_submit_leaves_attribution_untouched(self):
+        self.client.post(self.url, {'new_status': 'accepted'})
+        self.submission.refresh_from_db()
+        first_at, first_by = self.submission.status_changed_at, self.submission.status_changed_by
+
+        make_case_manager(username='other')
+        self.client.login(username='other', password='not-a-real-password')
+        self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status_changed_at, first_at)
+        self.assertEqual(self.submission.status_changed_by, first_by)
+
+    def test_invalid_status_returns_400_and_changes_nothing(self):
+        response = self.client.post(self.url, {'new_status': "evil'--"})
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+        self.assertIsNone(self.submission.status_changed_at)
+
+    def test_get_is_rejected_while_authenticated(self):
+        self.assertEqual(self.client.get(self.url).status_code, 405)
+
+    def test_anonymous_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.assertIn(reverse('dashboard:login'), response['Location'])
+
+    def test_access_only_user_gets_403(self):
+        make_read_only_reviewer()
+        self.client.login(username='reviewer', password='not-a-real-password')
+
+        response = self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.assertEqual(response.status_code, 403)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+
+
+class ReadOnlyReviewerTests(TestCase):
+    """access_dashboard alone: full read and notes, no write controls anywhere."""
+
+    def setUp(self):
+        self.reviewer = make_read_only_reviewer()
+        self.submission = make_submission()
+        self.client.login(username='reviewer', password='not-a-real-password')
+        self.detail_url = reverse('dashboard:detail', args=[self.submission.pk])
+
+    def test_queue_shows_no_status_column(self):
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'Change status')
+        self.assertNotContains(response, 'name="new_status"')
+
+    def test_detail_shows_notes_but_no_write_controls(self):
+        response = self.client.get(self.detail_url)
+
+        self.assertContains(response, 'id="notes-form"')
+        self.assertNotContains(response, 'Update case')
+        # The control itself, not the attribute text — the JS contains a
+        # querySelector('[name="assigned_to"]') literal even when the form is gated.
+        self.assertNotContains(response, '<select name="assigned_to"')
+        self.assertNotContains(response, 'id="assign-form"')
+        self.assertNotContains(response, 'name="new_status"')
+
+    def test_reviewer_can_still_add_a_note(self):
+        self.client.post(self.detail_url, {'body': 'Reviewer note.', 'save_note': '1'})
+
+        note = StaffNote.objects.get(intake=self.submission)
+        self.assertEqual(note.author, self.reviewer)
+
+    def test_reviewer_assignment_post_gets_403_and_changes_nothing(self):
+        response = self.client.post(
+            self.detail_url,
+            {'assigned_to': str(self.reviewer.pk), 'save_assignment': '1'},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
+
+class DetailFormSplitTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:detail', args=[self.submission.pk])
+
+    def test_note_submit_ignores_a_forged_assignment(self):
+        # The whole point of the split: a stale or forged assigned_to in a note POST
+        # must never touch the assignment.
+        self.submission.assigned_to = self.manager
+        self.submission.save()
+        other = make_case_manager(username='other')
+
+        self.client.post(self.url, {
+            'body': 'A note.', 'save_note': '1', 'assigned_to': str(other.pk),
+        })
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, self.manager)
+        self.assertEqual(StaffNote.objects.count(), 1)
+
+    def test_post_without_a_named_button_returns_400(self):
+        response = self.client.post(self.url, {'assigned_to': '', 'body': 'x'})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(StaffNote.objects.count(), 0)
+
+    def test_detail_status_form_renders_for_manager(self):
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'name="new_status"')
+        self.assertContains(response, 'Change status')

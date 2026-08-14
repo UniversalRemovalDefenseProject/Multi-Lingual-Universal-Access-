@@ -77,10 +77,21 @@ class IntakeSubmission(models.Model):
     consent_acknowledged = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='new')
     created_at = models.DateTimeField(auto_now_add=True)
+    # Attribution for the most recent status change only. Full audit history is a
+    # separate Issue; these two answer "who moved this last, and when".
+    status_changed_at = models.DateTimeField(null=True, blank=True)
+    status_changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='status_changed_cases',
+    )
 
     class Meta:
         permissions = [
             ('access_dashboard', 'Can access the case manager dashboard'),
+            ('change_case_status', 'Can change case status'),
         ]
 
     def __str__(self):

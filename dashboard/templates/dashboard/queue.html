@@ -7,6 +7,20 @@
     <h2>Case Queue</h2>
   </div>
 
+  <form method="post" action="{% url 'dashboard:search' %}" class="filters">
+    {% csrf_token %}
+    {# Keeps both active filters when the search changes. Never carries the query itself. #}
+    <input type="hidden" name="status" value="{{ selected_status }}" />
+    <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+    <label for="q">Search</label>
+    <input type="search" name="q" id="q" dir="auto" value="{{ search_query }}"
+           placeholder="Name, country, or A-number" maxlength="100" />
+    <button type="submit" class="btn btn-small">Search</button>
+    {% if search_query %}
+      <button type="submit" name="clear" value="1" class="btn-secondary btn-small">Clear</button>
+    {% endif %}
+  </form>
+
   <form method="get" class="filters">
     <label for="status">Status</label>
     <select name="status" id="status" onchange="this.form.submit()">
@@ -30,7 +44,10 @@
 
   <div class="table-wrap">
     <table>
-      <caption>Intake submissions, newest first</caption>
+      <caption>
+        Intake submissions, newest first{% if search_query %} — matching
+        <span class="applicant-text" dir="auto">{{ search_query }}</span>{% endif %}
+      </caption>
       <thead>
         <tr>
           <th scope="col">Name</th>
@@ -39,13 +56,14 @@
           <th scope="col">Status</th>
           <th scope="col">Assigned to</th>
           <th scope="col">Submitted</th>
+          {% if perms.intake.change_case_status %}<th scope="col">Change status</th>{% endif %}
         </tr>
       </thead>
       <tbody>
         {% for submission in submissions %}
           <tr>
             <td class="applicant-text" dir="auto">
-              <a href="{% url 'dashboard:detail' submission.pk %}{% if selected_status or selected_assignee != '' %}?{% if selected_status %}status={{ selected_status }}{% endif %}{% if selected_status and selected_assignee != '' %}&amp;{% endif %}{% if selected_assignee != '' %}assigned_to={{ selected_assignee }}{% endif %}{% endif %}">{{ submission.full_name }}</a>
+              <a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a>
             </td>
             <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
             <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
@@ -58,9 +76,26 @@
               {% endif %}
             </td>
             <td>{{ submission.created_at|date:"Y-m-d H:i" }}</td>
+            {% if perms.intake.change_case_status %}
+              <td>
+                <form method="post" action="{% url 'dashboard:status' submission.pk %}" class="rowaction">
+                  {% csrf_token %}
+                  <input type="hidden" name="status" value="{{ selected_status }}" />
+                  <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+                  <input type="hidden" name="page" value="{{ page_obj.number }}" />
+                  <label class="visually-hidden" for="new_status_{{ submission.pk }}">New status</label>
+                  <select name="new_status" id="new_status_{{ submission.pk }}">
+                    {% for value, label in status_choices %}
+                      <option value="{{ value }}"{% if value == submission.status %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-small">Update</button>
+                </form>
+              </td>
+            {% endif %}
           </tr>
         {% empty %}
-          <tr><td colspan="6" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
+          <tr><td colspan="{% if perms.intake.change_case_status %}7{% else %}6{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
         {% endfor %}
       </tbody>
     </table>

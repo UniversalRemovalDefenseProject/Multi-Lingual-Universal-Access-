@@ -177,6 +177,7 @@
     input[type=password],
     input[type=email],
     input[type=date],
+    input[type=search],
     textarea,
     select {
       font-family: inherit;
@@ -365,6 +366,26 @@
     }
 
     .filters select { width: auto; min-width: 140px; }
+
+    .filters input[type=search] { width: auto; flex: 1; max-width: 22rem; }
+
+    /* ── Per-row status form ── */
+    .rowaction { display: flex; align-items: center; gap: 6px; margin: 0; }
+
+    .rowaction select { width: auto; }
+
+    /* Labels each row's status select for screen readers without repeating the
+       text visibly on every row. */
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
 
     /* ── Pagination ── */
     .pager {
