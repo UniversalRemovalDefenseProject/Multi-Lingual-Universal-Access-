@@ -1,0 +1,115 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Case Queue | Case Manager Dashboard{% endblock %}
+
+{% block content %}
+  <div class="card-head">
+    <h2>Case Queue</h2>
+  </div>
+
+  <form method="post" action="{% url 'dashboard:search' %}" class="filters">
+    {% csrf_token %}
+    {# Keeps both active filters when the search changes. Never carries the query itself. #}
+    <input type="hidden" name="status" value="{{ selected_status }}" />
+    <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+    <label for="q">Search</label>
+    <input type="search" name="q" id="q" dir="auto" value="{{ search_query }}"
+           placeholder="Name, country, or A-number" maxlength="100" />
+    <button type="submit" class="btn btn-small">Search</button>
+    {% if search_query %}
+      <button type="submit" name="clear" value="1" class="btn-secondary btn-small">Clear</button>
+    {% endif %}
+  </form>
+
+  <form method="get" class="filters">
+    <label for="status">Status</label>
+    <select name="status" id="status" onchange="this.form.submit()">
+      <option value=""{% if not selected_status %} selected{% endif %}>All statuses</option>
+      {% for value, label in status_choices %}
+        <option value="{{ value }}"{% if value == selected_status %} selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="assigned_to">Assigned to</label>
+    <select name="assigned_to" id="assigned_to" onchange="this.form.submit()">
+      <option value=""{% if selected_assignee == '' %} selected{% endif %}>All assignees</option>
+      <option value="{{ UNASSIGNED }}"{% if selected_assignee == UNASSIGNED %} selected{% endif %}>Unassigned</option>
+      {% for user in assignable_users %}
+        <option value="{{ user.pk }}"{% if selected_assignee == user.pk %} selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+      {% endfor %}
+    </select>
+
+    <noscript><button type="submit" class="btn">Filter</button></noscript>
+  </form>
+
+  <div class="table-wrap">
+    <table>
+      <caption>
+        Intake submissions, newest first{% if search_query %} — matching
+        <span class="applicant-text" dir="auto">{{ search_query }}</span>{% endif %}
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Country of origin</th>
+          <th scope="col">Preferred language</th>
+          <th scope="col">Status</th>
+          <th scope="col">Assigned to</th>
+          <th scope="col">Submitted</th>
+          {% if perms.intake.change_case_status %}<th scope="col">Change status</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for submission in submissions %}
+          <tr>
+            <td class="applicant-text" dir="auto">
+              <a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a>
+            </td>
+            <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
+            <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
+            <td><span class="badge">{{ submission.get_status_display }}</span></td>
+            <td>
+              {% if submission.assigned_to %}
+                {{ submission.assigned_to.get_full_name|default:submission.assigned_to.username }}
+              {% else %}
+                <span class="badge badge--unassigned">Unassigned</span>
+              {% endif %}
+            </td>
+            <td>{{ submission.created_at|date:"Y-m-d H:i" }}</td>
+            {% if perms.intake.change_case_status %}
+              <td>
+                <form method="post" action="{% url 'dashboard:status' submission.pk %}" class="rowaction">
+                  {% csrf_token %}
+                  <input type="hidden" name="status" value="{{ selected_status }}" />
+                  <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+                  <input type="hidden" name="page" value="{{ page_obj.number }}" />
+                  <label class="visually-hidden" for="new_status_{{ submission.pk }}">New status</label>
+                  <select name="new_status" id="new_status_{{ submission.pk }}">
+                    {% for value, label in status_choices %}
+                      <option value="{{ value }}"{% if value == submission.status %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-small">Update</button>
+                </form>
+              </td>
+            {% endif %}
+          </tr>
+        {% empty %}
+          <tr><td colspan="{% if perms.intake.change_case_status %}7{% else %}6{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+      <nav class="pager" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}{% if selected_assignee %}&amp;assigned_to={{ selected_assignee }}{% endif %}">&larr; Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&amp;status={{ selected_status }}{% endif %}{% if selected_assignee %}&amp;assigned_to={{ selected_assignee }}{% endif %}">Next &rarr;</a>
+        {% endif %}
+      </nav>
+    {% endif %}
+  </div>
+{% endblock %}

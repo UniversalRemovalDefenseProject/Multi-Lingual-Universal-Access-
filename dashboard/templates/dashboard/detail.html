@@ -1,0 +1,386 @@
+{% extends "dashboard/base.html" %}
+
+{# Static title: the applicant's name must not reach browser history or a screen share. #}
+{% block title %}Case detail | Case Manager Dashboard{% endblock %}
+
+{% block content %}
+  <a class="back-link" href="{% url 'dashboard:queue' %}{% if back_query %}?{{ back_query }}{% endif %}">&larr; Back to queue</a>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Identity</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Full name</label>
+        <p class="applicant-text" dir="auto">{{ submission.full_name }}</p>
+      </div>
+      <div class="field-item">
+        <label>Date of birth</label>
+        {% if submission.date_of_birth %}<p class="applicant-text" dir="auto">{{ submission.date_of_birth }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Country of origin</label>
+        <p class="applicant-text" dir="auto">{{ submission.country_of_origin }}</p>
+      </div>
+      <div class="field-item">
+        <label>Preferred language</label>
+        <p class="applicant-text" dir="auto">{{ submission.preferred_language }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Contact</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Phone</label>
+        {% if submission.phone %}<p class="applicant-text" dir="auto">{{ submission.phone }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Email</label>
+        {% if submission.email %}<p class="applicant-text" dir="auto">{{ submission.email }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Current location</label>
+        {% if submission.current_location %}<p class="applicant-text" dir="auto">{{ submission.current_location }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Case and court</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Detained</label>
+        <p>{{ submission.detained|yesno:"Yes,No" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Immigration court</label>
+        {% if submission.immigration_court %}<p class="applicant-text" dir="auto">{{ submission.immigration_court }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>A-number</label>
+        {% if submission.a_number %}<p class="applicant-text" dir="auto">{{ submission.a_number }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Next hearing date</label>
+        {% if submission.next_hearing_date %}<p class="applicant-text" dir="auto">{{ submission.next_hearing_date }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Family members included</label>
+        <p>{{ submission.family_members_included|yesno:"Yes,No" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Submission details</h2>
+    </div>
+    <div class="field-grid">
+      <div class="field-item">
+        <label>Form language</label>
+        <p>{{ submission.get_language_preference_display }}</p>
+      </div>
+      <div class="field-item">
+        <label>Consent acknowledged</label>
+        <p>{{ submission.consent_acknowledged|yesno:"Yes,No" }}</p>
+      </div>
+      <div class="field-item">
+        <label>Status</label>
+        <p><span class="badge">{{ submission.get_status_display }}</span></p>
+      </div>
+      <div class="field-item">
+        <label>Status last changed</label>
+        {% if submission.status_changed_at %}<p>{{ submission.status_changed_at|date:"Y-m-d H:i" }}</p>{% else %}<p class="empty">Never changed</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Status changed by</label>
+        {% if submission.status_changed_by %}<p>{{ submission.status_changed_by.get_username }}</p>{% else %}<p class="empty">Not recorded</p>{% endif %}
+      </div>
+      <div class="field-item">
+        <label>Submitted</label>
+        <p>{{ submission.created_at|date:"Y-m-d H:i" }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Narrative responses</h2>
+    </div>
+
+    <div class="narrative">
+      <label>Why do you fear returning to your home country?</label>
+      {% if submission.fear_of_return_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.fear_of_return_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.fear_of_return_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.fear_of_return_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="narrative">
+      <label>Have you experienced past harm or persecution?</label>
+      {% if submission.past_harm_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.past_harm_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.past_harm_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.past_harm_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="narrative">
+      <label>What countries did you travel through, and did you apply for asylum there?</label>
+      {% if submission.countries_traveled_asylum_summary %}
+        <p class="applicant-text narrative-text" dir="auto">{{ submission.countries_traveled_asylum_summary }}</p>
+      {% else %}
+        <p class="empty">&mdash;</p>
+      {% endif %}
+      {% if submission.countries_traveled_asylum_summary_translated %}
+        <div class="translation">
+          <label>Staff translation{% if submission.translated_response_language %} ({{ submission.get_translated_response_language_display }}){% endif %}</label>
+          <p class="applicant-text narrative-text" dir="auto">{{ submission.countries_traveled_asylum_summary_translated }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Staff notes</h2>
+    </div>
+      {% if notes %}
+        <ul class="notes-list" style="margin-bottom:16px;">
+          <li id="note-pending" data-author="{{ user.get_username }}" hidden></li>
+          {% for note in notes %}
+            <li>
+              <p class="note-meta">{{ note.author.get_full_name|default:note.author.username }} &middot; {{ note.created_at|date:"Y-m-d H:i" }}</p>
+              <p class="note-body applicant-text" dir="auto">{{ note.body }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <ul class="notes-list" style="margin-bottom:16px;">
+          <li id="note-pending" data-author="{{ user.get_username }}" hidden></li>
+        </ul>
+        <p id="no-notes" style="color:var(--ink-faint);font-size:14px;margin:0 0 16px;">No notes yet.</p>
+      {% endif %}
+
+    <form method="post" id="notes-form">
+      {% csrf_token %}
+      <div id="note-toggle-wrap">
+        <button type="button" id="note-toggle" class="note-toggle-btn">+ Add a note</button>
+      </div>
+
+      <div id="note-field" style="display:none;">
+        {{ note_form.body }}
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+          <button type="button" id="note-cancel" class="note-cancel-btn">Cancel</button>
+          <button type="button" id="note-add" class="btn btn-small" disabled>Add Note</button>
+        </div>
+        {% if note_form.body.errors %}
+          <p class="form-error" style="margin-top:6px;">{{ note_form.body.errors }}</p>
+        {% endif %}
+      </div>
+
+      <div id="note-save-wrap" hidden>
+        <button type="submit" name="save_note" value="1" id="note-save" class="btn btn-small">Save note</button>
+      </div>
+    </form>
+  </div>
+
+  {% if perms.intake.change_case_status %}
+    <div class="card">
+      <div class="card-head">
+        <h2>Update case</h2>
+      </div>
+
+      <form method="post" id="assign-form">
+        {% csrf_token %}
+        <div class="field-item" style="margin-bottom:20px;">
+          <label for="{{ assign_form.assigned_to.id_for_label }}">Assigned to</label>
+          <div style="margin-top:6px;">{{ assign_form.assigned_to }}</div>
+          {% if assign_form.assigned_to.errors %}
+            <p class="form-error" style="margin-top:6px;">{{ assign_form.assigned_to.errors }}</p>
+          {% endif %}
+        </div>
+        <div class="action-row">
+          <button type="submit" name="save_assignment" value="1" class="btn">Update changes</button>
+          <button type="button" id="discard-open" class="btn-secondary" disabled>Discard changes</button>
+        </div>
+      </form>
+
+      <form method="post" action="{% url 'dashboard:status' submission.pk %}" class="action-row" style="margin-top:16px;">
+        {% csrf_token %}
+        <input type="hidden" name="status" value="{{ selected_status }}" />
+        <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
+        <input type="hidden" name="page" value="{{ selected_page }}" />
+        <label for="new_status">Status</label>
+        <select name="new_status" id="new_status">
+          {% for value, label in status_choices %}
+            <option value="{{ value }}"{% if value == submission.status %} selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn">Change status</button>
+      </form>
+    </div>
+  {% endif %}
+
+  <dialog id="discard-confirm" class="confirm-dialog" aria-labelledby="discard-title">
+    <h2 id="discard-title">Discard unsaved changes?</h2>
+    <p>Your unsaved note and any change to the assignee will be removed. Notes already
+       saved to this case are not affected.</p>
+    <div class="action-row">
+      <button type="button" id="discard-cancel" class="btn-secondary">Keep editing</button>
+      <button type="button" id="discard-confirm-btn" class="btn btn-danger">Discard</button>
+    </div>
+  </dialog>
+
+  <script>
+    (function () {
+      var notesForm  = document.getElementById('notes-form');
+      var assignForm = document.getElementById('assign-form');  // null without change_case_status
+      var toggle     = document.getElementById('note-toggle');
+      var toggleWrap = document.getElementById('note-toggle-wrap');
+      var field      = document.getElementById('note-field');
+      var cancel     = document.getElementById('note-cancel');
+      var addBtn     = document.getElementById('note-add');
+      var pending    = document.getElementById('note-pending');
+      var noNotes    = document.getElementById('no-notes');
+      var saveWrap   = document.getElementById('note-save-wrap');
+      var textarea   = field.querySelector('textarea');
+      var assignee   = assignForm ? assignForm.querySelector('[name="assigned_to"]') : null;
+      var dialog     = document.getElementById('discard-confirm');
+      var discardBtn = document.getElementById('discard-open');  // null without change_case_status
+
+      // The assignee value as the page loaded, so "dirty" means changed from saved.
+      var savedAssignee = assignee ? assignee.value : '';
+      var author = pending.dataset.author;
+
+      function openCompose(focus) {
+        field.style.display = 'block';
+        toggleWrap.style.display = 'none';
+        if (focus) { textarea.focus(); }
+      }
+
+      function closeCompose() {
+        field.style.display = 'none';
+        toggleWrap.style.display = 'block';
+      }
+
+      function isDirty() {
+        return textarea.value.trim() !== '' ||
+               (assignee && assignee.value !== savedAssignee);
+      }
+
+      function refreshButtons() {
+        addBtn.disabled = textarea.value.trim() === '';
+        if (discardBtn) { discardBtn.disabled = !isDirty(); }
+      }
+
+      function showPending() {
+        // Built with textContent, never innerHTML — a note body is untrusted input.
+        pending.className = 'note-pending';
+        pending.textContent = '';
+
+        var meta = document.createElement('p');
+        meta.className = 'note-meta';
+        meta.textContent = author + ' · ';
+        var tag = document.createElement('span');
+        tag.className = 'note-pending-tag';
+        tag.textContent = 'Unsaved';
+        meta.appendChild(tag);
+
+        var body = document.createElement('p');
+        body.className = 'note-body applicant-text';
+        body.setAttribute('dir', 'auto');
+        body.textContent = textarea.value;
+
+        var edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'note-toggle-btn';
+        edit.textContent = 'Edit';
+        edit.addEventListener('click', function () {
+          hidePending();
+          openCompose(true);
+        });
+
+        pending.appendChild(meta);
+        pending.appendChild(body);
+        pending.appendChild(edit);
+        pending.hidden = false;
+        saveWrap.hidden = false;
+        if (noNotes) { noNotes.hidden = true; }
+      }
+
+      function hidePending() {
+        pending.hidden = true;
+        pending.textContent = '';
+        saveWrap.hidden = true;
+        if (noNotes) { noNotes.hidden = false; }
+      }
+
+      toggle.addEventListener('click', function () { openCompose(true); });
+
+      cancel.addEventListener('click', function () {
+        textarea.value = '';
+        closeCompose();
+        hidePending();
+        refreshButtons();
+      });
+
+      addBtn.addEventListener('click', function () {
+        if (textarea.value.trim() === '') { return; }
+        closeCompose();
+        showPending();
+        refreshButtons();
+      });
+
+      textarea.addEventListener('input', refreshButtons);
+      if (assignee) { assignee.addEventListener('change', refreshButtons); }
+
+      if (discardBtn && dialog) {
+        discardBtn.addEventListener('click', function () { dialog.showModal(); });
+        document.getElementById('discard-cancel')
+          .addEventListener('click', function () { dialog.close(); });
+        document.getElementById('discard-confirm-btn')
+          .addEventListener('click', function () {
+            dialog.close();
+            // Native reset restores the select to its selected option and empties the
+            // textarea in one call — no manual bookkeeping to drift out of sync.
+            notesForm.reset();
+            if (assignForm) { assignForm.reset(); }
+            hidePending();
+            closeCompose();
+            refreshButtons();
+          });
+      }
+
+      // A server re-render after failed validation returns the submitted text in the
+      // textarea while the compose field is hidden. Stage it, or the note is invisible
+      // yet still queued to post.
+      if (textarea.value.trim() !== '') {
+        showPending();
+      } else if ({{ note_form.body.errors|yesno:"true,false" }}) {
+        openCompose(false);
+      }
+      refreshButtons();
+    })();
+  </script>
+{% endblock %}
