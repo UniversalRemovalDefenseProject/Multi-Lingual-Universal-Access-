@@ -13,7 +13,6 @@ env:
 permissions:
   issues: write
   pull-requests: read
-  contents: read
 
 jobs:
   check-stale-issues:
@@ -27,24 +26,117 @@ jobs:
           KEEP_LABEL: ${{ env.KEEP_LABEL }}
         with:
           script: |
-            // Fetch open issues that currently have an assignee.
+            const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              per_page: 100,
+            });
 
-            // For each issue, determine the most recent activity timestamp from:
-            //   - issue comments
-            //   - the linked pull request's updated_at, where the PR references the issue
-            //   - commits on a branch matching feat/issue-{N}-*, where no PR exists yet
+            // Keep only real issues with an assignee
+            const assignedIssues = openIssues.filter(
+              (item) => !item.pull_request && item.assignees && item.assignees.length > 0
+            );
 
-            // Exclude an issue from further processing if:
-            //   - it has the KEEP_LABEL label
-            //   - it was assigned fewer than NUDGE_DAYS days ago
+            core.info(`Found ${assignedIssues.length} open, assigned issue(s) to evaluate.`);
 
-            // For remaining issues, based on days since last activity:
-            //   - >= UNASSIGN_DAYS: remove the assignee and post a comment
-            //     noting the issue is available again.
-            //     This repo has no separate in-progress label; assignee
-            //     presence is the sole in-progress indicator. If such a
-            //     label is introduced later, it should be removed here
-            //     alongside unassignment.
-            //   - >= NUDGE_DAYS and < UNASSIGN_DAYS: post a comment tagging
-            //     the assignee to confirm the issue is still being worked on.
-            //   - otherwise: no action.
+            const nudgeDays = Number(process.env.NUDGE_DAYS);
+            const unassignDays = Number(process.env.UNASSIGN_DAYS);
+            const keepLabel = process.env.KEEP_LABEL;
+            const now = new Date();
+
+            function daysSince(dateString) {
+              if (!dateString) return Infinity;
+              const then = new Date(dateString);
+              return (now - then) / (1000 * 60 * 60 * 24);
+            }
+
+            function latest(timestamps) {
+              const valid = timestamps.filter(Boolean);
+              return valid.length > 0 ? valid.reduce((a, b) => (a > b ? a : b)) : null;
+            }
+
+            for (const issue of assignedIssues) {
+              const issueNumber = issue.number;
+
+              // Compute activity and assignment timestamps
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+              // Exclude bot comments
+              const humanComments = comments.filter((c) => c.user.type !== "Bot");
+              const lastCommentAt = latest(humanComments.map((c) => c.created_at));
+
+              const timelineEvents = await github.paginate(github.rest.issues.listEventsForTimeline, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                per_page: 100,
+              });
+
+              const linkedPRs = timelineEvents.filter(
+                (e) => e.event === "cross-referenced" && e.source && e.source.issue && e.source.issue.pull_request
+              );
+              const lastPRActivityAt = latest(linkedPRs.map((ref) => ref.source.issue.updated_at));
+
+              const referencedCommits = timelineEvents.filter((e) => e.event === "referenced");
+              const lastReferencedCommitAt = latest(referencedCommits.map((e) => e.created_at));
+
+              const assignedEvents = timelineEvents.filter((e) => e.event === "assigned");
+              const lastAssignedAt = latest(assignedEvents.map((e) => e.created_at)) || issue.created_at;
+
+              const lastActivityAt =
+                latest([lastCommentAt, lastPRActivityAt, lastReferencedCommitAt]) || issue.created_at;
+
+              const daysSinceActivity = daysSince(lastActivityAt);
+              const daysSinceAssigned = daysSince(lastAssignedAt);
+
+              // Skip keep-assigned labels
+              const hasKeepLabel = issue.labels.some((l) => l.name === keepLabel);
+              if (hasKeepLabel) {
+                core.info(`#${issueNumber}: has "${keepLabel}" label, skipping.`);
+                continue;
+              }
+              if (daysSinceAssigned < nudgeDays) {
+                core.info(`#${issueNumber}: assigned ${daysSinceAssigned.toFixed(1)} day(s) ago, too recent to check.`);
+                continue;
+              }
+
+              // Take nudge or unassign action
+              const assigneeLogins = issue.assignees.map((a) => a.login);
+              const assigneeMentions = assigneeLogins.map((login) => `@${login}`).join(", ");
+
+              if (daysSinceActivity >= unassignDays) {
+                await github.rest.issues.removeAssignees({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  assignees: assigneeLogins,
+                });
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body:
+                    `This issue has had no activity for ${unassignDays}+ days and has been unassigned. ` +
+                    `It's now open for anyone to pick up.`,
+                });
+                core.info(`#${issueNumber}: unassigned (${daysSinceActivity.toFixed(1)} day(s) since activity).`);
+              } else if (daysSinceActivity >= nudgeDays) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body:
+                    `${assigneeMentions}, this issue has had no activity for ${nudgeDays}+ days. ` +
+                    `Are you still working on it? If so, add the "${keepLabel}" label to prevent it from ` +
+                    `being unassigned. Otherwise, it will be unassigned in ${unassignDays - nudgeDays} more day(s).`,
+                });
+                core.info(`#${issueNumber}: nudge posted (${daysSinceActivity.toFixed(1)} day(s) since activity).`);
+              } else {
+                core.info(`#${issueNumber}: active (${daysSinceActivity.toFixed(1)} day(s) since activity), no action.`);
+              }
+            }
