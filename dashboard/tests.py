@@ -4,6 +4,7 @@ from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import timezone
 
 from dashboard.models import StaffNote
 from intake.models import IntakeSubmission
@@ -50,6 +51,20 @@ def make_case_manager(username='manager', password='not-a-real-password'):
     user = User.objects.create_user(username=username, password=password)
     user.groups.add(Group.objects.get(name='Case Manager'))
     return user
+
+
+def assign_post(assigned_to, expected=''):
+    """Assignment POST including the concurrency token the template renders."""
+    return {
+        'assigned_to': str(assigned_to),
+        'expected_assignee': str(expected),
+        'save_assignment': '1',
+    }
+
+
+def status_post(new_status, expected='new', **extra):
+    """Status POST including the concurrency token the template renders."""
+    return {'new_status': new_status, 'expected_status': expected, **extra}
 
 
 class DashboardAccessTests(TestCase):
@@ -434,7 +449,7 @@ class CaseAssignmentTests(TestCase):
         self.assertContains(response, 'name="assigned_to"')
 
     def test_assign_sets_assigned_to(self):
-        self.client.post(self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'})
+        self.client.post(self.url, assign_post(self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, self.manager)
@@ -444,7 +459,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': other.pk, 'save_assignment': '1'})
+        self.client.post(self.url, assign_post(other.pk, expected=self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, other)
@@ -453,7 +468,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': '', 'save_assignment': '1'})
+        self.client.post(self.url, assign_post('', expected=self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertIsNone(self.submission.assigned_to)
@@ -468,9 +483,7 @@ class CaseAssignmentTests(TestCase):
         self.assertIsNone(self.submission.assigned_to)
 
     def test_assign_redirects_to_detail_on_success(self):
-        response = self.client.post(
-            self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'}
-        )
+        response = self.client.post(self.url, assign_post(self.manager.pk))
 
         self.assertRedirects(response, self.url)
 
@@ -519,9 +532,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = inactive
         self.submission.save()
 
-        response = self.client.post(
-            self.url, {'assigned_to': str(inactive.pk), 'save_assignment': '1'}
-        )
+        response = self.client.post(self.url, assign_post(inactive.pk, expected=inactive.pk))
 
         self.assertRedirects(response, self.url)
         self.submission.refresh_from_db()
@@ -531,7 +542,7 @@ class CaseAssignmentTests(TestCase):
         # The dropdown hides them; this proves the queryset also rejects a posted pk.
         outsider = User.objects.create_user(username='outsider')
 
-        response = self.client.post(self.url, {'assigned_to': outsider.pk, 'save_assignment': '1'})
+        response = self.client.post(self.url, assign_post(outsider.pk))
 
         self.assertEqual(response.status_code, 200)  # re-render, not a redirect
         self.submission.refresh_from_db()
@@ -823,7 +834,7 @@ class CaseDetailContentTests(TestCase):
         submission = make_submission()
         self.client.post(
             reverse('dashboard:status', args=[submission.pk]),
-            {'new_status': 'accepted'},
+            status_post('accepted'),
         )
 
         response = self._get(submission)
@@ -1016,7 +1027,7 @@ class CaseStatusUpdateTests(TestCase):
         self.url = reverse('dashboard:status', args=[self.submission.pk])
 
     def test_status_change_updates_record_and_attribution(self):
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted'))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status, 'accepted')
@@ -1029,12 +1040,7 @@ class CaseStatusUpdateTests(TestCase):
 
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'conflict_check',
-                'status': 'new',
-                'assigned_to': 'unassigned',
-                'page': '2',
-            },
+            status_post('conflict_check', status='new', assigned_to='unassigned', page='2'),
         )
 
         self.assertEqual(
@@ -1045,10 +1051,7 @@ class CaseStatusUpdateTests(TestCase):
     def test_redirect_preserves_the_detained_filter(self):
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'accepted',
-                'detained': 'yes',
-            },
+            status_post('accepted', detained='yes'),
         )
 
         self.assertEqual(
@@ -1065,31 +1068,27 @@ class CaseStatusUpdateTests(TestCase):
 
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'accepted',
-                'status': 'new',
-                'page': '2',
-            },
+            status_post('accepted', status='new', page='2'),
         )
 
         self.assertEqual(response['Location'], f'{reverse("dashboard:queue")}?status=new')
         self.assertEqual(self.client.get(response['Location']).status_code, 200)
 
     def test_noop_submit_leaves_attribution_untouched(self):
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted'))
         self.submission.refresh_from_db()
         first_at, first_by = self.submission.status_changed_at, self.submission.status_changed_by
 
         make_case_manager(username='other')
         self.client.login(username='other', password='not-a-real-password')
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted', expected='accepted'))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status_changed_at, first_at)
         self.assertEqual(self.submission.status_changed_by, first_by)
 
     def test_invalid_status_returns_400_and_changes_nothing(self):
-        response = self.client.post(self.url, {'new_status': "evil'--"})
+        response = self.client.post(self.url, status_post("evil'--"))
 
         self.assertEqual(response.status_code, 400)
         self.submission.refresh_from_db()
@@ -1102,7 +1101,7 @@ class CaseStatusUpdateTests(TestCase):
     def test_anonymous_is_redirected_to_login(self):
         self.client.logout()
 
-        response = self.client.post(self.url, {'new_status': 'accepted'})
+        response = self.client.post(self.url, status_post('accepted'))
 
         self.assertIn(reverse('dashboard:login'), response['Location'])
 
@@ -1110,9 +1109,131 @@ class CaseStatusUpdateTests(TestCase):
         make_read_only_reviewer()
         self.client.login(username='reviewer', password='not-a-real-password')
 
-        response = self.client.post(self.url, {'new_status': 'accepted'})
+        response = self.client.post(self.url, status_post('accepted'))
 
         self.assertEqual(response.status_code, 403)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+
+
+class ConcurrentAssignmentTests(TestCase):
+    """Two managers on one case must not silently overwrite each other."""
+
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.colleague = make_case_manager(username='colleague')
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:detail', args=[self.submission.pk])
+
+    def test_stale_assignment_is_rejected_and_leaves_the_colleagues_change(self):
+        # Manager loaded the page while unassigned; colleague claimed it since.
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected=''))
+
+        self.assertEqual(response.status_code, 200)  # re-render, not a redirect
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, self.colleague)
+        self.assertContains(response, 'reassigned by someone else')
+
+    def test_rejected_assignment_rerenders_the_current_state(self):
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected=''))
+
+        self.assertContains(
+            response,
+            f'<option value="{self.colleague.pk}" selected>colleague</option>',
+            html=True,
+        )
+
+    def test_fresh_assignment_still_saves(self):
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(
+            self.url, assign_post(self.manager.pk, expected=self.colleague.pk)
+        )
+
+        self.assertRedirects(response, self.url)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, self.manager)
+
+    def test_missing_assignment_token_is_rejected(self):
+        response = self.client.post(
+            self.url, {'assigned_to': str(self.manager.pk), 'save_assignment': '1'}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
+    def test_malformed_assignment_token_is_rejected(self):
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected="evil'--"))
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
+
+class ConcurrentStatusTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.colleague = make_case_manager(username='colleague')
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:status', args=[self.submission.pk])
+
+    def _colleague_moves_case_to(self, status):
+        self.submission.status = status
+        self.submission.status_changed_by = self.colleague
+        self.submission.status_changed_at = timezone.now()
+        self.submission.save()
+
+    def test_stale_status_change_is_rejected_and_leaves_the_colleagues_change(self):
+        # Manager's queue page still shows 'new'; colleague moved it seconds ago.
+        self._colleague_moves_case_to('referred')
+
+        response = self.client.post(self.url, status_post('accepted', expected='new'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'referred')
+        self.assertEqual(self.submission.status_changed_by, self.colleague)
+        self.assertContains(self.client.get(response['Location']), 'updated by someone else')
+
+    def test_fresh_status_change_saves_and_records_attribution(self):
+        response = self.client.post(self.url, status_post('accepted', expected='new'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'accepted')
+        self.assertEqual(self.submission.status_changed_by, self.manager)
+        self.assertNotContains(self.client.get(response['Location']), 'updated by someone else')
+
+    def test_noop_submit_with_token_leaves_attribution_untouched(self):
+        self._colleague_moves_case_to('accepted')
+        changed_at = self.submission.status_changed_at
+
+        self.client.post(self.url, status_post('accepted', expected='accepted'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status_changed_by, self.colleague)
+        self.assertEqual(self.submission.status_changed_at, changed_at)
+
+    def test_missing_status_token_is_rejected(self):
+        response = self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+        self.assertIsNone(self.submission.status_changed_at)
+
+    def test_malformed_status_token_is_rejected(self):
+        response = self.client.post(self.url, status_post('accepted', expected="evil'--"))
+
+        self.assertEqual(response.status_code, 400)
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status, 'new')
 
@@ -1151,10 +1272,7 @@ class ReadOnlyReviewerTests(TestCase):
         self.assertEqual(note.author, self.reviewer)
 
     def test_reviewer_assignment_post_gets_403_and_changes_nothing(self):
-        response = self.client.post(
-            self.detail_url,
-            {'assigned_to': str(self.reviewer.pk), 'save_assignment': '1'},
-        )
+        response = self.client.post(self.detail_url, assign_post(self.reviewer.pk))
 
         self.assertEqual(response.status_code, 403)
         self.submission.refresh_from_db()

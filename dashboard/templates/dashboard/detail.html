@@ -213,6 +213,8 @@
 
       <form method="post" id="assign-form">
         {% csrf_token %}
+        {# The assignment this page was rendered from; the save is rejected if it moved since. #}
+        <input type="hidden" name="expected_assignee" value="{{ submission.assigned_to_id|default_if_none:'' }}" />
         <div class="field-item" style="margin-bottom:20px;">
           <label for="{{ assign_form.assigned_to.id_for_label }}">Assigned to</label>
           <div style="margin-top:6px;">{{ assign_form.assigned_to }}</div>
@@ -232,6 +234,7 @@
         <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
         <input type="hidden" name="page" value="{{ selected_page }}" />
         <input type="hidden" name="detained" value="{{ selected_detained }}" />
+        <input type="hidden" name="expected_status" value="{{ submission.status }}" />
         <label for="new_status">Status</label>
         <select name="new_status" id="new_status">
           {% for value, label in status_choices %}

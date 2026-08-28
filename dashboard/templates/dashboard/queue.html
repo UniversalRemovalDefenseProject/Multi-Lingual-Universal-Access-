@@ -95,6 +95,8 @@
                   <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
                   <input type="hidden" name="detained" value="{{ selected_detained }}" />
                   <input type="hidden" name="page" value="{{ page_obj.number }}" />
+                  {# The status this row was rendered from; the save is rejected if it moved since. #}
+                  <input type="hidden" name="expected_status" value="{{ submission.status }}" />
                   <label class="visually-hidden" for="new_status_{{ submission.pk }}">New status</label>
                   <select name="new_status" id="new_status_{{ submission.pk }}">
                     {% for value, label in status_choices %}
