@@ -91,7 +91,12 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y gettext  # msgfmt for compilemessages
       - run: pip install -r requirements-dev.txt
+      # Compile translation catalogs before tests, same as entrypoint.sh does at
+      # runtime. .mo files are gitignored, so tests that assert translated output
+      # need them built here (this job runs on its own runner, separate from `static`).
+      - run: python manage.py compilemessages --ignore='*/site-packages/*'
       - name: tests + coverage ratchet
         run: |
           coverage run manage.py test
