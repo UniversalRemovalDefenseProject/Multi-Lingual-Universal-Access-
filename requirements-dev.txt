@@ -2,6 +2,6 @@
 # Runtime deps live in requirements.txt.
 -r requirements.txt
 
-ruff==0.16.3        # format + lint + security (flake8-bandit) + django checks
+ruff==0.16.4        # format + lint + security (flake8-bandit) + django checks
 coverage==7.15.4    # test coverage measurement + ratchet threshold
 pip-audit==2.10.1   # known-CVE scan of the dependency closure
