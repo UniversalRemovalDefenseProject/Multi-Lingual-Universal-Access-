@@ -64,10 +64,11 @@ class IntakeSubmissionForm(forms.ModelForm):
                 }
             ),
             'date_of_birth': forms.DateInput(
+                format='%Y-%m-%d',
                 attrs={
                     'type': 'date',
                     'autocomplete': 'bday',
-                }
+                },
             ),
             'country_of_origin': forms.TextInput(
                 attrs={
@@ -113,7 +114,7 @@ class IntakeSubmissionForm(forms.ModelForm):
                     'autocomplete': 'off',
                 }
             ),
-            'next_hearing_date': forms.DateInput(attrs={'type': 'date'}),
+            'next_hearing_date': forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}),
             'fear_of_return_summary': forms.Textarea(
                 attrs={
                     'placeholder': _('Describe why returning would be unsafe for you.'),

@@ -35,8 +35,8 @@
     <select name="assigned_to" id="assigned_to" onchange="this.form.submit()">
       <option value=""{% if selected_assignee == '' %} selected{% endif %}>All assignees</option>
       <option value="{{ UNASSIGNED }}"{% if selected_assignee == UNASSIGNED %} selected{% endif %}>Unassigned</option>
-      {% for user in assignable_users %}
-        <option value="{{ user.pk }}"{% if selected_assignee == user.pk %} selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+      {% for user in filterable_users %}
+        <option value="{{ user.pk }}"{% if selected_assignee == user.pk %} selected{% endif %}>{{ user.get_full_name|default:user.username }}{% if not user.is_active %} (deactivated){% endif %}</option>
       {% endfor %}
     </select>
 
@@ -53,16 +53,18 @@
   <div class="table-wrap">
     <table>
       <caption>
-        Detained cases first, then newest first{% if search_query %} — matching
+        Detained cases first, then soonest hearing, then newest{% if search_query %} — matching
         <span class="applicant-text" dir="auto">{{ search_query }}</span>{% endif %}
       </caption>
       <thead>
         <tr>
           <th scope="col">Name</th>
+          <th scope="col">A-number</th>
           <th scope="col">Country of origin</th>
           <th scope="col">Preferred language</th>
           <th scope="col">Status</th>
           <th scope="col">Assigned to</th>
+          <th scope="col">Next hearing</th>
           <th scope="col">Submitted</th>
           {% if perms.intake.change_case_status %}<th scope="col">Change status</th>{% endif %}
         </tr>
@@ -74,6 +76,7 @@
               <span class="applicant-text" dir="auto"><a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a></span>{% if submission.detained %}
               <span class="badge badge--detained">Detained</span>{% endif %}
             </td>
+            <td class="applicant-text" dir="auto">{% if submission.a_number %}{{ submission.a_number }}{% else %}&mdash;{% endif %}</td>
             <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
             <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
             <td><span class="badge">{{ submission.get_status_display }}</span></td>
@@ -82,6 +85,14 @@
                 {{ submission.assigned_to.get_full_name|default:submission.assigned_to.username }}
               {% else %}
                 <span class="badge badge--unassigned">Unassigned</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if submission.next_hearing_date %}
+                {{ submission.next_hearing_date|date:"Y-m-d" }}{% if submission.hearing_is_soon %}
+                <span class="badge badge--hearing-soon">Hearing soon</span>{% endif %}
+              {% else %}
+                &mdash;
               {% endif %}
             </td>
             <td>{{ submission.created_at|date:"Y-m-d H:i" }}</td>
@@ -93,6 +104,8 @@
                   <input type="hidden" name="assigned_to" value="{{ selected_assignee }}" />
                   <input type="hidden" name="detained" value="{{ selected_detained }}" />
                   <input type="hidden" name="page" value="{{ page_obj.number }}" />
+                  {# The status this row was rendered from; the save is rejected if it moved since. #}
+                  <input type="hidden" name="expected_status" value="{{ submission.status }}" />
                   <label class="visually-hidden" for="new_status_{{ submission.pk }}">New status</label>
                   <select name="new_status" id="new_status_{{ submission.pk }}">
                     {% for value, label in status_choices %}
@@ -105,7 +118,7 @@
             {% endif %}
           </tr>
         {% empty %}
-          <tr><td colspan="{% if perms.intake.change_case_status %}7{% else %}6{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
+          <tr><td colspan="{% if perms.intake.change_case_status %}9{% else %}8{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
         {% endfor %}
       </tbody>
     </table>

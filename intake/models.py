@@ -1,6 +1,13 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+# How near a hearing has to be before the queue flags it. Pending Christina's
+# confirmation of the right window for removal defense.
+HEARING_SOON_DAYS = 7
 
 
 class IntakeSubmission(models.Model):
@@ -28,7 +35,7 @@ class IntakeSubmission(models.Model):
     ]
 
     full_name = models.CharField(max_length=255)
-    date_of_birth = models.CharField(max_length=100, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     country_of_origin = models.CharField(max_length=255)
     preferred_language = models.CharField(max_length=100)
     language_preference = models.CharField(
@@ -43,7 +50,7 @@ class IntakeSubmission(models.Model):
     detained = models.BooleanField(default=False)
     immigration_court = models.CharField(max_length=255, blank=True)
     a_number = models.CharField(max_length=50, blank=True)
-    next_hearing_date = models.CharField(max_length=100, blank=True)
+    next_hearing_date = models.DateField(null=True, blank=True)
     fear_of_return_summary = models.TextField()
     past_harm_summary = models.TextField(blank=True)
     countries_traveled_asylum_summary = models.TextField(blank=True)
@@ -96,3 +103,13 @@ class IntakeSubmission(models.Model):
 
     def __str__(self):
         return self.full_name
+
+    @property
+    def hearing_is_soon(self) -> bool:
+        """True when the next hearing falls within the urgency window."""
+        if self.next_hearing_date is None:
+            return False
+        today = timezone.localdate()
+        # Past-due hearings are deliberately unflagged: the flag means "act now",
+        # and a date already gone needs a different conversation.
+        return today <= self.next_hearing_date <= today + timedelta(days=HEARING_SOON_DAYS)

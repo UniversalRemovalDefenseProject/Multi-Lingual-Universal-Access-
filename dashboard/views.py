@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import F, Q
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -28,8 +28,16 @@ SEARCH_SESSION_KEY = 'dashboard_search'
 MAX_SEARCH_LENGTH = 100
 
 
+def _case_managers():
+    # Every Case Manager, active or not. Deactivated ones still hold cases, so the queue
+    # filter and the queue's filter dropdown must be able to reach their caseload.
+    return User.objects.filter(groups__name='Case Manager').order_by('username')
+
+
 def _assignable_users():
-    return User.objects.filter(groups__name='Case Manager', is_active=True).order_by('username')
+    # Who a case may be assigned *to*. AssignForm widens this to keep an inactive
+    # current holder selectable so re-saving does not silently unassign the case.
+    return _case_managers().filter(is_active=True)
 
 
 def _validated_status_value(value) -> str:
@@ -44,9 +52,18 @@ def _validated_assignee_value(raw):
         return _UNASSIGNED
     if isinstance(raw, str) and raw.isdigit():
         uid = int(raw)
-        if _assignable_users().filter(pk=uid).exists():
+        if _case_managers().filter(pk=uid).exists():
             return uid
     return ''
+
+
+def _expected_assignee(raw):
+    """Parses the assignee the detail page was rendered from. Raises ValueError if junk."""
+    if raw == '':
+        return None
+    if not raw.isdigit():
+        raise ValueError(raw)
+    return int(raw)
 
 
 def _validated_detained_value(value) -> str:
@@ -114,9 +131,13 @@ def _back_query(request) -> str:
 
 def _queue_queryset(status, assignee, detained, query):
     """The queue's result set. Shared so a POST redirect can page against the same rows."""
-    queryset = IntakeSubmission.objects.order_by('-detained', '-created_at').select_related(
-        'assigned_to'
-    )
+    # Detained first, then the soonest hearing (cases with no hearing date last),
+    # then newest. An imminent hearing is the core urgency signal in removal defense.
+    queryset = IntakeSubmission.objects.order_by(
+        '-detained',
+        F('next_hearing_date').asc(nulls_last=True),
+        '-created_at',
+    ).select_related('assigned_to')
     if status:
         queryset = queryset.filter(status=status)
     if assignee == _UNASSIGNED:
@@ -156,7 +177,7 @@ class CaseQueueView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = IntakeSubmission.STATUS_CHOICES
         context['selected_status'] = _selected_status(self.request)
-        context['assignable_users'] = _assignable_users()
+        context['filterable_users'] = _case_managers()
         context['selected_assignee'] = _selected_assignee(self.request)
         context['UNASSIGNED'] = _UNASSIGNED
         context['selected_detained'] = _selected_detained(self.request)
@@ -237,15 +258,36 @@ class CaseDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # read and leave notes, change_case_status is required to move the case.
             if not request.user.has_perm('intake.change_case_status'):
                 raise PermissionDenied
+            try:
+                expected = _expected_assignee(request.POST['expected_assignee'])
+            except (KeyError, ValueError):
+                return HttpResponseBadRequest('Missing or malformed assignment token.')
             assign_form = AssignForm(
                 request.POST,
                 instance=submission,
                 assignable_users=_assignable_users(),
             )
             if assign_form.is_valid():
-                assign_form.save()
-                messages.success(request, 'Assignment updated.')
-                return redirect('dashboard:detail', pk=pk)
+                # Conditional update: the row must still hold the assignee this page was
+                # rendered from, or someone else changed it since and we would clobber them.
+                updated = IntakeSubmission.objects.filter(pk=pk, assigned_to=expected).update(
+                    assigned_to=assign_form.cleaned_data['assigned_to']
+                )
+                if updated:
+                    messages.success(request, 'Assignment updated.')
+                    return redirect('dashboard:detail', pk=pk)
+                submission.refresh_from_db()
+                messages.error(
+                    request,
+                    'This case was reassigned by someone else while you had it open. '
+                    'Your change was not saved — the current assignment is shown below.',
+                )
+                return self._render(
+                    request,
+                    submission,
+                    AssignForm(instance=submission, assignable_users=_assignable_users()),
+                    StaffNoteForm(),
+                )
             return self._render(request, submission, assign_form, StaffNoteForm())
 
         return HttpResponseBadRequest('Unrecognized form submission.')
@@ -281,19 +323,29 @@ class CaseStatusUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     http_method_names = ['post']
 
     def post(self, request, pk, *args, **kwargs):
-        submission = get_object_or_404(IntakeSubmission, pk=pk)
+        get_object_or_404(IntakeSubmission, pk=pk)
         new_status = _validated_status_value(request.POST.get('new_status', ''))
         if not new_status:
             return HttpResponseBadRequest('Unrecognized status.')
+        expected_status = _validated_status_value(request.POST.get('expected_status', ''))
+        if not expected_status:
+            return HttpResponseBadRequest('Missing or unrecognized expected status.')
 
         # A no-op submit must not reassign authorship of the change that actually happened.
-        if new_status != submission.status:
-            submission.status = new_status
-            submission.status_changed_at = timezone.now()
-            submission.status_changed_by = request.user
-            submission.save(
-                update_fields=['status', 'status_changed_at', 'status_changed_by'],
+        if new_status != expected_status:
+            # Conditional update: the row must still hold the status this page was
+            # rendered from, or a colleague moved the case since and we would clobber them.
+            updated = IntakeSubmission.objects.filter(pk=pk, status=expected_status).update(
+                status=new_status,
+                status_changed_at=timezone.now(),
+                status_changed_by=request.user,
             )
+            if not updated:
+                messages.error(
+                    request,
+                    'This case was updated by someone else while you had the queue open. '
+                    'Your status change was not saved — the current status is shown below.',
+                )
 
         status = _validated_status_value(request.POST.get('status', ''))
         assignee = _validated_assignee_value(request.POST.get('assigned_to', ''))

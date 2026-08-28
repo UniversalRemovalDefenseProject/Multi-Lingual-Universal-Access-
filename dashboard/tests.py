@@ -1,12 +1,15 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import Group, User
 from django.db import connection
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
+from django.utils import timezone
 
 from dashboard.models import StaffNote
-from intake.models import IntakeSubmission
+from intake.models import HEARING_SOON_DAYS, IntakeSubmission
 
 
 def make_submission(**overrides):
@@ -50,6 +53,20 @@ def make_case_manager(username='manager', password='not-a-real-password'):
     user = User.objects.create_user(username=username, password=password)
     user.groups.add(Group.objects.get(name='Case Manager'))
     return user
+
+
+def assign_post(assigned_to, expected=''):
+    """Assignment POST including the concurrency token the template renders."""
+    return {
+        'assigned_to': str(assigned_to),
+        'expected_assignee': str(expected),
+        'save_assignment': '1',
+    }
+
+
+def status_post(new_status, expected='new', **extra):
+    """Status POST including the concurrency token the template renders."""
+    return {'new_status': new_status, 'expected_status': expected, **extra}
 
 
 class DashboardAccessTests(TestCase):
@@ -139,6 +156,16 @@ class CaseQueueTests(TestCase):
         self.assertContains(response, '<option value="" selected>All statuses</option>', html=True)
         self.assertNotContains(response, 'evil')
 
+    def test_queue_shows_a_number_or_placeholder(self):
+        make_submission(full_name='With Number', a_number='A-123-456-789')
+        make_submission(full_name='Without Number', a_number='')
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, '<th scope="col">A-number</th>', html=True)
+        self.assertContains(response, 'A-123-456-789')
+        self.assertContains(response, '&mdash;')
+
     def test_arabic_applicant_text_renders_isolated_and_intact(self):
         arabic_name = 'محمد الأحمد'
         make_submission(full_name=arabic_name, country_of_origin='سوريا')
@@ -215,18 +242,29 @@ class CaseQueueAssigneeTests(TestCase):
 
         self.assertContains(response, 'Case Alpha')
 
-    def test_deactivated_case_manager_excluded_from_assignee_filter(self):
-        # A deactivated Case Manager should not appear in the assignee filter
-        # dropdown — they're no longer selectable even if PROTECT on StaffNote
-        # prevents their account from being fully deleted.
+    def test_deactivated_case_manager_listed_in_assignee_filter(self):
+        # A deactivated Case Manager still holds cases, so the filter must reach
+        # their caseload. Listed, but labelled so nobody mistakes them for active.
         inactive = make_case_manager(username='inactive_mgr')
         inactive.is_active = False
         inactive.save()
 
         response = self.client.get(reverse('dashboard:queue'))
 
-        self.assertNotContains(response, 'inactive_mgr')
+        self.assertContains(response, 'inactive_mgr (deactivated)')
         self.assertContains(response, self.manager.username)
+
+    def test_queue_can_be_filtered_to_a_deactivated_managers_caseload(self):
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        make_submission(full_name='Orphaned Case', assigned_to=inactive)
+        make_submission(full_name='Other Case')
+
+        response = self.client.get(reverse('dashboard:queue'), {'assigned_to': str(inactive.pk)})
+
+        self.assertContains(response, 'Orphaned Case')
+        self.assertNotContains(response, 'Other Case')
 
     def test_queue_rows_link_to_detail_view(self):
         sub = make_submission()
@@ -413,7 +451,7 @@ class CaseAssignmentTests(TestCase):
         self.assertContains(response, 'name="assigned_to"')
 
     def test_assign_sets_assigned_to(self):
-        self.client.post(self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'})
+        self.client.post(self.url, assign_post(self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, self.manager)
@@ -423,7 +461,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': other.pk, 'save_assignment': '1'})
+        self.client.post(self.url, assign_post(other.pk, expected=self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, other)
@@ -432,7 +470,7 @@ class CaseAssignmentTests(TestCase):
         self.submission.assigned_to = self.manager
         self.submission.save()
 
-        self.client.post(self.url, {'assigned_to': '', 'save_assignment': '1'})
+        self.client.post(self.url, assign_post('', expected=self.manager.pk))
 
         self.submission.refresh_from_db()
         self.assertIsNone(self.submission.assigned_to)
@@ -447,9 +485,7 @@ class CaseAssignmentTests(TestCase):
         self.assertIsNone(self.submission.assigned_to)
 
     def test_assign_redirects_to_detail_on_success(self):
-        response = self.client.post(
-            self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'}
-        )
+        response = self.client.post(self.url, assign_post(self.manager.pk))
 
         self.assertRedirects(response, self.url)
 
@@ -462,6 +498,8 @@ class CaseAssignmentTests(TestCase):
         self.assertNotContains(response, 'outsider')
 
     def test_deactivated_case_manager_excluded_from_assign_dropdown(self):
+        # Not assignable to a case they don't already hold. The case in this class's
+        # setUp is unassigned, so the widening in AssignForm does not apply.
         inactive = make_case_manager(username='inactive_mgr')
         inactive.is_active = False
         inactive.save()
@@ -471,11 +509,42 @@ class CaseAssignmentTests(TestCase):
         self.assertNotContains(response, 'inactive_mgr')
         self.assertContains(response, self.manager.username)
 
+    def test_deactivated_holder_stays_selectable_on_the_case_they_hold(self):
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        self.submission.assigned_to = inactive
+        self.submission.save()
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'inactive_mgr (deactivated)')
+        self.assertContains(
+            response,
+            f'<option value="{inactive.pk}" selected>inactive_mgr (deactivated)</option>',
+            html=True,
+        )
+
+    def test_resaving_a_case_held_by_a_deactivated_manager_keeps_the_assignment(self):
+        # The bug: the holder was missing from the queryset, so an untouched re-save
+        # posted the rendered '— Unassigned —' and silently stripped the assignment.
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        self.submission.assigned_to = inactive
+        self.submission.save()
+
+        response = self.client.post(self.url, assign_post(inactive.pk, expected=inactive.pk))
+
+        self.assertRedirects(response, self.url)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, inactive)
+
     def test_non_case_manager_pk_is_rejected_by_the_form(self):
         # The dropdown hides them; this proves the queryset also rejects a posted pk.
         outsider = User.objects.create_user(username='outsider')
 
-        response = self.client.post(self.url, {'assigned_to': outsider.pk, 'save_assignment': '1'})
+        response = self.client.post(self.url, assign_post(outsider.pk))
 
         self.assertEqual(response.status_code, 200)  # re-render, not a redirect
         self.submission.refresh_from_db()
@@ -767,7 +836,7 @@ class CaseDetailContentTests(TestCase):
         submission = make_submission()
         self.client.post(
             reverse('dashboard:status', args=[submission.pk]),
-            {'new_status': 'accepted'},
+            status_post('accepted'),
         )
 
         response = self._get(submission)
@@ -960,7 +1029,7 @@ class CaseStatusUpdateTests(TestCase):
         self.url = reverse('dashboard:status', args=[self.submission.pk])
 
     def test_status_change_updates_record_and_attribution(self):
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted'))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status, 'accepted')
@@ -973,12 +1042,7 @@ class CaseStatusUpdateTests(TestCase):
 
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'conflict_check',
-                'status': 'new',
-                'assigned_to': 'unassigned',
-                'page': '2',
-            },
+            status_post('conflict_check', status='new', assigned_to='unassigned', page='2'),
         )
 
         self.assertEqual(
@@ -989,10 +1053,7 @@ class CaseStatusUpdateTests(TestCase):
     def test_redirect_preserves_the_detained_filter(self):
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'accepted',
-                'detained': 'yes',
-            },
+            status_post('accepted', detained='yes'),
         )
 
         self.assertEqual(
@@ -1009,31 +1070,27 @@ class CaseStatusUpdateTests(TestCase):
 
         response = self.client.post(
             self.url,
-            {
-                'new_status': 'accepted',
-                'status': 'new',
-                'page': '2',
-            },
+            status_post('accepted', status='new', page='2'),
         )
 
         self.assertEqual(response['Location'], f'{reverse("dashboard:queue")}?status=new')
         self.assertEqual(self.client.get(response['Location']).status_code, 200)
 
     def test_noop_submit_leaves_attribution_untouched(self):
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted'))
         self.submission.refresh_from_db()
         first_at, first_by = self.submission.status_changed_at, self.submission.status_changed_by
 
         make_case_manager(username='other')
         self.client.login(username='other', password='not-a-real-password')
-        self.client.post(self.url, {'new_status': 'accepted'})
+        self.client.post(self.url, status_post('accepted', expected='accepted'))
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status_changed_at, first_at)
         self.assertEqual(self.submission.status_changed_by, first_by)
 
     def test_invalid_status_returns_400_and_changes_nothing(self):
-        response = self.client.post(self.url, {'new_status': "evil'--"})
+        response = self.client.post(self.url, status_post("evil'--"))
 
         self.assertEqual(response.status_code, 400)
         self.submission.refresh_from_db()
@@ -1046,7 +1103,7 @@ class CaseStatusUpdateTests(TestCase):
     def test_anonymous_is_redirected_to_login(self):
         self.client.logout()
 
-        response = self.client.post(self.url, {'new_status': 'accepted'})
+        response = self.client.post(self.url, status_post('accepted'))
 
         self.assertIn(reverse('dashboard:login'), response['Location'])
 
@@ -1054,9 +1111,215 @@ class CaseStatusUpdateTests(TestCase):
         make_read_only_reviewer()
         self.client.login(username='reviewer', password='not-a-real-password')
 
-        response = self.client.post(self.url, {'new_status': 'accepted'})
+        response = self.client.post(self.url, status_post('accepted'))
 
         self.assertEqual(response.status_code, 403)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+
+
+class HearingUrgencyTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.today = timezone.localdate()
+
+    def test_flag_covers_today_through_the_threshold(self):
+        for offset in (0, 1, HEARING_SOON_DAYS):
+            submission = IntakeSubmission(next_hearing_date=self.today + timedelta(days=offset))
+            self.assertTrue(submission.hearing_is_soon, offset)
+
+    def test_flag_excludes_past_due_and_beyond_the_threshold(self):
+        for offset in (-1, HEARING_SOON_DAYS + 1, 90):
+            submission = IntakeSubmission(next_hearing_date=self.today + timedelta(days=offset))
+            self.assertFalse(submission.hearing_is_soon, offset)
+
+    def test_case_without_a_hearing_is_never_flagged(self):
+        self.assertFalse(IntakeSubmission(next_hearing_date=None).hearing_is_soon)
+
+    def test_queue_shows_the_hearing_date_or_a_placeholder(self):
+        make_submission(full_name='Has Hearing', next_hearing_date=self.today + timedelta(days=30))
+        make_submission(full_name='No Hearing')
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, '<th scope="col">Next hearing</th>', html=True)
+        self.assertContains(response, (self.today + timedelta(days=30)).isoformat())
+        self.assertContains(response, '&mdash;')
+
+    def test_imminent_hearing_renders_the_badge(self):
+        make_submission(full_name='Soon', next_hearing_date=self.today + timedelta(days=2))
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'class="badge badge--hearing-soon"')
+
+    def test_distant_hearing_renders_no_badge(self):
+        make_submission(full_name='Later', next_hearing_date=self.today + timedelta(days=60))
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertNotContains(response, 'class="badge badge--hearing-soon"')
+
+    def test_sooner_hearing_sorts_above_a_later_one(self):
+        make_submission(
+            full_name='Later Hearing', next_hearing_date=self.today + timedelta(days=30)
+        )
+        make_submission(
+            full_name='Sooner Hearing', next_hearing_date=self.today + timedelta(days=3)
+        )
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Sooner Hearing'), content.index('Later Hearing'))
+
+    def test_cases_without_a_hearing_sort_below_cases_with_one(self):
+        make_submission(full_name='No Hearing')  # newest, so -created_at alone would win
+        make_submission(
+            full_name='Distant Hearing', next_hearing_date=self.today + timedelta(days=365)
+        )
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Distant Hearing'), content.index('No Hearing'))
+
+    def test_hearingless_cases_still_sort_newest_first_among_themselves(self):
+        make_submission(full_name='Older Case')
+        make_submission(full_name='Newer Case')
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Newer Case'), content.index('Older Case'))
+
+    def test_detained_outranks_an_imminent_hearing(self):
+        make_submission(
+            full_name='Hearing Tomorrow', next_hearing_date=self.today + timedelta(days=1)
+        )
+        make_submission(full_name='Detained No Hearing', detained=True)
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Detained No Hearing'), content.index('Hearing Tomorrow'))
+
+
+class ConcurrentAssignmentTests(TestCase):
+    """Two managers on one case must not silently overwrite each other."""
+
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.colleague = make_case_manager(username='colleague')
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:detail', args=[self.submission.pk])
+
+    def test_stale_assignment_is_rejected_and_leaves_the_colleagues_change(self):
+        # Manager loaded the page while unassigned; colleague claimed it since.
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected=''))
+
+        self.assertEqual(response.status_code, 200)  # re-render, not a redirect
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, self.colleague)
+        self.assertContains(response, 'reassigned by someone else')
+
+    def test_rejected_assignment_rerenders_the_current_state(self):
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected=''))
+
+        self.assertContains(
+            response,
+            f'<option value="{self.colleague.pk}" selected>colleague</option>',
+            html=True,
+        )
+
+    def test_fresh_assignment_still_saves(self):
+        self.submission.assigned_to = self.colleague
+        self.submission.save()
+
+        response = self.client.post(
+            self.url, assign_post(self.manager.pk, expected=self.colleague.pk)
+        )
+
+        self.assertRedirects(response, self.url)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, self.manager)
+
+    def test_missing_assignment_token_is_rejected(self):
+        response = self.client.post(
+            self.url, {'assigned_to': str(self.manager.pk), 'save_assignment': '1'}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
+    def test_malformed_assignment_token_is_rejected(self):
+        response = self.client.post(self.url, assign_post(self.manager.pk, expected="evil'--"))
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertIsNone(self.submission.assigned_to)
+
+
+class ConcurrentStatusTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.colleague = make_case_manager(username='colleague')
+        self.submission = make_submission()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.url = reverse('dashboard:status', args=[self.submission.pk])
+
+    def _colleague_moves_case_to(self, status):
+        self.submission.status = status
+        self.submission.status_changed_by = self.colleague
+        self.submission.status_changed_at = timezone.now()
+        self.submission.save()
+
+    def test_stale_status_change_is_rejected_and_leaves_the_colleagues_change(self):
+        # Manager's queue page still shows 'new'; colleague moved it seconds ago.
+        self._colleague_moves_case_to('referred')
+
+        response = self.client.post(self.url, status_post('accepted', expected='new'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'referred')
+        self.assertEqual(self.submission.status_changed_by, self.colleague)
+        self.assertContains(self.client.get(response['Location']), 'updated by someone else')
+
+    def test_fresh_status_change_saves_and_records_attribution(self):
+        response = self.client.post(self.url, status_post('accepted', expected='new'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'accepted')
+        self.assertEqual(self.submission.status_changed_by, self.manager)
+        self.assertNotContains(self.client.get(response['Location']), 'updated by someone else')
+
+    def test_noop_submit_with_token_leaves_attribution_untouched(self):
+        self._colleague_moves_case_to('accepted')
+        changed_at = self.submission.status_changed_at
+
+        self.client.post(self.url, status_post('accepted', expected='accepted'))
+
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status_changed_by, self.colleague)
+        self.assertEqual(self.submission.status_changed_at, changed_at)
+
+    def test_missing_status_token_is_rejected(self):
+        response = self.client.post(self.url, {'new_status': 'accepted'})
+
+        self.assertEqual(response.status_code, 400)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.status, 'new')
+        self.assertIsNone(self.submission.status_changed_at)
+
+    def test_malformed_status_token_is_rejected(self):
+        response = self.client.post(self.url, status_post('accepted', expected="evil'--"))
+
+        self.assertEqual(response.status_code, 400)
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status, 'new')
 
@@ -1095,10 +1358,7 @@ class ReadOnlyReviewerTests(TestCase):
         self.assertEqual(note.author, self.reviewer)
 
     def test_reviewer_assignment_post_gets_403_and_changes_nothing(self):
-        response = self.client.post(
-            self.detail_url,
-            {'assigned_to': str(self.reviewer.pk), 'save_assignment': '1'},
-        )
+        response = self.client.post(self.detail_url, assign_post(self.reviewer.pk))
 
         self.assertEqual(response.status_code, 403)
         self.submission.refresh_from_db()
