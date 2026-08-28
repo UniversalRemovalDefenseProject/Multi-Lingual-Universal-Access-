@@ -53,7 +53,7 @@
   <div class="table-wrap">
     <table>
       <caption>
-        Detained cases first, then newest first{% if search_query %} — matching
+        Detained cases first, then soonest hearing, then newest{% if search_query %} — matching
         <span class="applicant-text" dir="auto">{{ search_query }}</span>{% endif %}
       </caption>
       <thead>
@@ -64,6 +64,7 @@
           <th scope="col">Preferred language</th>
           <th scope="col">Status</th>
           <th scope="col">Assigned to</th>
+          <th scope="col">Next hearing</th>
           <th scope="col">Submitted</th>
           {% if perms.intake.change_case_status %}<th scope="col">Change status</th>{% endif %}
         </tr>
@@ -84,6 +85,14 @@
                 {{ submission.assigned_to.get_full_name|default:submission.assigned_to.username }}
               {% else %}
                 <span class="badge badge--unassigned">Unassigned</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if submission.next_hearing_date %}
+                {{ submission.next_hearing_date|date:"Y-m-d" }}{% if submission.hearing_is_soon %}
+                <span class="badge badge--hearing-soon">Hearing soon</span>{% endif %}
+              {% else %}
+                &mdash;
               {% endif %}
             </td>
             <td>{{ submission.created_at|date:"Y-m-d H:i" }}</td>
@@ -109,7 +118,7 @@
             {% endif %}
           </tr>
         {% empty %}
-          <tr><td colspan="{% if perms.intake.change_case_status %}8{% else %}7{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
+          <tr><td colspan="{% if perms.intake.change_case_status %}9{% else %}8{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
         {% endfor %}
       </tbody>
     </table>

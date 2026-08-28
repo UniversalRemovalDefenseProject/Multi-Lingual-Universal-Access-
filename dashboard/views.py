@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import F, Q
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -131,9 +131,13 @@ def _back_query(request) -> str:
 
 def _queue_queryset(status, assignee, detained, query):
     """The queue's result set. Shared so a POST redirect can page against the same rows."""
-    queryset = IntakeSubmission.objects.order_by('-detained', '-created_at').select_related(
-        'assigned_to'
-    )
+    # Detained first, then the soonest hearing (cases with no hearing date last),
+    # then newest. An imminent hearing is the core urgency signal in removal defense.
+    queryset = IntakeSubmission.objects.order_by(
+        '-detained',
+        F('next_hearing_date').asc(nulls_last=True),
+        '-created_at',
+    ).select_related('assigned_to')
     if status:
         queryset = queryset.filter(status=status)
     if assignee == _UNASSIGNED:

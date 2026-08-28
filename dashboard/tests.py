@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import Group, User
 from django.db import connection
 from django.db.models.deletion import ProtectedError
@@ -7,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from dashboard.models import StaffNote
-from intake.models import IntakeSubmission
+from intake.models import HEARING_SOON_DAYS, IntakeSubmission
 
 
 def make_submission(**overrides):
@@ -1114,6 +1116,90 @@ class CaseStatusUpdateTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.status, 'new')
+
+
+class HearingUrgencyTests(TestCase):
+    def setUp(self):
+        self.manager = make_case_manager()
+        self.client.login(username='manager', password='not-a-real-password')
+        self.today = timezone.localdate()
+
+    def test_flag_covers_today_through_the_threshold(self):
+        for offset in (0, 1, HEARING_SOON_DAYS):
+            submission = IntakeSubmission(next_hearing_date=self.today + timedelta(days=offset))
+            self.assertTrue(submission.hearing_is_soon, offset)
+
+    def test_flag_excludes_past_due_and_beyond_the_threshold(self):
+        for offset in (-1, HEARING_SOON_DAYS + 1, 90):
+            submission = IntakeSubmission(next_hearing_date=self.today + timedelta(days=offset))
+            self.assertFalse(submission.hearing_is_soon, offset)
+
+    def test_case_without_a_hearing_is_never_flagged(self):
+        self.assertFalse(IntakeSubmission(next_hearing_date=None).hearing_is_soon)
+
+    def test_queue_shows_the_hearing_date_or_a_placeholder(self):
+        make_submission(full_name='Has Hearing', next_hearing_date=self.today + timedelta(days=30))
+        make_submission(full_name='No Hearing')
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, '<th scope="col">Next hearing</th>', html=True)
+        self.assertContains(response, (self.today + timedelta(days=30)).isoformat())
+        self.assertContains(response, '&mdash;')
+
+    def test_imminent_hearing_renders_the_badge(self):
+        make_submission(full_name='Soon', next_hearing_date=self.today + timedelta(days=2))
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, 'class="badge badge--hearing-soon"')
+
+    def test_distant_hearing_renders_no_badge(self):
+        make_submission(full_name='Later', next_hearing_date=self.today + timedelta(days=60))
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertNotContains(response, 'class="badge badge--hearing-soon"')
+
+    def test_sooner_hearing_sorts_above_a_later_one(self):
+        make_submission(
+            full_name='Later Hearing', next_hearing_date=self.today + timedelta(days=30)
+        )
+        make_submission(
+            full_name='Sooner Hearing', next_hearing_date=self.today + timedelta(days=3)
+        )
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Sooner Hearing'), content.index('Later Hearing'))
+
+    def test_cases_without_a_hearing_sort_below_cases_with_one(self):
+        make_submission(full_name='No Hearing')  # newest, so -created_at alone would win
+        make_submission(
+            full_name='Distant Hearing', next_hearing_date=self.today + timedelta(days=365)
+        )
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Distant Hearing'), content.index('No Hearing'))
+
+    def test_hearingless_cases_still_sort_newest_first_among_themselves(self):
+        make_submission(full_name='Older Case')
+        make_submission(full_name='Newer Case')
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Newer Case'), content.index('Older Case'))
+
+    def test_detained_outranks_an_imminent_hearing(self):
+        make_submission(
+            full_name='Hearing Tomorrow', next_hearing_date=self.today + timedelta(days=1)
+        )
+        make_submission(full_name='Detained No Hearing', detained=True)
+
+        content = self.client.get(reverse('dashboard:queue')).content.decode()
+
+        self.assertLess(content.index('Detained No Hearing'), content.index('Hearing Tomorrow'))
 
 
 class ConcurrentAssignmentTests(TestCase):
