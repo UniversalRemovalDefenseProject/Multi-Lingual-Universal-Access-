@@ -225,18 +225,29 @@ class CaseQueueAssigneeTests(TestCase):
 
         self.assertContains(response, 'Case Alpha')
 
-    def test_deactivated_case_manager_excluded_from_assignee_filter(self):
-        # A deactivated Case Manager should not appear in the assignee filter
-        # dropdown — they're no longer selectable even if PROTECT on StaffNote
-        # prevents their account from being fully deleted.
+    def test_deactivated_case_manager_listed_in_assignee_filter(self):
+        # A deactivated Case Manager still holds cases, so the filter must reach
+        # their caseload. Listed, but labelled so nobody mistakes them for active.
         inactive = make_case_manager(username='inactive_mgr')
         inactive.is_active = False
         inactive.save()
 
         response = self.client.get(reverse('dashboard:queue'))
 
-        self.assertNotContains(response, 'inactive_mgr')
+        self.assertContains(response, 'inactive_mgr (deactivated)')
         self.assertContains(response, self.manager.username)
+
+    def test_queue_can_be_filtered_to_a_deactivated_managers_caseload(self):
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        make_submission(full_name='Orphaned Case', assigned_to=inactive)
+        make_submission(full_name='Other Case')
+
+        response = self.client.get(reverse('dashboard:queue'), {'assigned_to': str(inactive.pk)})
+
+        self.assertContains(response, 'Orphaned Case')
+        self.assertNotContains(response, 'Other Case')
 
     def test_queue_rows_link_to_detail_view(self):
         sub = make_submission()
@@ -472,6 +483,8 @@ class CaseAssignmentTests(TestCase):
         self.assertNotContains(response, 'outsider')
 
     def test_deactivated_case_manager_excluded_from_assign_dropdown(self):
+        # Not assignable to a case they don't already hold. The case in this class's
+        # setUp is unassigned, so the widening in AssignForm does not apply.
         inactive = make_case_manager(username='inactive_mgr')
         inactive.is_active = False
         inactive.save()
@@ -480,6 +493,39 @@ class CaseAssignmentTests(TestCase):
 
         self.assertNotContains(response, 'inactive_mgr')
         self.assertContains(response, self.manager.username)
+
+    def test_deactivated_holder_stays_selectable_on_the_case_they_hold(self):
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        self.submission.assigned_to = inactive
+        self.submission.save()
+
+        response = self.client.get(self.url)
+
+        self.assertContains(response, 'inactive_mgr (deactivated)')
+        self.assertContains(
+            response,
+            f'<option value="{inactive.pk}" selected>inactive_mgr (deactivated)</option>',
+            html=True,
+        )
+
+    def test_resaving_a_case_held_by_a_deactivated_manager_keeps_the_assignment(self):
+        # The bug: the holder was missing from the queryset, so an untouched re-save
+        # posted the rendered '— Unassigned —' and silently stripped the assignment.
+        inactive = make_case_manager(username='inactive_mgr')
+        inactive.is_active = False
+        inactive.save()
+        self.submission.assigned_to = inactive
+        self.submission.save()
+
+        response = self.client.post(
+            self.url, {'assigned_to': str(inactive.pk), 'save_assignment': '1'}
+        )
+
+        self.assertRedirects(response, self.url)
+        self.submission.refresh_from_db()
+        self.assertEqual(self.submission.assigned_to, inactive)
 
     def test_non_case_manager_pk_is_rejected_by_the_form(self):
         # The dropdown hides them; this proves the queryset also rejects a posted pk.

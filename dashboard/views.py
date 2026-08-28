@@ -28,8 +28,16 @@ SEARCH_SESSION_KEY = 'dashboard_search'
 MAX_SEARCH_LENGTH = 100
 
 
+def _case_managers():
+    # Every Case Manager, active or not. Deactivated ones still hold cases, so the queue
+    # filter and the queue's filter dropdown must be able to reach their caseload.
+    return User.objects.filter(groups__name='Case Manager').order_by('username')
+
+
 def _assignable_users():
-    return User.objects.filter(groups__name='Case Manager', is_active=True).order_by('username')
+    # Who a case may be assigned *to*. AssignForm widens this to keep an inactive
+    # current holder selectable so re-saving does not silently unassign the case.
+    return _case_managers().filter(is_active=True)
 
 
 def _validated_status_value(value) -> str:
@@ -44,7 +52,7 @@ def _validated_assignee_value(raw):
         return _UNASSIGNED
     if isinstance(raw, str) and raw.isdigit():
         uid = int(raw)
-        if _assignable_users().filter(pk=uid).exists():
+        if _case_managers().filter(pk=uid).exists():
             return uid
     return ''
 
@@ -156,7 +164,7 @@ class CaseQueueView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context['status_choices'] = IntakeSubmission.STATUS_CHOICES
         context['selected_status'] = _selected_status(self.request)
-        context['assignable_users'] = _assignable_users()
+        context['filterable_users'] = _case_managers()
         context['selected_assignee'] = _selected_assignee(self.request)
         context['UNASSIGNED'] = _UNASSIGNED
         context['selected_detained'] = _selected_detained(self.request)

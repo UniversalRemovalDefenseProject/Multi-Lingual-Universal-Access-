@@ -35,8 +35,8 @@
     <select name="assigned_to" id="assigned_to" onchange="this.form.submit()">
       <option value=""{% if selected_assignee == '' %} selected{% endif %}>All assignees</option>
       <option value="{{ UNASSIGNED }}"{% if selected_assignee == UNASSIGNED %} selected{% endif %}>Unassigned</option>
-      {% for user in assignable_users %}
-        <option value="{{ user.pk }}"{% if selected_assignee == user.pk %} selected{% endif %}>{{ user.get_full_name|default:user.username }}</option>
+      {% for user in filterable_users %}
+        <option value="{{ user.pk }}"{% if selected_assignee == user.pk %} selected{% endif %}>{{ user.get_full_name|default:user.username }}{% if not user.is_active %} (deactivated){% endif %}</option>
       {% endfor %}
     </select>
 
