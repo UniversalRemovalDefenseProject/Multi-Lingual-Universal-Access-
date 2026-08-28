@@ -59,6 +59,7 @@
       <thead>
         <tr>
           <th scope="col">Name</th>
+          <th scope="col">A-number</th>
           <th scope="col">Country of origin</th>
           <th scope="col">Preferred language</th>
           <th scope="col">Status</th>
@@ -74,6 +75,7 @@
               <span class="applicant-text" dir="auto"><a href="{% url 'dashboard:detail' submission.pk %}{% if row_query %}?{{ row_query }}{% endif %}">{{ submission.full_name }}</a></span>{% if submission.detained %}
               <span class="badge badge--detained">Detained</span>{% endif %}
             </td>
+            <td class="applicant-text" dir="auto">{% if submission.a_number %}{{ submission.a_number }}{% else %}&mdash;{% endif %}</td>
             <td class="applicant-text" dir="auto">{{ submission.country_of_origin }}</td>
             <td class="applicant-text" dir="auto">{{ submission.preferred_language }}</td>
             <td><span class="badge">{{ submission.get_status_display }}</span></td>
@@ -105,7 +107,7 @@
             {% endif %}
           </tr>
         {% empty %}
-          <tr><td colspan="{% if perms.intake.change_case_status %}7{% else %}6{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
+          <tr><td colspan="{% if perms.intake.change_case_status %}8{% else %}7{% endif %}" style="text-align:center;color:var(--ink-faint);padding:32px;">No intake submissions match this filter.</td></tr>
         {% endfor %}
       </tbody>
     </table>

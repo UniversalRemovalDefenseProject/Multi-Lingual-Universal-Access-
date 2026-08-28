@@ -139,6 +139,16 @@ class CaseQueueTests(TestCase):
         self.assertContains(response, '<option value="" selected>All statuses</option>', html=True)
         self.assertNotContains(response, 'evil')
 
+    def test_queue_shows_a_number_or_placeholder(self):
+        make_submission(full_name='With Number', a_number='A-123-456-789')
+        make_submission(full_name='Without Number', a_number='')
+
+        response = self.client.get(reverse('dashboard:queue'))
+
+        self.assertContains(response, '<th scope="col">A-number</th>', html=True)
+        self.assertContains(response, 'A-123-456-789')
+        self.assertContains(response, '&mdash;')
+
     def test_arabic_applicant_text_renders_isolated_and_intact(self):
         arabic_name = 'محمد الأحمد'
         make_submission(full_name=arabic_name, country_of_origin='سوريا')

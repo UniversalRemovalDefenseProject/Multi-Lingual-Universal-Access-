@@ -119,7 +119,7 @@
     }
 
     /* ── Page wrapper ── */
-    .page { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+    .page { max-width: 1440px; margin: 0 auto; padding: 28px 24px; }
 
     /* ── Cards / sections ── */
     .card {
@@ -258,10 +258,11 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      overflow: hidden;
+      overflow-x: auto;
     }
 
-    table { width: 100%; border-collapse: collapse; }
+    /* min-width keeps columns readable; the wrapper scrolls instead of squashing. */
+    table { width: 100%; min-width: 1080px; border-collapse: collapse; }
 
     caption {
       text-align: left;
