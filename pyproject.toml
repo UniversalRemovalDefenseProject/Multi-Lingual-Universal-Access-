@@ -1,0 +1,37 @@
+[tool.ruff]
+# Pin the line length the codebase already lives within.
+line-length = 100
+target-version = "py312"
+extend-exclude = [
+    "*/migrations/*",  # Django-generated; not hand-maintained style.
+    ".qgvenv",
+]
+
+[tool.ruff.lint]
+# Focused, high-signal rule set. Each family earns its place:
+#   E,F  pyflakes + pycodestyle errors (real bugs: undefined names, unused imports)
+#   I    import sorting (deterministic, auto-fixable)
+#   UP   pyupgrade (keep syntax current for the pinned Python)
+#   B    bugbear (mutable defaults, silent except, etc.)
+#   DJ   flake8-django (Django anti-patterns: null CharField, missing __str__)
+#   S    flake8-bandit (security lint — replaces a standalone bandit gate)
+select = ["E", "F", "I", "UP", "B", "DJ", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test assertions and hard-coded fixtures are not production security risks;
+# long fixture lines in tests aren't worth wrapping.
+"*/tests.py" = ["S101", "S105", "S106", "S107", "E501"]
+
+[tool.ruff.format]
+# Match the codebase: single quotes, spaces. Avoids a no-value mass re-quote diff.
+quote-style = "single"
+
+[tool.coverage.run]
+source = ["intake", "dashboard", "urdp"]
+omit = ["*/migrations/*", "*/tests.py", "manage.py", "urdp/wsgi.py", "urdp/asgi.py"]
+
+[tool.coverage.report]
+# Ratchet: baseline measured at 98%. Floor sits just under it; raise by hand as
+# coverage climbs, never auto-tune (auto-tuning ratchets the margin to zero).
+fail_under = 95
+show_missing = true

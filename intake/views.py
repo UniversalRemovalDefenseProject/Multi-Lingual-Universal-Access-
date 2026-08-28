@@ -6,7 +6,6 @@ from django.utils import translation
 
 from .forms import IntakeSubmissionForm
 
-
 SUPPORTED_LANGUAGE_CODES = {code for code, _name in settings.LANGUAGES}
 
 
@@ -14,7 +13,9 @@ def _valid_language(code: str | None) -> str:
     if code in SUPPORTED_LANGUAGE_CODES and translation.check_for_language(code):
         return code
     current_language = translation.get_language() or settings.LANGUAGE_CODE
-    return current_language if current_language in SUPPORTED_LANGUAGE_CODES else settings.LANGUAGE_CODE
+    if current_language in SUPPORTED_LANGUAGE_CODES:
+        return current_language
+    return settings.LANGUAGE_CODE
 
 
 def _remember_language(response: HttpResponse, language_code: str) -> HttpResponse:

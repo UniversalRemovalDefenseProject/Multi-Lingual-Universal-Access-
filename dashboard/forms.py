@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
 from intake.models import IntakeSubmission
+
 from .models import StaffNote
 
 
@@ -30,10 +31,12 @@ class StaffNoteForm(forms.ModelForm):
         model = StaffNote
         fields = ['body']
         widgets = {
-            'body': forms.Textarea(attrs={
-                'placeholder': 'Add a staff note here…',
-                'rows': 4,
-            }),
+            'body': forms.Textarea(
+                attrs={
+                    'placeholder': 'Add a staff note here…',
+                    'rows': 4,
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):

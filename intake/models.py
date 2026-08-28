@@ -28,7 +28,7 @@ class IntakeSubmission(models.Model):
     ]
 
     full_name = models.CharField(max_length=255)
-    date_of_birth = models.CharField(max_length=100,blank=True)
+    date_of_birth = models.CharField(max_length=100, blank=True)
     country_of_origin = models.CharField(max_length=255)
     preferred_language = models.CharField(max_length=100)
     language_preference = models.CharField(

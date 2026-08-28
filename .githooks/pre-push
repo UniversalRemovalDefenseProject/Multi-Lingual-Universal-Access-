@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Block a push that would send a committed secret. Scans only the OUTGOING range
+# (what you're about to push), so it's fast and never trips over old history.
+# Install with: make hooks
+set -uo pipefail
+
+command -v gitleaks >/dev/null 2>&1 || {
+  echo "pre-push: gitleaks not installed — skipping secret scan (CI still enforces it)." >&2
+  exit 0
+}
+
+status=0
+# stdin: <local ref> <local sha> <remote ref> <remote sha> per pushed ref.
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue  # branch deletion
+  if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+    range="$local_sha"            # new branch: scan every commit it introduces
+  else
+    range="$remote_sha..$local_sha"
+  fi
+  gitleaks git --no-banner --redact --log-opts="$range" || status=1
+done
+
+[ "$status" -ne 0 ] && echo "pre-push: secret scan failed — push aborted." >&2
+exit "$status"

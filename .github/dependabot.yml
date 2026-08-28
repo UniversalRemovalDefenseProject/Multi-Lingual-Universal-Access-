@@ -1,0 +1,17 @@
+version: 2
+# Automation, not a gate: opens PRs when deps or pinned actions fall behind.
+# pip-audit tells you that you're vulnerable; these PRs are how you fix it. Each
+# PR still has to pass the `gates` check before it can merge.
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      python-deps:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly

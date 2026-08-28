@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Enforce Conventional Commits, the style already used across this repo's history
+# (feat:, fix:, docs:, chore(scope): ...). Pure regex — no extra dependency.
+# Install with: make hooks
+set -uo pipefail
+
+msg_file="$1"
+header="$(sed -n '1p' "$msg_file")"
+
+# Allow merge/revert/fixup commits through untouched.
+case "$header" in
+  "Merge "*|"Revert "*|"fixup! "*|"squash! "*) exit 0 ;;
+esac
+
+pattern='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9/_-]+\))?!?: .+'
+if ! printf '%s' "$header" | grep -Eq "$pattern"; then
+  echo "commit-msg: header does not follow Conventional Commits." >&2
+  echo "  got:      $header" >&2
+  echo "  expected: <type>(<optional-scope>): <description>" >&2
+  echo "  types:    feat fix docs style refactor perf test build ci chore revert" >&2
+  exit 1
+fi
