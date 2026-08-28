@@ -17,7 +17,7 @@
       </div>
       <div class="field-item">
         <label>Date of birth</label>
-        {% if submission.date_of_birth %}<p class="applicant-text" dir="auto">{{ submission.date_of_birth }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+        {% if submission.date_of_birth %}<p class="applicant-text" dir="auto">{{ submission.date_of_birth|date:"Y-m-d" }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Country of origin</label>
@@ -69,7 +69,7 @@
       </div>
       <div class="field-item">
         <label>Next hearing date</label>
-        {% if submission.next_hearing_date %}<p class="applicant-text" dir="auto">{{ submission.next_hearing_date }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
+        {% if submission.next_hearing_date %}<p class="applicant-text" dir="auto">{{ submission.next_hearing_date|date:"Y-m-d" }}</p>{% else %}<p class="empty">&mdash;</p>{% endif %}
       </div>
       <div class="field-item">
         <label>Family members included</label>

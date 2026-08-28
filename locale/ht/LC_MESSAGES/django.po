@@ -407,3 +407,8 @@ msgstr "Tanpri sivèye imèl ak telefòn ou pou kominikasyon sivit."
 #: intake/templates/intake/intake_success.html:87
 msgid "Submit Another Intake"
 msgstr "Soumèt Yon Lòt Demann"
+
+#. Django's built-in form error for an invalid date. Django ships no `ht` message
+#. catalog, so this project supplies it. NEEDS REVIEW BY A HAITIAN CREOLE SPEAKER.
+msgid "Enter a valid date."
+msgstr "Antre yon dat valab."
