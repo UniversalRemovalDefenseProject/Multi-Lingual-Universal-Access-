@@ -7,12 +7,12 @@ from .models import IntakeSubmission
 class IntakeSubmissionForm(forms.ModelForm):
     consent_acknowledged = forms.BooleanField(
         label=_(
-            "I understand that submitting this form does not create an "
-            "attorney-client relationship."
+            'I understand that submitting this form does not create an '
+            'attorney-client relationship.'
         ),
         required=True,
         error_messages={
-            "required": _("Please acknowledge this notice before submitting your intake.")
+            'required': _('Please acknowledge this notice before submitting your intake.')
         },
         widget=forms.CheckboxInput(),
     )
@@ -38,110 +38,108 @@ class IntakeSubmissionForm(forms.ModelForm):
             'consent_acknowledged',
         ]
         labels = {
-            "full_name": _("Full name"),
-            "date_of_birth": _("Date of birth"),
-            "country_of_origin": _("Country of origin"),
-            "preferred_language": _("Preferred language"),
-            "phone": _("Phone number"),
-            "email": _("Email address"),
-            "current_location": _("Current city or location"),
-            "detained": _("Currently detained"),
-            "immigration_court": _("Immigration court"),
-            "a_number": _("A-number"),
-            "next_hearing_date": _("Next hearing date"),
-            "fear_of_return_summary": _("Reason for fearing return"),
-            "past_harm_summary": _("Past harm or persecution"),
-            "countries_traveled_asylum_summary": _(
-                "Countries traveled through and asylum applications"
+            'full_name': _('Full name'),
+            'date_of_birth': _('Date of birth'),
+            'country_of_origin': _('Country of origin'),
+            'preferred_language': _('Preferred language'),
+            'phone': _('Phone number'),
+            'email': _('Email address'),
+            'current_location': _('Current city or location'),
+            'detained': _('Currently detained'),
+            'immigration_court': _('Immigration court'),
+            'a_number': _('A-number'),
+            'next_hearing_date': _('Next hearing date'),
+            'fear_of_return_summary': _('Reason for fearing return'),
+            'past_harm_summary': _('Past harm or persecution'),
+            'countries_traveled_asylum_summary': _(
+                'Countries traveled through and asylum applications'
             ),
-            "family_members_included": _("Family members included"),
+            'family_members_included': _('Family members included'),
         }
         widgets = {
-            "full_name": forms.TextInput(
+            'full_name': forms.TextInput(
                 attrs={
-                    "placeholder": _("Enter your full name"),
-                    "autocomplete": "name",
+                    'placeholder': _('Enter your full name'),
+                    'autocomplete': 'name',
                 }
             ),
-            "date_of_birth": forms.DateInput(
+            'date_of_birth': forms.DateInput(
                 attrs={
-                    "type": "date",
-                    "autocomplete": "bday",
+                    'type': 'date',
+                    'autocomplete': 'bday',
                 }
             ),
-            "country_of_origin": forms.TextInput(
+            'country_of_origin': forms.TextInput(
                 attrs={
-                    "placeholder": _("Country where you are from"),
-                    "autocomplete": "country-name",
+                    'placeholder': _('Country where you are from'),
+                    'autocomplete': 'country-name',
                 }
             ),
-            "preferred_language": forms.TextInput(
+            'preferred_language': forms.TextInput(
                 attrs={
-                    "placeholder": _("Language you prefer for communication"),
-                    "autocomplete": "language",
+                    'placeholder': _('Language you prefer for communication'),
+                    'autocomplete': 'language',
                 }
             ),
-            "phone": forms.TextInput(
+            'phone': forms.TextInput(
                 attrs={
-                    "placeholder": _("Best phone number to reach you"),
-                    "autocomplete": "tel",
-                    "inputmode": "tel",
+                    'placeholder': _('Best phone number to reach you'),
+                    'autocomplete': 'tel',
+                    'inputmode': 'tel',
                 }
             ),
-            "email": forms.EmailInput(
+            'email': forms.EmailInput(
                 attrs={
-                    "placeholder": _("Email address, if available"),
-                    "autocomplete": "email",
-                    "inputmode": "email",
+                    'placeholder': _('Email address, if available'),
+                    'autocomplete': 'email',
+                    'inputmode': 'email',
                 }
             ),
-            "current_location": forms.TextInput(
+            'current_location': forms.TextInput(
                 attrs={
-                    "placeholder": _("City, state, or detention facility"),
-                    "autocomplete": "address-level2",
+                    'placeholder': _('City, state, or detention facility'),
+                    'autocomplete': 'address-level2',
                 }
             ),
-            "detained": forms.CheckboxInput(),
-            "immigration_court": forms.TextInput(
+            'detained': forms.CheckboxInput(),
+            'immigration_court': forms.TextInput(
                 attrs={
-                    "placeholder": _("Court name or city, if known"),
+                    'placeholder': _('Court name or city, if known'),
                 }
             ),
-            "a_number": forms.TextInput(
+            'a_number': forms.TextInput(
                 attrs={
-                    "placeholder": _("Example: A123456789"),
-                    "autocomplete": "off",
+                    'placeholder': _('Example: A123456789'),
+                    'autocomplete': 'off',
                 }
             ),
-            "next_hearing_date": forms.DateInput(
-                attrs={"type": "date"}
-            ),
-            "fear_of_return_summary": forms.Textarea(
+            'next_hearing_date': forms.DateInput(attrs={'type': 'date'}),
+            'fear_of_return_summary': forms.Textarea(
                 attrs={
-                    "placeholder": _("Describe why returning would be unsafe for you."),
-                    "rows": 5,
+                    'placeholder': _('Describe why returning would be unsafe for you.'),
+                    'rows': 5,
                 }
             ),
-            "past_harm_summary": forms.Textarea(
+            'past_harm_summary': forms.Textarea(
                 attrs={
-                    "placeholder": _("Describe any past harm, threats, or persecution."),
-                    "rows": 5,
+                    'placeholder': _('Describe any past harm, threats, or persecution.'),
+                    'rows': 5,
                 }
             ),
-            "countries_traveled_asylum_summary": forms.Textarea(
+            'countries_traveled_asylum_summary': forms.Textarea(
                 attrs={
-                    "placeholder": _(
-                        "List countries traveled through and whether you applied for asylum."
+                    'placeholder': _(
+                        'List countries traveled through and whether you applied for asylum.'
                     ),
-                    "rows": 5,
+                    'rows': 5,
                 }
             ),
-            "family_members_included": forms.CheckboxInput(),
+            'family_members_included': forms.CheckboxInput(),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
-            if name == "consent_acknowledged":
+            if name == 'consent_acknowledged':
                 continue
-            field.error_messages["required"] = _("This information is required.")
+            field.error_messages['required'] = _('This information is required.')

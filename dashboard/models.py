@@ -19,3 +19,6 @@ class StaffNote(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Note by {self.author} on intake {self.intake_id}'

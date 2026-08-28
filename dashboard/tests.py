@@ -5,8 +5,8 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
-from intake.models import IntakeSubmission
 from dashboard.models import StaffNote
+from intake.models import IntakeSubmission
 
 
 def make_submission(**overrides):
@@ -58,7 +58,7 @@ class DashboardAccessTests(TestCase):
 
         self.assertRedirects(
             response,
-            f"{reverse('dashboard:login')}?next={reverse('dashboard:queue')}",
+            f'{reverse("dashboard:login")}?next={reverse("dashboard:queue")}',
         )
 
     def test_login_without_next_lands_on_the_queue(self):
@@ -122,7 +122,9 @@ class CaseQueueTests(TestCase):
 
         self.assertContains(response, 'Accepted Applicant')
         self.assertNotContains(response, 'New Applicant')
-        self.assertContains(response, '<option value="accepted" selected>Accepted</option>', html=True)
+        self.assertContains(
+            response, '<option value="accepted" selected>Accepted</option>', html=True
+        )
 
     def test_unrecognized_status_falls_back_to_unfiltered(self):
         make_submission(full_name='Accepted Applicant', status='accepted')
@@ -187,7 +189,9 @@ class CaseQueueAssigneeTests(TestCase):
         make_submission(full_name='Manager Case', assigned_to=self.manager)
         make_submission(full_name='Other Case', assigned_to=other)
 
-        response = self.client.get(reverse('dashboard:queue'), {'assigned_to': str(self.manager.pk)})
+        response = self.client.get(
+            reverse('dashboard:queue'), {'assigned_to': str(self.manager.pk)}
+        )
 
         self.assertContains(response, 'Manager Case')
         self.assertNotContains(response, 'Other Case')
@@ -293,16 +297,23 @@ class CaseQueueDetainedTests(TestCase):
         self.assertNotContains(response, 'evil')
 
     def test_detained_composes_with_status_and_assignee(self):
-        make_submission(full_name='Full Match', detained=True,
-                        status='accepted', assigned_to=self.manager)
+        make_submission(
+            full_name='Full Match', detained=True, status='accepted', assigned_to=self.manager
+        )
         make_submission(full_name='Wrong Detained', status='accepted', assigned_to=self.manager)
-        make_submission(full_name='Wrong Status', detained=True,
-                        status='new', assigned_to=self.manager)
+        make_submission(
+            full_name='Wrong Status', detained=True, status='new', assigned_to=self.manager
+        )
         make_submission(full_name='Wrong Assignee', detained=True, status='accepted')
 
-        response = self.client.get(reverse('dashboard:queue'), {
-            'status': 'accepted', 'assigned_to': str(self.manager.pk), 'detained': 'yes',
-        })
+        response = self.client.get(
+            reverse('dashboard:queue'),
+            {
+                'status': 'accepted',
+                'assigned_to': str(self.manager.pk),
+                'detained': 'yes',
+            },
+        )
 
         self.assertContains(response, 'Full Match')
         self.assertNotContains(response, 'Wrong Detained')
@@ -317,7 +328,8 @@ class CaseQueueDetainedTests(TestCase):
 
         self.client.post(reverse('dashboard:search'), {'q': 'Match'})
         response = self.client.get(
-            reverse('dashboard:queue'), {'detained': 'yes', 'page': 2},
+            reverse('dashboard:queue'),
+            {'detained': 'yes', 'page': 2},
         )
 
         # 26 detained matches -> page 2 holds the oldest one; the non-detained match
@@ -337,7 +349,7 @@ class CaseDetailAccessTests(TestCase):
 
         response = self.client.get(url)
 
-        self.assertRedirects(response, f"{reverse('dashboard:login')}?next={url}")
+        self.assertRedirects(response, f'{reverse("dashboard:login")}?next={url}')
 
     def test_user_without_permission_gets_403(self):
         User.objects.create_user(username='clerk', password='pass')
@@ -379,7 +391,8 @@ class CaseDetailAccessTests(TestCase):
 
     def test_detail_is_not_reachable_from_intake_urls(self):
         # The intake app's URL conf must not expose the detail view.
-        from django.urls import resolve, Resolver404
+        from django.urls import Resolver404, resolve
+
         try:
             resolve(f'/asylum-intake/{self.submission.pk}/')
             self.fail('Intake URL space should not resolve to a case detail view')
@@ -434,7 +447,9 @@ class CaseAssignmentTests(TestCase):
         self.assertIsNone(self.submission.assigned_to)
 
     def test_assign_redirects_to_detail_on_success(self):
-        response = self.client.post(self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'})
+        response = self.client.post(
+            self.url, {'assigned_to': self.manager.pk, 'save_assignment': '1'}
+        )
 
         self.assertRedirects(response, self.url)
 
@@ -526,7 +541,8 @@ class StaffNoteTests(TestCase):
             self.manager.delete()
 
     def test_no_note_update_url_exists(self):
-        from django.urls import resolve, Resolver404
+        from django.urls import Resolver404, resolve
+
         try:
             resolve('/dashboard/notes/1/edit/')
             self.fail('No update route should exist for StaffNote')
@@ -534,7 +550,8 @@ class StaffNoteTests(TestCase):
             pass
 
     def test_no_note_delete_url_exists(self):
-        from django.urls import resolve, Resolver404
+        from django.urls import Resolver404, resolve
+
         try:
             resolve('/dashboard/notes/1/delete/')
             self.fail('No delete route should exist for StaffNote')
@@ -584,16 +601,29 @@ class CaseDetailContentTests(TestCase):
 
         response = self._get(submission)
 
-        for heading in ('Identity', 'Contact', 'Case and court',
-                        'Submission details', 'Narrative responses'):
+        for heading in (
+            'Identity',
+            'Contact',
+            'Case and court',
+            'Submission details',
+            'Narrative responses',
+        ):
             self.assertContains(response, heading)
         for value in (
-            'Maria Example', '1990-01-01', 'Venezuela', 'Spanish',      # identity
-            '+1-555-0100', 'maria@example.test', 'Houston',             # contact
-            'Houston Immigration Court', 'A-000-000-000', '2026-09-01', # case and court
-            'Needs Legal Review',                                       # submission details
-            'Original fear narrative.', 'Original past harm narrative.',
-            'Original travel narrative.',                               # narratives
+            'Maria Example',
+            '1990-01-01',
+            'Venezuela',
+            'Spanish',  # identity
+            '+1-555-0100',
+            'maria@example.test',
+            'Houston',  # contact
+            'Houston Immigration Court',
+            'A-000-000-000',
+            '2026-09-01',  # case and court
+            'Needs Legal Review',  # submission details
+            'Original fear narrative.',
+            'Original past harm narrative.',
+            'Original travel narrative.',  # narratives
         ):
             self.assertContains(response, value)
 
@@ -661,7 +691,9 @@ class CaseDetailContentTests(TestCase):
         response = self._get(submission)
 
         self.assertContains(
-            response, '<title>Case detail | Case Manager Dashboard</title>', html=True,
+            response,
+            '<title>Case detail | Case Manager Dashboard</title>',
+            html=True,
         )
         self.assertContains(response, 'Distinctive Applicant Name')  # still in the body
 
@@ -709,7 +741,9 @@ class CaseDetailContentTests(TestCase):
         response = self._get(submission, detained='yes')
 
         self.assertContains(
-            response, '<input type="hidden" name="detained" value="yes" />', html=True,
+            response,
+            '<input type="hidden" name="detained" value="yes" />',
+            html=True,
         )
 
     def test_back_link_drops_unrecognized_filters(self):
@@ -732,7 +766,8 @@ class CaseDetailContentTests(TestCase):
     def test_attribution_renders_after_a_status_change(self):
         submission = make_submission()
         self.client.post(
-            reverse('dashboard:status', args=[submission.pk]), {'new_status': 'accepted'},
+            reverse('dashboard:status', args=[submission.pk]),
+            {'new_status': 'accepted'},
         )
 
         response = self._get(submission)
@@ -833,7 +868,7 @@ class CaseSearchTests(TestCase):
 
         self.assertEqual(
             response['Location'],
-            f"{reverse('dashboard:queue')}?status=accepted&assigned_to=unassigned",
+            f'{reverse("dashboard:queue")}?status=accepted&assigned_to=unassigned',
         )
 
     def test_search_redirect_keeps_the_detained_filter(self):
@@ -842,7 +877,7 @@ class CaseSearchTests(TestCase):
 
         self.assertEqual(
             response['Location'],
-            f"{reverse('dashboard:queue')}?status=accepted&detained=yes",
+            f'{reverse("dashboard:queue")}?status=accepted&detained=yes',
         )
 
     def test_search_composes_with_filter_and_pagination(self):
@@ -853,7 +888,8 @@ class CaseSearchTests(TestCase):
 
         self._search('Match')
         response = self.client.get(
-            reverse('dashboard:queue'), {'status': 'accepted', 'page': 2},
+            reverse('dashboard:queue'),
+            {'status': 'accepted', 'page': 2},
         )
 
         # 26 accepted matches -> page 2 holds the oldest one; the 'new' match and the
@@ -910,6 +946,7 @@ class CaseSearchTests(TestCase):
 def make_read_only_reviewer(username='reviewer', password='not-a-real-password'):
     """access_dashboard directly, no group: can read and leave notes, cannot write."""
     from django.contrib.auth.models import Permission
+
     user = User.objects.create_user(username=username, password=password)
     user.user_permissions.add(Permission.objects.get(codename='access_dashboard'))
     return user
@@ -934,23 +971,33 @@ class CaseStatusUpdateTests(TestCase):
         for _ in range(30):
             make_submission(status='new')
 
-        response = self.client.post(self.url, {
-            'new_status': 'conflict_check',
-            'status': 'new', 'assigned_to': 'unassigned', 'page': '2',
-        })
+        response = self.client.post(
+            self.url,
+            {
+                'new_status': 'conflict_check',
+                'status': 'new',
+                'assigned_to': 'unassigned',
+                'page': '2',
+            },
+        )
 
         self.assertEqual(
             response['Location'],
-            f"{reverse('dashboard:queue')}?status=new&assigned_to=unassigned&page=2",
+            f'{reverse("dashboard:queue")}?status=new&assigned_to=unassigned&page=2',
         )
 
     def test_redirect_preserves_the_detained_filter(self):
-        response = self.client.post(self.url, {
-            'new_status': 'accepted', 'detained': 'yes',
-        })
+        response = self.client.post(
+            self.url,
+            {
+                'new_status': 'accepted',
+                'detained': 'yes',
+            },
+        )
 
         self.assertEqual(
-            response['Location'], f"{reverse('dashboard:queue')}?detained=yes",
+            response['Location'],
+            f'{reverse("dashboard:queue")}?detained=yes',
         )
 
     def test_page_clamps_when_the_change_empties_it(self):
@@ -960,11 +1007,16 @@ class CaseStatusUpdateTests(TestCase):
             make_submission(full_name=f'Filler {i}', status='new')
         # self.submission is the oldest 'new' case, i.e. the lone page-2 row.
 
-        response = self.client.post(self.url, {
-            'new_status': 'accepted', 'status': 'new', 'page': '2',
-        })
+        response = self.client.post(
+            self.url,
+            {
+                'new_status': 'accepted',
+                'status': 'new',
+                'page': '2',
+            },
+        )
 
-        self.assertEqual(response['Location'], f"{reverse('dashboard:queue')}?status=new")
+        self.assertEqual(response['Location'], f'{reverse("dashboard:queue")}?status=new')
         self.assertEqual(self.client.get(response['Location']).status_code, 200)
 
     def test_noop_submit_leaves_attribution_untouched(self):
@@ -1067,9 +1119,14 @@ class DetailFormSplitTests(TestCase):
         self.submission.save()
         other = make_case_manager(username='other')
 
-        self.client.post(self.url, {
-            'body': 'A note.', 'save_note': '1', 'assigned_to': str(other.pk),
-        })
+        self.client.post(
+            self.url,
+            {
+                'body': 'A note.',
+                'save_note': '1',
+                'assigned_to': str(other.pk),
+            },
+        )
 
         self.submission.refresh_from_db()
         self.assertEqual(self.submission.assigned_to, self.manager)

@@ -60,7 +60,9 @@ class IntakeSubmissionAdmin(admin.ModelAdmin):
                     'past_harm_summary_translated',
                     'countries_traveled_asylum_summary_translated',
                 ),
-                'description': 'Enter translations here without replacing the applicant original wording.',
+                'description': (
+                    'Enter translations here without replacing the applicant original wording.'
+                ),
             },
         ),
     )

@@ -13,6 +13,7 @@ from django.views import View
 from django.views.generic import ListView
 
 from intake.models import IntakeSubmission
+
 from .forms import AssignForm, StaffNoteForm
 
 User = get_user_model()
@@ -101,17 +102,21 @@ def _queue_url(status='', assignee='', detained='', page=1) -> str:
 
 def _back_query(request) -> str:
     """Query string for links back to the queue, from validated GET state."""
-    return urlencode(_queue_params(
-        _selected_status(request),
-        _selected_assignee(request),
-        _selected_detained(request),
-        _validated_page(request.GET.get('page', 1)),
-    ))
+    return urlencode(
+        _queue_params(
+            _selected_status(request),
+            _selected_assignee(request),
+            _selected_detained(request),
+            _validated_page(request.GET.get('page', 1)),
+        )
+    )
 
 
 def _queue_queryset(status, assignee, detained, query):
     """The queue's result set. Shared so a POST redirect can page against the same rows."""
-    queryset = IntakeSubmission.objects.order_by('-detained', '-created_at').select_related('assigned_to')
+    queryset = IntakeSubmission.objects.order_by('-detained', '-created_at').select_related(
+        'assigned_to'
+    )
     if status:
         queryset = queryset.filter(status=status)
     if assignee == _UNASSIGNED:
@@ -160,19 +165,23 @@ class CaseQueueView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['search_query'] = _active_search(self.request)
         # Row links carry the current filters and page so the detail back-link can
         # return here; built server-side so templates never assemble filter state.
-        context['row_query'] = urlencode(_queue_params(
-            context['selected_status'],
-            context['selected_assignee'],
-            context['selected_detained'],
-            context['page_obj'].number,
-        ))
+        context['row_query'] = urlencode(
+            _queue_params(
+                context['selected_status'],
+                context['selected_assignee'],
+                context['selected_detained'],
+                context['page_obj'].number,
+            )
+        )
         # Filters without a page number: the pager appends its own page param, so this
         # must omit page (left at its default of 1).
-        context['filter_query'] = urlencode(_queue_params(
-            context['selected_status'],
-            context['selected_assignee'],
-            context['selected_detained'],
-        ))
+        context['filter_query'] = urlencode(
+            _queue_params(
+                context['selected_status'],
+                context['selected_assignee'],
+                context['selected_detained'],
+            )
+        )
         return context
 
 
@@ -181,18 +190,22 @@ class CaseDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
     template_name = 'dashboard/detail.html'
 
     def _render(self, request, submission, assign_form, note_form):
-        return render(request, self.template_name, {
-            'submission': submission,
-            'assign_form': assign_form,
-            'note_form': note_form,
-            'notes': submission.staff_notes.select_related('author'),
-            'back_query': _back_query(request),
-            'selected_status': _selected_status(request),
-            'selected_assignee': _selected_assignee(request),
-            'selected_detained': _selected_detained(request),
-            'selected_page': _validated_page(request.GET.get('page', 1)),
-            'status_choices': IntakeSubmission.STATUS_CHOICES,
-        })
+        return render(
+            request,
+            self.template_name,
+            {
+                'submission': submission,
+                'assign_form': assign_form,
+                'note_form': note_form,
+                'notes': submission.staff_notes.select_related('author'),
+                'back_query': _back_query(request),
+                'selected_status': _selected_status(request),
+                'selected_assignee': _selected_assignee(request),
+                'selected_detained': _selected_detained(request),
+                'selected_page': _validated_page(request.GET.get('page', 1)),
+                'status_choices': IntakeSubmission.STATUS_CHOICES,
+            },
+        )
 
     def get(self, request, pk):
         submission = get_object_or_404(IntakeSubmission, pk=pk)
@@ -225,7 +238,9 @@ class CaseDetailView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if not request.user.has_perm('intake.change_case_status'):
                 raise PermissionDenied
             assign_form = AssignForm(
-                request.POST, instance=submission, assignable_users=_assignable_users(),
+                request.POST,
+                instance=submission,
+                assignable_users=_assignable_users(),
             )
             if assign_form.is_valid():
                 assign_form.save()
@@ -250,11 +265,13 @@ class CaseSearchView(LoginRequiredMixin, PermissionRequiredMixin, View):
             # icontains='' matches everything, so an empty query is a clear, not a search.
             request.session.pop(SEARCH_SESSION_KEY, None)
         # A new result set invalidates the page number; keep both filters.
-        return redirect(_queue_url(
-            _validated_status_value(request.POST.get('status', '')),
-            _validated_assignee_value(request.POST.get('assigned_to', '')),
-            _validated_detained_value(request.POST.get('detained', '')),
-        ))
+        return redirect(
+            _queue_url(
+                _validated_status_value(request.POST.get('status', '')),
+                _validated_assignee_value(request.POST.get('assigned_to', '')),
+                _validated_detained_value(request.POST.get('detained', '')),
+            )
+        )
 
 
 class CaseStatusUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -281,9 +298,14 @@ class CaseStatusUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         status = _validated_status_value(request.POST.get('status', ''))
         assignee = _validated_assignee_value(request.POST.get('assigned_to', ''))
         detained = _validated_detained_value(request.POST.get('detained', ''))
-        return redirect(_queue_url(
-            status, assignee, detained, self._clamped_page(request, status, assignee, detained),
-        ))
+        return redirect(
+            _queue_url(
+                status,
+                assignee,
+                detained,
+                self._clamped_page(request, status, assignee, detained),
+            )
+        )
 
     @staticmethod
     def _clamped_page(request, status, assignee, detained) -> int:
@@ -292,6 +314,7 @@ class CaseStatusUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         # so the count reflects the new result set.
         page = _validated_page(request.POST.get('page', 1))
         paginator = Paginator(
-            _queue_queryset(status, assignee, detained, _active_search(request)), PAGE_SIZE,
+            _queue_queryset(status, assignee, detained, _active_search(request)),
+            PAGE_SIZE,
         )
         return min(page, paginator.num_pages)
