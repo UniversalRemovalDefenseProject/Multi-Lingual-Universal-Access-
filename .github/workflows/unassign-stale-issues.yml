@@ -150,6 +150,7 @@ jobs:
                   lastCommentAt,
                   lastPRActivityAt,
                   lastReferencedCommitAt,
+                  lastAssignedAt,
                 ]) || issue.created_at;
 
               const daysSinceActivity = daysSince(lastActivityAt);
@@ -202,7 +203,7 @@ jobs:
 
               // Nudge issues that have reached the inactivity threshold.
               if (daysSinceActivity >= nudgeDays) {
-                // Prevent the daily cron from posting the same nudge repeatedly.
+                // Prevent the workflow from posting the same nudge repeatedly.
                 const alreadyNudged = comments.some(
                   (comment) =>
                     comment.user.type === "Bot" &&
@@ -228,7 +229,7 @@ jobs:
                     `if you're still working on it. If life got busy, ` +
                     `totally fine. Reply here or add the \`${keepLabel}\` ` +
                     `label if you want to hold it, otherwise it'll go ` +
-                    `back in the pool in a few days.`,
+                    `back in the pool in ${unassignDays - nudgeDays} more days.`,
                 });
 
                 core.info(
