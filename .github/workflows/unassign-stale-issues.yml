@@ -12,7 +12,10 @@ env:
 
 permissions:
   issues: write
-  pull-requests: read
+
+concurrency:
+  group: stale-issue-workflow
+  cancel-in-progress: false
 
 jobs:
   check-stale-issues:
@@ -121,12 +124,17 @@ jobs:
 
                 // Get issue timeline events.
                 const timelineEvents = await github.paginate(
-                  github.rest.issues.listEventsForTimeline,
+                  github.request,
+                  "GET /repos/{owner}/{repo}/issues/{issue_number}/timeline",
                   {
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     issue_number: issueNumber,
                     per_page: 100,
+                    headers: {
+                      accept:
+                        "application/vnd.github+json, application/vnd.github.mockingbird-preview+json",
+                    },
                   }
                 );
 
