@@ -231,11 +231,18 @@ jobs:
                 // Nudge issues that have reached the inactivity threshold.
                 if (daysSinceActivity >= nudgeDays) {
                   // Prevent the workflow from posting the same nudge repeatedly.
-                  const alreadyNudged = comments.some(
-                    (comment) =>
-                      comment.user.type === "Bot" &&
-                      comment.body.includes(nudgeMarker)
+                  const latestNudgeAt = latest(
+                    comments
+                      .filter(
+                        (comment) =>
+                          comment.user.type === "Bot" &&
+                          comment.body.includes(nudgeMarker)
+                      )
+                      .map((comment) => comment.created_at)
                   );
+
+                  const alreadyNudged =
+                    latestNudgeAt && new Date(latestNudgeAt) > new Date(lastActivityAt);
 
                   if (alreadyNudged) {
                     core.info(
@@ -270,8 +277,11 @@ jobs:
                   );
                 }
               } catch (error) {
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
+
                 core.warning(
-                  `#${issueNumber}: failed to process issue: ${error.message}`
+                  `#${issueNumber}: failed to process issue: ${errorMessage}`
                 );
               }
             }
