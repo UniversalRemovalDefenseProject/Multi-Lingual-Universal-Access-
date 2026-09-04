@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Check assigned issues for staleness
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         env:
           NUDGE_DAYS: ${{ env.NUDGE_DAYS }}
           UNASSIGN_DAYS: ${{ env.UNASSIGN_DAYS }}
